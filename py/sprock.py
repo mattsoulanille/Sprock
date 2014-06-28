@@ -12,7 +12,6 @@ class Thing(object):
 class HelloWorld(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
-        #self._cp_config = self.config
 
     @cherrypy.expose
     def index(self):
@@ -21,6 +20,21 @@ class HelloWorld(object):
     @cherrypy.expose
     def whatzup(self):
         return "good\n"
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def data(self):
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"key":"val", "N":5}' 'http://localhost:8082/data'
+        return {'foo': 'bar',
+                'count': range(cherrypy.request.json['N']),
+                'request data': cherrypy.request.json
+                }
+
+
+class DataService(object):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
 
 
 def serve(g):
