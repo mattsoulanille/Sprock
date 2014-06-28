@@ -5,3 +5,10 @@ bower_components/
 tmp
 .DS_Store
 .idea
+
+# Editor backups & temps
+*~
+.#*
+
+# Log files
+*.log
