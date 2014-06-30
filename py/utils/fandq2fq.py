@@ -18,7 +18,7 @@ def main(argv):
     parser.add_argument('-d', action='store_true',
                         help="print diagnostics to stderr")
     parser.add_argument('-z','--gzip', action='store_true',
-                       help='')
+                       help='input & output are gzipped')
     parser.add_argument('-p', '--profile', action='store_true',
                         help="profile this execution")
     parser.add_argument('-o', '--output',
