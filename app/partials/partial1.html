@@ -1,1 +1,9 @@
 <p>This is the partial for view 1.</p>
+<form ng-submit="calcN()">
+  <input type="text" ng-model="text_N" placeholder="a modest integer">
+  <input class="btn-primary" type="submit" value="do">
+</form>
+<h1>That's {{N}}</h1>
+<ul class="unstyled">
+ <li ng-repeat="result in results">{{result}}
+</ul>
