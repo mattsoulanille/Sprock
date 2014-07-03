@@ -6,6 +6,7 @@ import sys
 
 from Bio import SeqIO
 from Bio.SeqIO.QualityIO import PairedFastaQualIterator
+from Bio.Alphabet import IUPAC
 
 def main(argv):
     parser = argparse.ArgumentParser(description='Convert a FASTA and QUAL pair of files into a FASQ file')
@@ -45,7 +46,7 @@ def main(argv):
         qual = open(args.qual_filename)
         outf = args.output
 
-
+    # alphabet irrelevant (and makes it slow) records = PairedFastaQualIterator(fasta, qual, alphabet=IUPAC.ambiguous_dna)
     records = PairedFastaQualIterator(fasta, qual)
     count = SeqIO.write(records, outf, "fastq")
     outf.close()
