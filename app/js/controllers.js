@@ -7,7 +7,7 @@ angular.module('sprockApp.controllers', [])
 	$scope.serverError = ''
 	$scope.calcN = function() {
 	    $scope.N = Math.max(Math.min(20, parseInt($scope.text_N)))
-	    $http.post('/data', {N: $scope.N})
+	    $http.post('/data/n', {N: $scope.N})
 		.success(function (v) {
 		    console.log(v)
 		    $scope.results = v['count']
@@ -26,7 +26,7 @@ angular.module('sprockApp.controllers', [])
     .controller('MyCtrl2', ['$scope', '$http', function($scope, $http) {
 	$scope.serverError = ''
 	$scope.getSeq = function() {
-	    $http.post('/getSeq', {scaffold: $scope.scaffold,
+	    $http.post('/data/getSeq', {scaffold: $scope.scaffold,
 				   start: $scope.start,
 				   end: $scope.end
 				  })

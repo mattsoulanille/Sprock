@@ -26,10 +26,18 @@ class HelloWorld(object):
     def whatzup(self):
         return "good\n"
 
+
+class DataService(object):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+        # FIXME: config, pass in
+        fqdb_filename = '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/Spur_3.1.LinearScaffold.fq'
+        self.fqdb = FQDB(fqdb_filename)
+
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
-    def data(self):
+    def n(self):
         #curl -i -X POST -H "Content-Type: application/json" -d '{"key":"val", "N":5}' 'http://localhost:8082/data'
         return {'foo': 'bar',
                 'count': range(cherrypy.request.json['N']),
@@ -46,11 +54,6 @@ class HelloWorld(object):
         end = int(argd['end'])
         return { 'request': argd,
                  'results': self.fqdb.get_sequence(scaffold, start, end) }
-
-
-class DataService(object):
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
 
 
 def serve(g):
@@ -97,6 +100,7 @@ def serve(g):
                   }
     app = HelloWorld(g=g)#, config=app_config)
     cherrypy.tree.mount(app, '/', app_config)
+    cherrypy.tree.mount(DataService(g=g), '/data', app_config)
 
     cherrypy.engine.signals.subscribe()
     cherrypy.engine.start()
