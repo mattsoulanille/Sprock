@@ -14,9 +14,6 @@ class Thing(object):
 class HelloWorld(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
-        # FIXME: config, pass in
-        fqdb_filename = '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/Spur_3.1.LinearScaffold.fq'
-        self.fqdb = FQDB(fqdb_filename)
 
     @cherrypy.expose
     def index(self):
@@ -30,6 +27,7 @@ class HelloWorld(object):
 class DataService(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
+        cherrypy.log("DataService starting")
         # FIXME: config, pass in
         fqdb_filename = '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/Spur_3.1.LinearScaffold.fq'
         self.fqdb = FQDB(fqdb_filename)
