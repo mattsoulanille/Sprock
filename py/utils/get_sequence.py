@@ -8,10 +8,15 @@ from Bio.Alphabet import IUPAC
 class FQDB(object):
     def __init__(self, filename):
         self.fastqDB = SeqIO.index(filename, 'fastq', alphabet=IUPAC.ambiguous_dna)
+        self.cache = (None, None)
     
     def get_sequence(self, scaffold, start_position, end_position):
         # {'sequence': [the sequence], 'quality': [the quality]}
-        record = self.fastqDB[scaffold]
+        if self.cache[0] == scaffold:
+            record = self.cache[1]
+        else:
+            record = self.fastqDB[scaffold]
+            self.cache = (scaffold, record)
         snippedRecord = record[start_position:end_position]
         return {'sequence': str(snippedRecord.seq), 'quality': snippedRecord.letter_annotations["phred_quality"]}
         
