@@ -27,9 +27,13 @@ class HelloWorld(object):
 class DataService(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
-        cherrypy.log("DataService starting")
-        # FIXME: config, pass in
-        fqdb_filename = '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/Spur_3.1.LinearScaffold.fq'
+#        cherrypy.log("DataService starting")
+#        cherrypy.log("sessions locking is %s " % cherrypy.config['tools.sessions.locking'])
+#        cherrypy.log("Data from %s " % cherrypy.config['data.directory_path'])
+        fqdb_filename = os.path.join(cherrypy.config['data.directory_path'],
+                                     cherrypy.config['data.fastq_filename'])
+
+        cherrypy.log("FASTQ %s " % fqdb_filename)
         self.fqdb = FQDB(fqdb_filename)
 
     @cherrypy.expose
@@ -76,7 +80,9 @@ def serve(g):
                      'tools.sessions.locking': 'explicit',
                      'tools.encode.on' : True,
                      'tools.encode.encoding' : 'utf-8',
-                     'engine.autoreload.on': True
+                     'engine.autoreload.on': True,
+                     'data.directory_path': '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/',
+                     'data.fastq_filename': 'Spur_3.1.LinearScaffold.fq'
                      }
     cherrypy.config.update(global_config)
 
@@ -89,15 +95,16 @@ def serve(g):
                    'tools.auth_basic.realm': 'earth',
                    'tools.auth_basic.checkpassword': checkpassword,
                    'tools.staticdir.on': True,
-                   'tools.staticdir.root': os.path.abspath(os.getcwd()),
+                   'tools.staticdir.root': os.path.abspath(os.getcwd()), # FIXME: cwd is the wrong choice
                    'tools.staticdir.dir': '../app',
                    #'tools.mako.collection_size': 500,
                    #'tools.mako.directories':  "mako/templates",
                    'response.timeout': 86400
                    }
                   }
-    app = HelloWorld(g=g)#, config=app_config)
-    cherrypy.tree.mount(app, '/', app_config)
+
+    hello_app = HelloWorld(g=g)
+    cherrypy.tree.mount(hello_app, '/', app_config)
     cherrypy.tree.mount(DataService(g=g), '/data', app_config)
 
     cherrypy.engine.signals.subscribe()
