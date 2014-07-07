@@ -2,6 +2,8 @@ import os.path
 
 import cherrypy
 
+from utils.get_sequence import FQDB # FIXME: names
+
 
 # An object to hold things
 class Thing(object):
@@ -12,6 +14,9 @@ class Thing(object):
 class HelloWorld(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
+        # FIXME: config, pass in
+        fqdb_filename = '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/Spur_3.1.LinearScaffold.fq'
+        self.fqdb = FQDB(fqdb_filename)
 
     @cherrypy.expose
     def index(self):
@@ -30,6 +35,17 @@ class HelloWorld(object):
                 'count': range(cherrypy.request.json['N']),
                 'request data': cherrypy.request.json
                 }
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def getSeq(self):
+        argd = cherrypy.request.json
+        scaffold = argd['scaffold']
+        start = int(argd['start'])
+        end = int(argd['end'])
+        return { 'request': argd,
+                 'results': self.fqdb.get_sequence(scaffold, start, end) }
 
 
 class DataService(object):

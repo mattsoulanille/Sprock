@@ -9,9 +9,9 @@ class FQDB(object):
     def __init__(self, filename):
         self.fastqDB = SeqIO.index(filename, 'fastq', alphabet=IUPAC.ambiguous_dna)
     
-    def get_sequence(self, scaffold_number, start_position, end_position):
+    def get_sequence(self, scaffold, start_position, end_position):
         # {'sequence': [the sequence], 'quality': [the quality]}
-        record = self.fastqDB['Scaffold%d' % scaffold_number]
+        record = self.fastqDB[scaffold]
         snippedRecord = record[start_position:end_position]
         return {'sequence': str(snippedRecord.seq), 'quality': snippedRecord.letter_annotations["phred_quality"]}
         
