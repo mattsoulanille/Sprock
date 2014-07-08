@@ -30,5 +30,6 @@
 }
 
 .sequence {
+  font-family: Andale Mono, monospace;
   word-wrap: break-word;
 }
