@@ -8,7 +8,7 @@ class GDB(object):
     def __init__(self, dbname, filename=None, forceCreate=False):
         if filename != None:
             print('Creating database...')
-            self.db = gffutils.create_db(filename, dbfn=dbname, force=forceCreate, keep_order=False, merge_strategy='merge') # Make a dict for looking up gene ids from gene names and plug the user input into it. Output from it goes into the db.
+            self.db = gffutils.create_db(filename, dbfn=dbname, force=forceCreate, keep_order=False, merge_strategy='merge')
             print('Database created.')
         else:
             self.db = gffutils.FeatureDB(dbname)
