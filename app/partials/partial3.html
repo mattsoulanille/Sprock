@@ -1,0 +1,23 @@
+<p>This is the partial for view 3 (Gene).</p>
+<form ng-submit="getGene()">
+  <input type="text" ng-model="gene_name" size="16" placeholder="Gene name">
+  <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
+</form>
+<pre>{{serverError}}</pre>
+<div class="gene" ng-show="gene">
+<h1>Gene {{gene.name}}</h1>
+<p>From {{gene.start}} to {{gene.end}} ({{gene.end - gene.start}}bp)</p>
+<h2>Exons</h2>
+<ul>
+  <li ng-repeat="exon in gene_exons_pairs">{{exon[0]}}: {{exon[1] | json}}</li>
+</ul>
+
+<h2>JSON of gene</h2>
+{{gene | json}}
+</div>
+
+
+<p>
+  Showing of 'interpolate' filter:
+  {{ 'Current version is v%VERSION%.' | interpolate }}
+</p>

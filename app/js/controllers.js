@@ -40,19 +40,21 @@ angular.module('sprockApp.controllers', [])
 	})
     }
   }])
-  .controller('MyCtrl3', ['$scope', '$http', function($scope, $http) {
+  .controller('MyCtrl3', ['$scope', '_', '$http', function($scope, _, $http) {
     $scope.serverError = ''
     $scope.getGene = function() {
       $http.post('/data/getGene', {name: $scope.gene_name})
 	.success(function (v) {
-	  $scope.results = v['results']
+	  console.log(v)
+	  $scope.gene = v['results']
 	  $scope.serverError = ''
+	  $scope.gene_exons_pairs = _.pairs($scope.gene.exons)
 	})
 	.error(function(data, status, headers, config) {
 	  console.log(data)
 	  angular.element(data)
 	  $scope.serverError = data
-	  $scope.results = []
+	  $scope.gene = []
 	})
     }
   }])
