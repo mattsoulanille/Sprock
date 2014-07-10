@@ -40,3 +40,19 @@ angular.module('sprockApp.controllers', [])
 	})
     }
   }])
+  .controller('MyCtrl3', ['$scope', '$http', function($scope, $http) {
+    $scope.serverError = ''
+    $scope.getGene = function() {
+      $http.post('/data/getGene', {name: $scope.gene_name})
+	.success(function (v) {
+	  $scope.results = v['results']
+	  $scope.serverError = ''
+	})
+	.error(function(data, status, headers, config) {
+	  console.log(data)
+	  angular.element(data)
+	  $scope.serverError = data
+	  $scope.results = []
+	})
+    }
+  }])
