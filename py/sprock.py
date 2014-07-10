@@ -1,8 +1,10 @@
-import os.path
+#curl -i -X POST -H "Content-Type: application/json" -d '{"key":"val", "N":5}' 'http://localhost:8082/data/n'import os.path
 
+import os
 import cherrypy
 
 from utils.get_sequence import FQDB # FIXME: names
+from utils.get_gene import GFFDB, GeneDB
 
 
 # An object to hold things
@@ -32,9 +34,9 @@ class DataService(object):
 #        cherrypy.log("Data from %s " % cherrypy.config['data.directory_path'])
         fqdb_filename = os.path.join(cherrypy.config['data.directory_path'],
                                      cherrypy.config['data.fastq_filename'])
-
         cherrypy.log("FASTQ %s " % fqdb_filename)
         self.fqdb = FQDB(fqdb_filename)
+        self.gene_db = GeneDB(self.g.gffdb)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -58,10 +60,28 @@ class DataService(object):
         return { 'request': argd,
                  'results': self.fqdb.get_sequence(scaffold, start, end) }
 
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def getGene(self):
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"name":"SPU_022066"}' 'http://localhost:8082/data/getGene'
+        argd = cherrypy.request.json
+        gene_name = argd['name']
+        gene_ID = self.g.gene_ID_from_name[gene_name]
+        location = self.gene_db.get_location(gene_ID)
+        # {'ID':geneID, 'scaffold':scaffold, 'start':gene.start, 'end':gene.end}
+        exons = self.gene_db.get_exons(gene_ID)['exons']
+        return { 'request': argd,
+                 'results': {'name': gene_name,
+                             'ID': gene_ID,
+                             'scaffold': location['scaffold'],
+                             'start': location['start'],
+                             'end':  location['end'],
+                             'exons': exons
+                             }
+                 }
 
 def serve(g):
-    from collections import defaultdict
-
     # Set up site-wide config first so we get a log if errors occur.
     cherrypy.config.update({#'environment': 'production',
                             'log.access_file': 'access.log',
@@ -104,6 +124,14 @@ def serve(g):
                    'response.timeout': 86400
                    }
                   }
+
+
+    g.gffdb_filename = os.path.join(cherrypy.config['data.directory_path'],
+                                    cherrypy.config['data.gffdb_filename'])
+    cherrypy.log("gffdb path %s" % g.gffdb_filename)
+    g.gffdb = GFFDB(g.gffdb_filename)
+    g.gene_ID_from_name = g.gffdb.name_to_ID_dict()
+    cherrypy.log("%d genes named" % len(g.gene_ID_from_name))
 
     hello_app = HelloWorld(g=g)
     cherrypy.tree.mount(hello_app, '/', app_config)
