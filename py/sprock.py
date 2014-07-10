@@ -40,7 +40,7 @@ class DataService(object):
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def n(self):
-        #curl -i -X POST -H "Content-Type: application/json" -d '{"key":"val", "N":5}' 'http://localhost:8082/data'
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"key":"val", "N":5}' 'http://localhost:8082/data/n'
         return {'foo': 'bar',
                 'count': range(cherrypy.request.json['N']),
                 'request data': cherrypy.request.json
@@ -50,6 +50,7 @@ class DataService(object):
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def getSeq(self):
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"scaffold":"Scaffold12345", "start":67, "end":89}' 'http://localhost:8082/data/getSeq'
         argd = cherrypy.request.json
         scaffold = argd['scaffold']
         start = int(argd['start'])
@@ -82,7 +83,8 @@ def serve(g):
                      'tools.encode.encoding' : 'utf-8',
                      'engine.autoreload.on': True,
                      'data.directory_path': '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/',
-                     'data.fastq_filename': 'Spur_3.1.LinearScaffold.fq'
+                     'data.fastq_filename': 'Spur_3.1.LinearScaffold.fq',
+                     'data.gffdb_filename': 'GLEAN-UTR-3.1.db'
                      }
     cherrypy.config.update(global_config)
 
