@@ -31,7 +31,7 @@ def main(argv):
     parser.add_argument('end', type=int, help='Coordinate to end at.')
     args = parser.parse_args()
     db = FQDB(args.fastq)
-    print(db.get_sequence(args.scaffold, args.start, args.end))
+    print(db.get_sequence('Scaffold' + str(args.scaffold), args.start, args.end))
 
 if __name__ == '__main__':
     main(sys.argv)
