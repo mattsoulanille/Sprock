@@ -16,7 +16,7 @@ class GFFDB(object):
 
     def create_from(self, filename, forceCreate=False):
         gffutils.create_db(filename,
-                           dbfn=dbname,
+                           dbfn=self.dbname,
                            force=forceCreate,
                            keep_order=False,
                            merge_strategy='merge')
