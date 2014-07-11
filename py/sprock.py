@@ -67,7 +67,7 @@ class DataService(object):
         #curl -i -X POST -H "Content-Type: application/json" -d '{"name":"SPU_022066"}' 'http://localhost:8082/data/getGene'
         argd = cherrypy.request.json
         gene_name = argd['name']
-        gene_ID = self.g.gene_ID_from_name[gene_name]
+        gene_ID = self.g.dict_ID_from_gene_name[gene_name]
         location = self.gene_db.get_location(gene_ID)
         # {'ID':geneID, 'scaffold':scaffold, 'start':gene.start, 'end':gene.end}
         exons = self.gene_db.get_exons(gene_ID)['exons']
@@ -130,8 +130,9 @@ def serve(g):
                                     cherrypy.config['data.gffdb_filename'])
     cherrypy.log("gffdb path %s" % g.gffdb_filename)
     g.gffdb = GFFDB(g.gffdb_filename)
-    g.gene_ID_from_name = g.gffdb.name_to_ID_dict()
-    cherrypy.log("%d genes named" % len(g.gene_ID_from_name))
+    g.dict_ID_from_gene_name = g.gffdb.name_to_ID_dict('gene')
+    g.dict_ID_from_transcript_name = g.gffdb.name_to_ID_dict('transcript')
+    cherrypy.log("%d gene and %d transcript names" % (len(g.dict_ID_from_gene_name), len(g.dict_ID_from_transcript_name)))
 
     hello_app = HelloWorld(g=g)
     cherrypy.tree.mount(hello_app, '/', app_config)
