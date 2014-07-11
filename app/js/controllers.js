@@ -21,9 +21,10 @@ angular.module('sprockApp.controllers', [])
 	})
     }
   }])
-  .controller('MyCtrl2', ['$scope', '$http', function($scope, $http) {
+  .controller('MyCtrl2', ['$scope', '$http', 'getSequence', function($scope, $http, getSequence) {
     $scope.serverError = ''
     $scope.getSeq = function() {
+/*
       $http.post('/data/getSeq', {scaffold: $scope.scaffold,
 				  start: $scope.start,
 				  end: $scope.end
@@ -33,6 +34,18 @@ angular.module('sprockApp.controllers', [])
 	  $scope.serverError = ''
 	})
 	.error(function(data, status, headers, config) {
+	  console.log(data)
+	  angular.element(data)
+	  $scope.serverError = data
+	  $scope.results = []
+	})
+*/
+      getSequence($scope.scaffold, $scope.start, $scope.end)
+	.then(function (v) {
+	  $scope.results = v
+	  $scope.serverError = ''
+	},
+	function(data) {
 	  console.log(data)
 	  angular.element(data)
 	  $scope.serverError = data
