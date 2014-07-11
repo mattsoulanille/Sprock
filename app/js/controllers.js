@@ -10,31 +10,31 @@ angular.module('sprockApp.controllers', [])
 	.success(function (v) {
 	  console.log(v)
 	  $scope.results = v['count']
-	  $scope.serverError = ''
+	  $scope.serverError = null
 	  console.log($scope.results)
 	})
 	.error(function(data, status, headers, config) {
 	  console.log(data)
 	  angular.element(data)
 	  $scope.serverError = data
-	  $scope.results = []
+	  $scope.results = null
 	})
     }
   }])
   .controller('MyCtrl2', ['$scope', '$http', 'getSequence',
 			  function($scope, $http, getSequence) {
-    $scope.serverError = ''
+    $scope.serverError = null
     $scope.getSeq = function() {
       getSequence($scope.scaffold, $scope.start, $scope.end)
 	.then(function (v) {
 	  $scope.results = v
-	  $scope.serverError = ''
+	  $scope.serverError = null
 	},
 	function(data) {
 	  console.log(data)
 	  angular.element(data)
 	  $scope.serverError = data
-	  $scope.results = []
+	  $scope.results = null
 	})
     }
   }])
@@ -60,15 +60,15 @@ angular.module('sprockApp.controllers', [])
       getGene($scope.gene_name)
 	.then(function (v) {
 	  $scope.gene = v
-	  $scope.serverError = ''
 	  $scope.gene_exons_pairs = _.pairs($scope.gene.exons)
+	  $scope.serverError = null
 	},
 	function(data) {
 	  console.log(data)
 	  angular.element(data)
 	  $scope.serverError = data
-	  $scope.results = []
-	  $scope.gene_exons_pairs = []
+	  $scope.gene = null
+	  $scope.gene_exons_pairs = null
 	})
     }
   }])
