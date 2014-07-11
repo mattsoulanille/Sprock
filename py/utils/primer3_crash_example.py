@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser(description='Show a primer3 bug')
 parser.add_argument('fastq', type=str, help='A fastq file to search through')
 parser.add_argument('scaffold', type=int, help='The number of a Scaffold', default=1)
 parser.add_argument('start', type=int, help='Coordinate to start at.', default=0)
-parser.add_argument('end', type=int, help='Coordinate to end at.', default=500)
+parser.add_argument('end', type=int, help='Coordinate to end at.', default=2000)
 args=parser.parse_args()
 fastqfile = args.fastq
 
