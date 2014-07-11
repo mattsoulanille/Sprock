@@ -13,3 +13,8 @@ tmp
 
 # Log files
 *.log
+
+# data files
+*.fa
+*.fq
+*.db
