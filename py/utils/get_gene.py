@@ -45,7 +45,7 @@ class GeneDB(object):
         self.gffdb = gffdb 
 
     def get_gene(self, geneID):
-        return self.gffdb.get_feature(self, geneID)
+        return self.gffdb.get_feature(geneID)
 
     def get_location(self, geneID):
         return self.gffdb.get_location(geneID)
