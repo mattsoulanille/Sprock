@@ -21,3 +21,17 @@ angular.module('sprockApp.services', [])
       return deferred.promise
     }
   }])
+  .factory('getGene', ['$http', '$q', function($http, $q) {
+    return function (name) {
+      var deferred = $q.defer()
+      $http.post('/data/getGene', {name: name})
+	.success(function (v) {
+	  deferred.resolve(v['results'])
+	})
+	.error(function(data, status, headers, config) {
+	  console.log(data)
+	  deferred.reject(data)
+	})
+      return deferred.promise
+    }
+  }])
