@@ -6,7 +6,8 @@ parser = argparse.ArgumentParser(description='Show a primer3 bug')
 parser.add_argument('fastq', type=str, help='A fastq file to search through')
 parser.add_argument('scaffold', type=int, help='The number of a Scaffold', default=1)
 parser.add_argument('start', type=int, help='Coordinate to start at.', default=0)
-parser.add_argument('end', type=int, help='Coordinate to end at.', default=500)
+parser.add_argument('end', type=int, help='Coordinate to end at.', default=2000)
+parser.add_argument('-q', action='store_true', help='include quality', default=False)
 args=parser.parse_args()
 fastqfile = args.fastq
 
@@ -21,6 +22,9 @@ seq_args['SEQUENCE_TEMPLATE'] = sequence
 seq_args['SEQUENCE_QUALITY'] = qualList
 seq_only = dict()
 seq_only['SEQUENCE_TEMPLATE'] = sequence
-primer3.designPrimers(seq_only, {})
+if args.q:
+    print(primer3.designPrimers(seq_args, {}))
+else:
+    print(primer3.designPrimers(seq_only, {}))
 
-primer3.designPrimers(seq_args, {})
+
