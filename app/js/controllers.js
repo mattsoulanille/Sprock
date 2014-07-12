@@ -25,9 +25,10 @@ angular.module('sprockApp.controllers', [])
 			  function($scope, $http, getSequence) {
     $scope.serverError = null
     $scope.getSeq = function() {
+	$scope.scaffold = 'Scaffold' + $scope.scaffoldNumber
       getSequence($scope.scaffold, $scope.start, $scope.end)
 	.then(function (v) {
-	  $scope.results = v
+	  $scope.sequenceData = v
 	  $scope.serverError = null
 	},
 	function(data) {

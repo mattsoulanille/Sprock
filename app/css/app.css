@@ -29,7 +29,295 @@
   padding: 0;
 }
 
-.sequence {
+.seq {
   font-family: Andale Mono, monospace;
   word-wrap: break-word;
+}
+
+.qual0 {
+  color: #eee;
+}
+
+.qual20 {
+  color: #ddd;
+}
+
+.qual21 {
+  color: #ddd;
+}
+
+.qual22 {
+  color: #ddd;
+}
+
+.qual23 {
+  color: #ddd;
+}
+
+.qual24 {
+  color: #ddd;
+}
+
+.qual25 {
+  color: #ccc;
+}
+
+.qual26 {
+  color: #ccc;
+}
+
+.qual27 {
+  color: #ccc;
+}
+
+.qual28 {
+  color: #ccc;
+}
+
+.qual29 {
+  color: #ccc;
+}
+
+.qual30 {
+  color: #bbb;
+}
+
+.qual31 {
+  color: #bbb;
+}
+
+.qual32 {
+  color: #bbb;
+}
+
+.qual33 {
+  color: #bbb;
+}
+
+.qual34 {
+  color: #bbb;
+}
+
+.qual35 {
+  color: #aaa;
+}
+
+.qual36 {
+  color: #aaa;
+}
+
+.qual37 {
+  color: #aaa;
+}
+
+.qual38 {
+  color: #aaa;
+}
+
+.qual39 {
+  color: #999;
+}
+
+.qual40 {
+  color: #999;
+}
+
+.qual41 {
+  color: #999;
+}
+
+.qual42 {
+  color: #999;
+}
+
+.qual43 {
+  color: #999;
+}
+
+.qual44 {
+  color: #888;
+}
+
+.qual45 {
+  color: #888;
+}
+
+.qual46 {
+  color: #888;
+}
+
+.qual47 {
+  color: #888;
+}
+
+.qual48 {
+  color: #888;
+}
+
+.qual49 {
+  color: #777;
+}
+
+.qual50 {
+  color: #777;
+}
+
+.qual51 {
+  color: #777;
+}
+
+.qual52 {
+  color: #777;
+}
+
+.qual53 {
+  color: #666;
+}
+
+.qual54 {
+  color: #666;
+}
+
+.qual55 {
+  color: #666;
+}
+
+.qual56 {
+  color: #666;
+}
+
+.qual57 {
+  color: #666;
+}
+
+.qual58 {
+  color: #555;
+}
+
+.qual59 {
+  color: #555;
+}
+
+.qual60 {
+  color: #555;
+}
+
+.qual61 {
+  color: #555;
+}
+
+.qual62 {
+  color: #555;
+}
+
+.qual63 {
+  color: #444;
+}
+
+.qual64 {
+  color: #444;
+}
+
+.qual65 {
+  color: #444;
+}
+
+.qual66 {
+  color: #444;
+}
+
+.qual67 {
+  color: #333;
+}
+
+.qual68 {
+  color: #333;
+}
+
+.qual69 {
+  color: #333;
+}
+
+.qual70 {
+  color: #333;
+}
+
+.qual71 {
+  color: #333;
+}
+
+.qual72 {
+  color: #222;
+}
+
+.qual73 {
+  color: #222;
+}
+
+.qual74 {
+  color: #222;
+}
+
+.qual75 {
+  color: #222;
+}
+
+.qual76 {
+  color: #222;
+}
+
+.qual77 {
+  color: #111;
+}
+
+.qual78 {
+  color: #111;
+}
+
+.qual79 {
+  color: #111;
+}
+
+.qual80 {
+  color: #111;
+}
+
+.qual81 {
+  color: #000;
+}
+
+.qual82 {
+  color: #000;
+}
+
+.qual83 {
+  color: #000;
+}
+
+.qual84 {
+  color: #000;
+}
+
+.qual85 {
+  color: #000;
+}
+
+.qual86 {
+  color: #000;
+}
+
+.qual87 {
+  color: #000;
+}
+
+.qual88 {
+  color: #000;
+}
+
+.qual89 {
+  color: #000;
+}
+
+.qual90 {
+  color: #000;
 }

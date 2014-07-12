@@ -1,14 +1,17 @@
 <p>This is the partial for view 2.</p>
 <form ng-submit="getSeq()">
-  <input type="text" ng-model="scaffold" size="16" placeholder="Scaffold name">
+  Scaffold<input type="text" ng-model="scaffoldNumber" size="6" placeholder="number">
   <input type="text" ng-model="start" size="6" placeholder="start position">
   <input type="text" ng-model="end" size="6" placeholder="end position">
   <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
 </form>
 <pre>{{serverError}}</pre>
 <h1>The Sequence</h1>
-<div format-sequence="results['sequence']"></div>
-<p>
-  Showing of 'interpolate' filter:
-  {{ 'Current version is v%VERSION%.' | interpolate }}
-</p>
+<div format-sequence="sequenceData"></div>
+<hr/>
+<div>
+  <p>
+    Showing of 'interpolate' filter:
+    {{ 'Current version is v%VERSION%.' | interpolate }}
+  </p>
+ </div>
