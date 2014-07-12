@@ -7,9 +7,7 @@
 </form>
 <pre>{{serverError}}</pre>
 <h1>The Sequence</h1>
-<div class="sequence">{{results['sequence']}}</div>
-
-
+<div format-sequence="results['sequence']"></div>
 <p>
   Showing of 'interpolate' filter:
   {{ 'Current version is v%VERSION%.' | interpolate }}

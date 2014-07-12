@@ -6,7 +6,9 @@
 // Demonstrate how to register services
 // In this case it is a simple value service.
 angular.module('sprockApp.services', [])
+
   .value('version', '0.0.3')
+
   .factory('getSequence', ['$http', '$q', function($http, $q) {
     return function (scaffold, start, end) {
       var deferred = $q.defer()
@@ -21,6 +23,7 @@ angular.module('sprockApp.services', [])
       return deferred.promise
     }
   }])
+
   .factory('getGene', ['$http', '$q', function($http, $q) {
     return function (name) {
       var deferred = $q.defer()
