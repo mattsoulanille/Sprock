@@ -2,13 +2,13 @@
 
 
 // Declare app level module which depends on filters, and services
-angular.module('sprockApp', [
+angular.module('sprock', [
   'ngRoute',
   'underscore',
-  'sprockApp.filters',
-  'sprockApp.services',
-  'sprockApp.directives',
-  'sprockApp.controllers'
+  'sprock.filters',
+  'sprock.services',
+  'sprock.directives',
+  'sprock.controllers'
 ])
 
 .config(['$routeProvider', function($routeProvider) {
