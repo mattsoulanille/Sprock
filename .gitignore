@@ -9,7 +9,7 @@ tmp
 
 # Editor backups & temps
 *~
-.#*
+\#*\#
 
 # Log files
 *.log
