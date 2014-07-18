@@ -8,7 +8,8 @@ angular.module('sprock', [
   'sprock.filters',
   'sprock.services',
   'sprock.directives',
-  'sprock.controllers'
+  'sprock.controllers',
+  'sprock.utilities'
 ])
 
 .config(['$routeProvider', function($routeProvider) {

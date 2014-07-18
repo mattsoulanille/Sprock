@@ -3,7 +3,7 @@
 /* jasmine specs for controllers go here */
 
 describe('controllers', function(){
-  beforeEach(module('sprock.controllers'));
+  beforeEach(module(/*'sprock.controllers'*/'sprock'));
 
 
   it('should ....', inject(function($controller) {
@@ -15,6 +15,6 @@ describe('controllers', function(){
   it('should ....', inject(function($controller) {
     //spec body
     var myCtrl2 = $controller('MyCtrl2', { $scope: {} });
-//    expect(myCtrl2).toBeDefined();
+    expect(myCtrl2).toBeDefined();
   }));
 });
