@@ -21,7 +21,7 @@ angular.module('sprock.utilities', ['underscore']).
     };
     }]).
 
-  factory('integrateSequence', ['eachInOrder', '_', function(eachInOrder, _) {
+  factory('integrateSequenceEventsToHTML', ['eachInOrder', '_', function(eachInOrder, _) {
     return function integrate(events) {
       var s = '';
       var state = {};
@@ -35,34 +35,34 @@ angular.module('sprock.utilities', ['underscore']).
 	    classes_string += p[1];
 	  };
 	});
-	s += '<span class="' + classes_string + '">';
-	s += e.seq;
-	s += '</span>';
+	if (e.seq) {
+	  s += '<span class="' + classes_string + '">';
+	  s += e.seq;
+	  s += '</span>';
+	};
       });
-
-//      var v = _.reduce(events, function(memo, e) {
-//	return memo;
-//      }, {r:'', s:{}});
- 
       return s;
     }
+  }]).
+
+  factory('differentiateSequenceToEvents', ['eachInOrder', '_', function(eachInOrder, _) {
+    return function differentiate(seqInfo) {
+      var events = [{a: 'seq'}];
+      var quality = seqInfo.quality;
+      var sequence = seqInfo.sequence;
+      var prior_quality = -1;
+      var e = {};
+      for (var i = 0, length = sequence.length; i < length; i++) {
+	var q = quality[i];
+	if (q != prior_quality) {
+	  if (!_.isEmpty(e)) { events.push(e); };
+	  e = {q: 'qual' + q, seq: sequence[i]}
+	} else {
+	  e.seq += sequence[i];
+	};
+	prior_quality = q;
+      };
+      if (!_.isEmpty(e)) { events.push(e); };
+      return events;
+    };
   }]);
-
-
-/*
-  .factory('getSequence', ['$http', '$q', function($http, $q) {
-    return function (scaffold, start, end) {
-      var deferred = $q.defer()
-      $http.post('/data/getSeq', {scaffold: scaffold, start: start, end: end})
-	.success(function (v) {
-	  deferred.resolve(v['results'])
-	})
-	.error(function(data, status, headers, config) {
-	  console.log(data)
-	  deferred.reject(data)
-	})
-      return deferred.promise
-    }
-  }])
-
-*/
