@@ -27,7 +27,7 @@ def main(argv):
     parser = argparse.ArgumentParser(description='Find data from a gff3 file about specific genes.')
 
     parser.add_argument('database_path', type=str, help='A path to a gffutils feature database (make this using the get_gene.py program)')
-    parser.add_argument('scaffold', type=int, help='The number of a scaffold to search through. eg "Scaffold423" would be "423".')
+    parser.add_argument('scaffold', type=int, help='The number of a scaffold to search through. eg "Scaffold423" would be "423". The first scaffold is "1"')
     parser.add_argument('start', type=int, help='Where to start searching for features on the scaffold. The range is zero based. eg if the scaffold had 5 bases, they would start at 0 and end at 4.')
     parser.add_argument('end', type=int, help='Where to stop searching for features on the scaffold.')
     parser.add_argument('-t', '--feature_type', nargs='?', default=None, help='Filter search based on feature type')

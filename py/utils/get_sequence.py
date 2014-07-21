@@ -19,7 +19,13 @@ class FQDB(object):
             self.cache = (scaffold, record)
         snippedRecord = record[start_position:end_position]
         return {'sequence': str(snippedRecord.seq), 'quality': snippedRecord.letter_annotations["phred_quality"]}
-        
+    def get_seq_object(self, scaffold, start_position, end_position):
+        if self.cache[0] == scaffold:
+            record = self.cache[1]
+        else:
+            record = self.fastqDB[scaffold]
+            self.cache = (scaffold, record)
+        return record[start_position:end_position]
         
 
 def main(argv):

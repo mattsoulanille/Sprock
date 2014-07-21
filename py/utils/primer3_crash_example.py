@@ -8,6 +8,8 @@ parser.add_argument('scaffold', type=int, help='The number of a Scaffold', defau
 parser.add_argument('start', type=int, help='Coordinate to start at.', default=0)
 parser.add_argument('end', type=int, help='Coordinate to end at.', default=2000)
 parser.add_argument('-q', action='store_true', help='include quality', default=False)
+parser.add_argument('-t', action='store_true', help='require primers to enclose the region 3000-3100', default=False)
+parser.add_argument('flag', type=str, nargs='?', help='add flags to the sequence arguments.')
 args=parser.parse_args()
 fastqfile = args.fastq
 
@@ -22,9 +24,14 @@ seq_args['SEQUENCE_TEMPLATE'] = sequence
 seq_args['SEQUENCE_QUALITY'] = qualList
 seq_only = dict()
 seq_only['SEQUENCE_TEMPLATE'] = sequence
+if args.t:
+    seq_only['SEQUENCE_TARGET'] = [3000, 100]
+    seq_args['SEQUENCE_TARGET'] = [3000, 100]
 if args.q:
+    print(seq_args)
     print(primer3.designPrimers(seq_args, {}))
 else:
+    print(seq_only)
     print(primer3.designPrimers(seq_only, {}))
 
 
