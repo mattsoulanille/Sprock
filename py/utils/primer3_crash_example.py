@@ -23,9 +23,11 @@ seq_args = dict([x.split('=') for x in args.flag])
 print seq_args
 seq_args['SEQUENCE_TEMPLATE'] = sequence
 if args.q:
-    seq_args['SEQUENCE_QUALITY'] = qualList
+    seq_args['SEQUENCE_QUALITY'] = qual
 if args.t:
     seq_args['SEQUENCE_TARGET'] = [3000, 100]
+#seq_args.update({ 'SEQUENCE_INCLUDED_REGION': [36,345]})
+
 print(seq_args)
-print(primer3.designPrimers(seq_args, {}))
+print(primer3.wrappers.designPrimers(seq_args))
 
