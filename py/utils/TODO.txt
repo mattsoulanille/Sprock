@@ -1,0 +1,6 @@
+
+Nice to do someday:
+
+* Use the primer3.bindings to libprimer3 methods (the default) instead
+  of the wrapper method of passing arguments to a subprocess - will
+  require debugging the passing of the phred quality vector
