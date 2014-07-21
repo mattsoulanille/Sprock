@@ -29,9 +29,9 @@ if args.t:
     seq_args['SEQUENCE_TARGET'] = [3000, 100]
 if args.q:
     print(seq_args)
-    print(primer3.designPrimers(seq_args, {}))
+    print(primer3.designPrimers(seq_args))
 else:
     print(seq_only)
-    print(primer3.designPrimers(seq_only, {}))
+    print(primer3.designPrimers(seq_only))
 
 
