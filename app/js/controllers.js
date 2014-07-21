@@ -1,7 +1,7 @@
 'use strict';
 
 /* Controllers */
-angular.module('sprockApp.controllers', [])
+angular.module('sprock.controllers', [])
   .controller('MyCtrl1', ['$scope', '$http', function($scope, $http) {
     $scope.serverError = ''
     $scope.calcN = function() {

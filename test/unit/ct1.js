@@ -3,7 +3,7 @@
 /* jasmine specs for controllers go here */
 
 describe('controllers', function(){
-  beforeEach(module('myApp.controllers'));
+  beforeEach(module(/*'sprock.controllers'*/'sprock'));
 
 
   it('should ....', inject(function($controller) {
