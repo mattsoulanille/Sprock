@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import argparse
 import sys
+
 from Bio import SeqIO
 from Bio.Alphabet import IUPAC
 
@@ -11,14 +12,9 @@ class FQDB(object):
         self.cache = (None, None)
     
     def get_sequence(self, scaffold, start_position, end_position):
-        # {'sequence': [the sequence], 'quality': [the quality]}
-        if self.cache[0] == scaffold:
-            record = self.cache[1]
-        else:
-            record = self.fastqDB[scaffold]
-            self.cache = (scaffold, record)
-        snippedRecord = record[start_position:end_position]
+        snippedRecord = self.get_seq_object(scaffold, start_position, end_position)
         return {'sequence': str(snippedRecord.seq), 'quality': snippedRecord.letter_annotations["phred_quality"]}
+
     def get_seq_object(self, scaffold, start_position, end_position):
         if self.cache[0] == scaffold:
             record = self.cache[1]
@@ -36,6 +32,7 @@ def main(argv):
     parser.add_argument('start', type=int, help='Coordinate to start at.')
     parser.add_argument('end', type=int, help='Coordinate to end at.')
     args = parser.parse_args()
+
     db = FQDB(args.fastq)
     print(db.get_sequence('Scaffold' + str(args.scaffold), args.start, args.end))
 
