@@ -8,7 +8,7 @@ import get_gene
 class get_features(object):
     
     def __init__(self, databasePath):
-        self.database = get_gene.GFFDB(databasePath)
+        self.database = get_gene.GeneDB(databasePath)
     def open(self):
         return self.database.open()
     def featuregen(self, scaffold, start, end, featureType=None, completely_within=False): # featureType of None means all features are included. Returns a list

@@ -1,5 +1,4 @@
 from __future__ import print_function
-from get_gene import GeneDB, GFFDB
 from get_sequence import FQDB
 from get_features import get_features
 import primer3, sys, argparse
