@@ -4,7 +4,7 @@ import os
 import cherrypy
 
 from utils.get_sequence import FQDB # FIXME: names
-from utils.get_gene import GFFDB, GeneDB
+from utils.get_gene import GeneDB
 
 
 # An object to hold things
@@ -36,7 +36,7 @@ class DataService(object):
                                      cherrypy.config['data.fastq_filename'])
         cherrypy.log("FASTQ %s " % fqdb_filename)
         self.fqdb = FQDB(fqdb_filename)
-        self.gene_db = GeneDB(self.g.gffdb)
+        self.gene_db = GeneDB(self.g.gffdb_filename)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -58,7 +58,7 @@ class DataService(object):
         start = int(argd['start'])
         end = int(argd['end'])
         return { 'request': argd,
-                 'results': self.fqdb.get_sequence(scaffold, start, end) }
+                 'results': self.fqdb.get_sequence_data(scaffold, start, end) }
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -67,13 +67,11 @@ class DataService(object):
         #curl -i -X POST -H "Content-Type: application/json" -d '{"name":"SPU_022066"}' 'http://localhost:8082/data/getGene'
         argd = cherrypy.request.json
         gene_name = argd['name']
-        gene_ID = self.g.dict_ID_from_gene_name[gene_name]
-        location = self.gene_db.get_location(gene_ID)
+        location = self.gene_db.get_location_data_by_name(gene_name)
         # {'ID':geneID, 'scaffold':scaffold, 'start':gene.start, 'end':gene.end}
-        exons = self.gene_db.get_exons(gene_ID)['exons']
+        exons = self.gene_db.get_exons_data_by_name(gene_name)
         return { 'request': argd,
                  'results': {'name': gene_name,
-                             'ID': gene_ID,
                              'scaffold': location['scaffold'],
                              'start': location['start'],
                              'end':  location['end'],
@@ -129,10 +127,10 @@ def serve(g):
     g.gffdb_filename = os.path.join(cherrypy.config['data.directory_path'],
                                     cherrypy.config['data.gffdb_filename'])
     cherrypy.log("gffdb path %s" % g.gffdb_filename)
-    g.gffdb = GFFDB(g.gffdb_filename)
-    g.dict_ID_from_gene_name = g.gffdb.name_to_ID_dict('gene')
-    g.dict_ID_from_transcript_name = g.gffdb.name_to_ID_dict('transcript')
-    cherrypy.log("%d gene and %d transcript names" % (len(g.dict_ID_from_gene_name), len(g.dict_ID_from_transcript_name)))
+#    g.gffdb = GFFDB(g.gffdb_filename)
+#    g.dict_ID_from_gene_name = g.gffdb.name_to_ID_dict('gene')
+#    g.dict_ID_from_transcript_name = g.gffdb.name_to_ID_dict('transcript')
+#    cherrypy.log("%d gene and %d transcript names" % (len(g.dict_ID_from_gene_name), len(g.dict_ID_from_transcript_name)))
 
     hello_app = HelloWorld(g=g)
     cherrypy.tree.mount(hello_app, '/', app_config)
