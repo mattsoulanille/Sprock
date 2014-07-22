@@ -22,47 +22,75 @@ angular.module('sprock.utilities', ['underscore']).
     }]).
 
   factory('integrateSequenceEventsToHTML', ['eachInOrder', '_', function(eachInOrder, _) {
-    return function integrate(events) {
+    /*
+    if (false) {
+      // example input:
+      var seq_events = { events: [[11, {x: null}],
+				  [0, {q: 'qual90', x: 'exon'}],
+				  [14, {q: 'qual20'}],
+				  [0, {a: 'seq'}],
+				  [5, {q: 'qual70'}]
+				 ],
+			 seq: 'GACCTACATCAGGCT' };
+    };*/
+    return function integrate(seq_events) {
+      var sequence = seq_events['seq'];
+      var len_sequence = sequence.length;
+      var grouped_events = _.groupBy(seq_events['events'],
+				     function(pep) { return pep[0] })//.sort();
+      var sequence_index = 0;
       var s = '';
       var state = {};
-      eachInOrder(events, function(e) {
-	_.extend(state, e);
-	state.seq = null;
-	var classes_string = '';
+
+      function classes_string(state) {
+	var rv = '';
 	eachInOrder(_.pairs(state).sort(), function(p) {
 	  if (p[1]) {
-	    if (classes_string) { classes_string += ' '; }
-	    classes_string += p[1];
+	    if (rv) { rv += ' '; };
+	    rv += p[1];
 	  };
 	});
-	if (e.seq) {
-	  s += '<span class="' + classes_string + '">';
-	  s += e.seq;
-	  s += '</span>';
+	return rv;
+      };
+
+      eachInOrder(grouped_events, function(event_group) {
+	var event_position = event_group[0][0];
+	state = _.reduce(event_group,
+			 function(state, pep) {
+			   return _.extend(state, pep[1]);
+			 },
+			 state);
+	if (s) {
+	  while (sequence_index < event_position) {
+	    s += sequence[sequence_index++];
+	  };
+	  s += '</span>'; 
 	};
+	s += '<span class="' + classes_string(state) + '">';
       });
+      while (sequence_index < len_sequence) {
+	s += sequence[sequence_index++];
+      };
+      s += '</span>'; 
       return s;
     }
   }]).
 
   factory('differentiateSequenceToEvents', ['eachInOrder', '_', function(eachInOrder, _) {
     return function differentiate(seqInfo) {
-      var events = [{a: 'seq'}];
+      var events = [[0, {a: 'seq'}]];
       var quality = seqInfo.quality;
-      var sequence = seqInfo.sequence;
+//      var sequence = seqInfo.sequence;
       var prior_quality = -1;
       var e = {};
-      for (var i = 0, length = sequence.length; i < length; i++) {
+      for (var i = 0, length = quality.length; i < length; i++) {
 	var q = quality[i];
 	if (q != prior_quality) {
-	  if (!_.isEmpty(e)) { events.push(e); };
-	  e = {q: 'qual' + q, seq: sequence[i]}
-	} else {
-	  e.seq += sequence[i];
+	  events.push([i, {q: 'qual' + q}]); 
 	};
 	prior_quality = q;
       };
-      if (!_.isEmpty(e)) { events.push(e); };
-      return events;
+      return {events: events, seq: seqInfo.sequence};
     };
   }]);
+
