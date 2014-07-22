@@ -80,7 +80,6 @@ angular.module('sprock.utilities', ['underscore']).
     return function differentiate(seqInfo) {
       var events = [[0, {a: 'seq'}]];
       var quality = seqInfo.quality;
-//      var sequence = seqInfo.sequence;
       var prior_quality = -1;
       var e = {};
       for (var i = 0, length = quality.length; i < length; i++) {
@@ -92,5 +91,18 @@ angular.module('sprock.utilities', ['underscore']).
       };
       return {events: events, seq: seqInfo.sequence};
     };
-  }]);
+  }]).
 
+  factory('convertExonsToEvents', ['eachInOrder', '_', function(eachInOrder, _) {
+    return function convertExons(exons, offset) {
+
+//{"request": {"name": "SPU_022066"}, "results": {"start": 10480, "scaffold": "Scaffold694", "end": 18337, "name": "SPU_022066", "exons": {"ID": "SPU_022066gn", "exons": {"SPU_022066:5\"": [14180, 14538], "SPU_022066:6\"": [17988, 18337], "SPU_022066:0\"": [10514, 10683], "SPU_022066:1\"": [11406, 11633], "SPU_022066:2\"": [11875, 11997], "SPU_022066:3\"": [12713, 12826], "SPU_022066:4\"": [13329, 13541]}}}}
+
+      offset = offset || 0;
+      var events = _.reduce(exons.exons, function(memo, exon, key) {
+	memo.push([exon[0] - offset, {x: 'exon'}], [exon[1] - offset, {x: null}]);
+	return memo;
+      }, []);
+      return {'events': events};
+    };
+  }]);
