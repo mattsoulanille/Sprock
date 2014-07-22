@@ -9,15 +9,14 @@ import copy
 
 class get_primers(object):
     def __init__(self):
-        self.global_args = {}
         self.seq_args = {}
 
-    def runPrimer3(self, seq, qual=None, global_args=dict()): # seq is a string and qual is a list
+    def runPrimer3(self, seq, qual=None): # seq is a string and qual is a list
         seq_args = dict()
         seq_args['SEQUENCE_TEMPLATE'] = seq
         if qual:
             seq_args['SEQUENCE_QUALITY'] = qual
-        return primer3.designPrimers(seq_args, global_args)
+        return primer3.wrappers.designPrimers(seq_args)
 
     @classmethod
     def splitSequence(self, start, stop, primerSpan=2000, overlap=700):
@@ -41,19 +40,21 @@ class get_primers(object):
         """
         interval = self.splitSequence(start, stop, primerSpan, overlap)
         included_region = [[x[0], primerSpan] for x in interval]
-        self.global_args['PRIMER_PRODUCT_SIZE_RANGE'] = [[primerSpan, primerSpan + fuzziness]]
+        self.seq_args['PRIMER_PRODUCT_SIZE_RANGE'] = str(primerSpan) + '-' + str(primerSpan + fuzziness)
         self.seq_args['SEQUENCE_TEMPLATE'] = str(sequence.seq)
-        seqqual = [] # ignoring quality right now. fix me.
+        qualList = sequence.letter_annotations["phred_quality"]
+        qual = ' '.join([str(x) for x in qualList])
+        self.seq_args['SEQUENCE_QUALITY'] = qual
         output = []
         
         for target in included_region:
-            self.seq_args['SEQUENCE_TARGET'] = target
-            pdb.set_trace() # Debug
-            primers = primer3.designPrimers(self.seq_args, self.global_args)
-            output += [[copy.deepcopy(primers), copy.deepcopy(self.global_args)]]
-            cb and cb(target)
+            self.seq_args['SEQUENCE_TARGET'] = "%d,%d" % (target[0], target[1])
+            #pdb.set_trace() # Debug
+            primers = primer3.wrappers.designPrimers(self.seq_args)
+            yield primers #self.seq_args
+            # cb and cb(target)
             # pdb.set_trace() # Debug
-        return output
+
 
 
 
@@ -75,16 +76,16 @@ def main(argv):
     parser.add_argument('--start', type=int, default=0, nargs='?', help='Start sequence from here')
     parser.add_argument('--end', type=int, default=50000, nargs='?', help='End sequence here')
     parser.add_argument('--length', type=int, default=2000, help='Primer product minimum length')
-    parser.add_argument('--quality', action='store_true', default=False, help='Use qual data in primer calculation. Probably won\'t work')
+    #parser.add_argument('--quality', action='store_true', default=False, help='Use qual data in primer calculation. Probably won\'t work')
     
     
     args = parser.parse_args()
     prime = get_primers()
-    global_variables = dict()
     fqdb = FQDB(args.seq_file)
     sequence = fqdb.get_seq_object(args.scaffold, args.start, args.end)
 
-    pprint(prime.makePrimers(sequence, args.start, args.end, args.length, args.overlap, args.fuzziness, print))
+    for primer in prime.makePrimers(sequence, args.start, args.end, args.length, args.overlap, args.fuzziness):
+        print(primer)
     """
     if args.product_size:
         global_variables['PRIMER_PRODUCT_SIZE_RANGE'] = csv_to_int_list(args.product_size)
