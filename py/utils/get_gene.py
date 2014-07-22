@@ -4,57 +4,65 @@ import argparse
 import sys
 import gffutils
 
-class GFFDB(object):
+class GeneDB(object):
     """A .gff database using gffutils.
 
     gffutils uses SQLite, which is not threadsafe. We create a
     gffutils.FeatureDB every time as a workaround.
     """
-
     def __init__(self, dbname):
         self.dbname = dbname
 
     def create_from(self, filename, forceCreate=False):
+        """Create the gffutils sqLite db for the specified .gff file"""
         gffutils.create_db(filename,
                            dbfn=self.dbname,
                            force=forceCreate,
                            keep_order=False,
                            merge_strategy='merge')
-    def open(self):
-        return self.db()        # Convenience
-
-    def name_to_ID_dict(self, featureType):
-        return dict((v['Name'][0], v['ID'][0]) for v in self.db().features_of_type(featureType))
-
     def db(self):
         return gffutils.FeatureDB(self.dbname)
     
-    def get_feature(self, ID):
+    def open(self):
+        return self.db()        # Convenience method
+
+    def name_to_ID_dict(self):
+        try:
+            return self.name_to_ID_dict_cache
+        except AttributeError:
+            self.name_to_ID_dict_cache = dict((v['Name'][0], v['ID'][0]) for v in self.db().all_features())
+            return self.name_to_ID_dict_cache
+
+    def id(self, name):
+        return self.name_to_ID_dict()[name]
+
+    def get_feature_by_ID(self, ID):
         return self.db()[ID]
        
-    def get_location(self, ID):
-        feature = self.get_feature(ID)
+    def get_feature_by_name(self, name):
+        return self.get_feature_by_ID(self.id(name))
+
+    def get_gene_by_ID(self, geneID):
+        return self.get_feature_by_ID(geneID)
+
+    def get_gene_by_name(self, name):
+        return self.get_gene_by_ID(self.id(name))
+
+    def get_location_data_by_ID(self, ID):  
+        feature = self.get_feature_by_ID(ID)
         scaffold = feature.seqid
         return {'ID':ID, 'scaffold':scaffold, 'start':feature.start, 'end':feature.end}
 
+    def get_location_data_by_name(self, name):
+        return self.get_location_data_by_ID(self.id(name))
 
-class GeneDB(object):
-    def __init__(self, gffdb):
-#        self.db = gffdb.gimme_the_db() # FIXME: Ugly
-#        self.name_to_id = dict((v['Name'][0], v['ID'][0]) for v in self.db.features_of_type('gene'))
-        self.gffdb = gffdb 
-
-    def get_gene(self, geneID):
-        return self.gffdb.get_feature(geneID)
-
-    def get_location(self, geneID):
-        return self.gffdb.get_location(geneID)
-
-    def get_exons(self, geneID):
-        gene = self.get_gene(geneID)
-        exons = self.gffdb.db().children(gene, featuretype='exon')
+    def get_exons_data_by_ID(self, geneID):
+        gene = self.get_gene_by_ID(geneID)
+        exons = self.db().children(gene, featuretype='exon')
         return {'ID':geneID, 'exons':dict((x.id, [x.start, x.end]) for x in exons)}
 
+    def get_exons_data_by_name(self, name):
+        return self.get_exons_data_by_ID(self.id(name))
 
 
 def main(argv):
@@ -81,6 +89,8 @@ def main(argv):
 
     args = parser.parse_args()
     #OLD db = GFFDB(args.database, args.gff3_file[0], args.force)
+
+    # WRONG, FIXME below, not adapted to refactoring:
 
     # in steps for debugging:
     gffdb = GFFDB(args.database)

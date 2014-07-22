@@ -11,8 +11,8 @@ class GetSequenceTestCase(unittest.TestCase):
     def tearDown(self):
         self.db = None
 
-    def testGetSequence(self):
-        seq = self.db.get_sequence('Scaffold1', 1, 23)
+    def testGetSequenceDatq(self):
+        seq = self.db.get_sequence_data('Scaffold1', 1, 23)
         assert seq == {'quality': [35, 35, 35, 32, 35, 53, 47, 41, 42, 46, 45, 29, 29, 29, 32, 33, 51, 51, 51, 51, 51, 51],
                        'sequence': 'ACATTTTATCACCAGTTCGATT'}
 
