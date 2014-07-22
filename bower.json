@@ -12,6 +12,7 @@
     "angular-mocks": "~1.2.x",
     "html5-boilerplate": "~4.3.0",
     "underscore": "~1.6.0",
-    "angular-underscore-module": "*"
+    "angular-underscore-module": "*",
+    "chai": "^1.9.1"
   }
 }
