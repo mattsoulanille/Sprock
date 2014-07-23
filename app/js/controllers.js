@@ -58,11 +58,29 @@ angular.module('sprock.controllers', [])
 	});
     };
   }])
-  .controller('MyCtrl4', ['$scope', '$http', 'getSequence', 'getGene',
-			  function($scope, $http, getSequence, getGene) {
+  .controller('MyCtrl4', ['$scope', '$http', 'getSequence', 'getGene', '_',
+			  function($scope, $http, getSequence, getGene, _) {
     $scope.serverError = null;
-    $scope.getSeq = function() {
-	$scope.scaffold = 'Scaffold' + $scope.scaffoldNumber;
+    $scope.getGene = function() {
+      getGene($scope.gene_name).
+	then(function (gene) {
+	  $scope.gene = gene;
+	  $scope.gene_exons_pairs = _.pairs($scope.gene.exons);
+	  $scope.serverError = null;
+	  $scope.scaffold = gene.scaffold;
+	  $scope.start = gene.start;
+	  $scope.end = gene.end;
+	  $scope.getSequence();
+	},
+	function(data) {
+	  console.log(data);
+	  angular.element(data);
+	  $scope.serverError = data;
+	  $scope.gene = null;
+	  $scope.gene_exons_pairs = null;
+	});
+    };
+    $scope.getSequence = function() {
       getSequence($scope.scaffold, $scope.start, $scope.end).
 	then(function (v) {
 	  $scope.sequenceData = v;
@@ -73,21 +91,6 @@ angular.module('sprock.controllers', [])
 	  angular.element(data);
 	  $scope.serverError = data;
 	  $scope.results = null;
-	});
-    };
-    $scope.getGene = function() {
-      getGene($scope.gene_name).
-	then(function (v) {
-	  $scope.gene = v;
-	  $scope.gene_exons_pairs = _.pairs($scope.gene.exons);
-	  $scope.serverError = null;
-	},
-	function(data) {
-	  console.log(data);
-	  angular.element(data);
-	  $scope.serverError = data;
-	  $scope.gene = null;
-	  $scope.gene_exons_pairs = null;
 	});
     };
   }]);
