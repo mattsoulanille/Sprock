@@ -3,25 +3,7 @@
 
 angular.module('sprock.utilities', ['underscore']).
 
-  factory('eachInOrder', [function() {
-    var breaker = {};
-    return function eachInOrder(obj, iterator, context) {
-      if (obj == null) return obj;
-      if (obj.length === +obj.length) {
-	for (var i = 0, length = obj.length; i < length; i++) {
-	  if (iterator.call(context, obj[i], i, obj) === breaker) return;
-	}
-      } else {
-	var keys = _.keys(obj);
-	for (var i = 0, length = keys.length; i < length; i++) {
-	  if (iterator.call(context, obj[keys[i]], keys[i], obj) === breaker) return;
-	}
-      }
-      return obj;
-    };
-    }]).
-
-  factory('integrateSequenceEventsToHTML', ['eachInOrder', '_', function(eachInOrder, _) {
+  factory('integrateSequenceEventsToHTML', ['_', function(_) {
     /*
     if (false) {
       // example input:
@@ -44,7 +26,7 @@ angular.module('sprock.utilities', ['underscore']).
 
       function classes_string(state) {
 	var rv = '';
-	eachInOrder(_.pairs(state).sort(), function(p) {
+	_.each(_.pairs(state).sort(), function(p) {
 	  if (p[1]) {
 	    if (rv) { rv += ' '; };
 	    rv += p[1];
@@ -53,7 +35,7 @@ angular.module('sprock.utilities', ['underscore']).
 	return rv;
       };
 
-      eachInOrder(grouped_events, function(event_group) {
+      _.each(grouped_events, function(event_group) {
 	var event_position = event_group[0][0];
 	state = _.reduce(event_group,
 			 function(state, pep) {
@@ -76,7 +58,7 @@ angular.module('sprock.utilities', ['underscore']).
     }
   }]).
 
-  factory('differentiateSequenceToEvents', ['eachInOrder', '_', function(eachInOrder, _) {
+  factory('differentiateSequenceToEvents', ['_', function(_) {
     return function differentiate(seqInfo) {
       var events = [[0, {a: 'seq'}]];
       var quality = seqInfo.quality;
@@ -93,7 +75,7 @@ angular.module('sprock.utilities', ['underscore']).
     };
   }]).
 
-  factory('convertExonsToEvents', ['eachInOrder', '_', function(eachInOrder, _) {
+  factory('convertExonsToEvents', ['_', function(_) {
     return function convertExons(exons, offset) {
 
 //{"request": {"name": "SPU_022066"}, "results": {"start": 10480, "scaffold": "Scaffold694", "end": 18337, "name": "SPU_022066", "exons": {"ID": "SPU_022066gn", "exons": {"SPU_022066:5\"": [14180, 14538], "SPU_022066:6\"": [17988, 18337], "SPU_022066:0\"": [10514, 10683], "SPU_022066:1\"": [11406, 11633], "SPU_022066:2\"": [11875, 11997], "SPU_022066:3\"": [12713, 12826], "SPU_022066:4\"": [13329, 13541]}}}}
@@ -107,7 +89,7 @@ angular.module('sprock.utilities', ['underscore']).
     };
   }]).
 
-  factory('convertFeaturesToEvents', ['eachInOrder', '_', function(eachInOrder, _) {
+  factory('convertFeaturesToEvents', ['_', function(_) {
     return function convertFeatures(features, offset) {
 
 //{"request": {"start": 0, "scaffold": "Scaffold1", "end": 18000}, "results": [{"span": [13028, 18195], "type": "gene", "id": "SPU_016802gn", "strand": "-"}, {"span": [13028, 18195], "type": "transcript", "id": "SPU_016802-tr", "strand": "-"}, {"span": [15818, 16028], "type": "exon", "id": "SPU_016802:1", "strand": "-"}, {"span": [15263, 15412], "type": "exon", "id": "SPU_016802:2", "strand": "-"}, {"span": [13880, 13989], "type": "exon", "id": "SPU_016802:3", "strand": "-"}, {"span": [13028, 13193], "type": "exon", "id": "SPU_016802:4", "strand": "-"}]}

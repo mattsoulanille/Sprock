@@ -15,21 +15,22 @@ describe('module interface', function() {
 describe('service', function() {
   beforeEach(module('sprock.utilities'));
 
-  describe('eachInOrder', function() {
-    it('should exist', inject(function(eachInOrder) {
-      expect(eachInOrder).toBeDefined();
+  describe('underscore each()', function() {
+    it('should exist', inject(function(_) {
+      expect(_.each).toBeDefined();
     }));
-    it('should go through an array in order', inject(function(eachInOrder) {
+    it('should go through an array in order', inject(function(_) {
       var cat = '';
-      eachInOrder([1,2,3,4,5], function(e) { cat += e })
+      _.each([1,2,3,4,5], function(e) { cat += e })
       expect(cat).toEqual('12345');
     }));
     it('should go through an array in order when elements added out of order',
-       inject(function(eachInOrder) {
+       // http://ecma-international.org/ecma-262/5.1/#sec-15.4.4.18
+       inject(function(_) {
 	 var cat = '';
 	 var a = [];
 	 a[2] = 3; a[0] = 1; a[4] = 5; a[1] = 2; a[3] = 4;
-	 eachInOrder(a, function(e) { cat += e })
+	 _.each(a, function(e) { cat += e })
 	 expect(cat).toEqual('12345');
        }));
   });
