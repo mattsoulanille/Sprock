@@ -22,6 +22,14 @@ class FQDB(object):
             record = self.fastqDB[scaffold]
             self.cache = (scaffold, record)
         return record[start_position:end_position]
+    def get_seq_object_entire_scaffold(self, scaffold):
+        if self.cache[0] == scaffold:
+            record = self.cache[1]
+        else:
+            record = self.fastqDB[scaffold]
+            self.cache = (scaffold, record)
+        return record
+    
         
 
 def main(argv):

@@ -1,6 +1,7 @@
 from __future__ import print_function
 from get_sequence import FQDB
 from get_features import get_features
+from get_gene import GeneDB
 import primer3, sys, argparse
 from Bio import SeqIO
 import pdb
@@ -24,16 +25,16 @@ class get_primers(object):
     @classmethod
     def splitInterval(self, start, stop, primerSpan=2000, overlap=700):
         """
-        Make an interval for splitting the sequence into ones smaller than or equal to the primerSpan. Overlap determines the minimum number of base pairs overlapped for each overlap.
+        Make an interval for splitting the sequence into ones smaller than or equal to the primerSpan. Overlap determines the minimum number of base pairs overlapped for each overlap. Intervals include the ends.
         """
 
-        end = primerSpan - 1 + start
+        end = primerSpan + start
         interval = [[start, end]]
-        while end <= stop: # brute force :P If you know a prettier way, feel free to change it
+        while end < stop: # brute force :P If you know a prettier way, feel free to change it
             start = end - overlap
             end = start + primerSpan
             interval += [[start, end]]
-        interval[-1][-1] = (stop -1)
+        interval[-1][-1] = (stop)
         return interval
 
     def makePrimers(self, sequence, interval, fuzziness=500, cb=None): 
@@ -64,8 +65,8 @@ class get_primers(object):
         if start < 0:
             start = 0
         end = interval[-1][-1] + upper_bound_extension
-        self.features = get_features(database)
-        featurelist = self.features.featuregen(scaffold, start, end, featuretype, False)
+        genedb = GeneDB(database)
+        featurelist = [x for x in genedb.gen_features_by_interval(scaffold, start, end, featuretype, False)]
         filteredInterval = filter(lambda x: reduce(lambda t, p: t == p == True, map(lambda f: (x[1] < (f.start - lower_bound_extension)) or (x[0] > (f.end + upper_bound_extension)), featurelist)), interval)
         #pdb.set_trace() # Debug
         return filteredInterval
@@ -97,9 +98,11 @@ def main(argv):
     args = parser.parse_args()
     prime = get_primers(args.start, args.end, args.scaffold)
     fqdb = FQDB(args.seq_file)
-    sequence = fqdb.get_seq_object(args.scaffold, args.start, args.end)
+    #sequence = fqdb.get_seq_object_entire_scaffold(args.scaffold)
+    sequence = fqdb.get_seq_object(args.scaffold, 0, args.end + args.fuzziness)
     interval = prime.splitInterval(args.start, args.end, args.length, args.overlap)
     finterval = prime.filterInterval(interval, args.featuredb)
+
     for primer in prime.makePrimers(sequence, finterval, args.fuzziness):
         print(primer)
     """
