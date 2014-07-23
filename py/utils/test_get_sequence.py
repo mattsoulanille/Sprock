@@ -2,7 +2,7 @@ import unittest
 
 from get_sequence import FQDB
 
-fastq_name = '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/Spur_3.1.LinearScaffold.fq'
+fastq_name = 'data/Spur_3.1.LinearScaffold.fq'
 
 class GetSequenceTestCase(unittest.TestCase):
     def setUp(self):

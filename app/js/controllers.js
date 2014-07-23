@@ -58,8 +58,10 @@ angular.module('sprock.controllers', [])
 	});
     };
   }])
-  .controller('MyCtrl4', ['$scope', '$http', 'getSequence', 'getGene', '_',
-			  function($scope, $http, getSequence, getGene, _) {
+  .controller('MyCtrl4', ['$scope', '$http', '$q', '_',
+			  'getSequence', 'getGene', 'getFeatures',
+			  function($scope, $http, $q, _,
+				   getSequence, getGene, getFeatures) {
     $scope.serverError = null;
     $scope.getGene = function() {
       getGene($scope.gene_name).
@@ -68,9 +70,9 @@ angular.module('sprock.controllers', [])
 	  $scope.gene_exons_pairs = _.pairs($scope.gene.exons);
 	  $scope.serverError = null;
 	  $scope.scaffold = gene.scaffold;
-	  $scope.start = gene.start;
-	  $scope.end = gene.end;
-	  $scope.getSequence();
+	  $scope.start = Math.max(gene.start - 500, 0);
+	  $scope.end = gene.end + 500;
+	  $scope.getAnnotatedSequence();
 	},
 	function(data) {
 	  console.log(data);
@@ -84,6 +86,22 @@ angular.module('sprock.controllers', [])
       getSequence($scope.scaffold, $scope.start, $scope.end).
 	then(function (v) {
 	  $scope.sequenceData = v;
+	  $scope.serverError = null;
+	},
+	function(data) {
+	  console.log(data);
+	  angular.element(data);
+	  $scope.serverError = data;
+	  $scope.results = null;
+	});
+    };
+    $scope.getAnnotatedSequence = function() {
+      var sequence_p = getSequence($scope.scaffold, $scope.start, $scope.end);
+      var features_p = getFeatures($scope.scaffold, $scope.start, $scope.end);
+      $q.all([sequence_p, features_p]).
+	then(function (values) {
+	  $scope.sequenceData = values[0];
+	  $scope.featuresData = values[1];
 	  $scope.serverError = null;
 	},
 	function(data) {

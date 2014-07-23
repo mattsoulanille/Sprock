@@ -114,7 +114,7 @@ def serve(g):
                      'tools.encode.on' : True,
                      'tools.encode.encoding' : 'utf-8',
                      'engine.autoreload.on': True,
-                     'data.directory_path': '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/',
+                     'data.directory_path': 'data/',
                      'data.fastq_filename': 'Spur_3.1.LinearScaffold.fq',
                      'data.gffdb_filename': 'GLEAN-UTR-3.1.db'
                      }
@@ -130,7 +130,7 @@ def serve(g):
                    'tools.auth_basic.checkpassword': checkpassword,
                    'tools.staticdir.on': True,
                    'tools.staticdir.root': os.path.abspath(os.getcwd()), # FIXME: cwd is the wrong choice
-                   'tools.staticdir.dir': '../app',
+                   'tools.staticdir.dir': 'app/',
                    #'tools.mako.collection_size': 500,
                    #'tools.mako.directories':  "mako/templates",
                    'response.timeout': 86400

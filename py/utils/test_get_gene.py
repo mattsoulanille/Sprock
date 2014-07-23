@@ -2,7 +2,7 @@ import unittest
 
 from get_gene import GeneDB
 
-gff_name = '/Users/soul/Projects/Bioinformatics/Echinobase/derived_data/GLEAN-UTR-3.1.db'
+gff_name = 'data/GLEAN-UTR-3.1.db'
 db = GeneDB(gff_name)
 
 class GetGeneTestCase(unittest.TestCase):

@@ -13,21 +13,47 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 	    ['_',
 	     'differentiateSequenceToEvents',
 	     'integrateSequenceEventsToHTML',
-	     function(_, differentiateSequenceToEvents, integrateSequenceEventsToHTML ) {
-	       function link(scope, elm, attrs) {
-		 function updateSequenceDisplay(seqInfo) {
-		   elm.empty();
-		   seqInfo && elm.append(function(seqInfo) {
-		     return integrateSequenceEventsToHTML(differentiateSequenceToEvents(seqInfo));
-		   }(seqInfo));
-		 };
+	     function(_,
+		      differentiateSequenceToEvents,
+		      integrateSequenceEventsToHTML ) {
+			function link(scope, elm, attrs) {
+			  function updateSequenceDisplay(seqInfo) {
+			    elm.empty();
+			    seqInfo && elm.append(function(seqInfo) {
+			      return integrateSequenceEventsToHTML(differentiateSequenceToEvents(seqInfo));
+			    }(seqInfo));
+			  };
 
-		 scope.$watch(attrs.formatSequence, function(seqInfo) {
-		   updateSequenceDisplay(seqInfo);
-		 });
-	       };
+			  scope.$watch(attrs.formatSequence, function(seqInfo) {
+			    updateSequenceDisplay(seqInfo);
+			  });
+			};
 
-	       return {
-		 link: link
-	       };
-	     }]);
+			return {
+			  link: link
+			};
+		      }]).
+  directive('formatScience',
+	    ['_',
+	     'differentiateSequenceToEvents',
+	     'integrateSequenceEventsToHTML',
+	     function(_,
+		      differentiateSequenceToEvents,
+		      integrateSequenceEventsToHTML ) {
+			function link(scope, elm, attrs) {
+			  function updateSequenceDisplay(seqInfo) {
+			    elm.empty();
+			    seqInfo && elm.append(function(seqInfo) {
+			      return integrateSequenceEventsToHTML(differentiateSequenceToEvents(seqInfo));
+			    }(seqInfo));
+			  };
+
+			  scope.$watch(attrs.formatSequence, function(seqInfo) {
+			    updateSequenceDisplay(seqInfo);
+			  });
+			};
+
+			return {
+			  link: link
+			};
+		      }]);
