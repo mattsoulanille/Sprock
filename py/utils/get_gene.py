@@ -64,6 +64,17 @@ class GeneDB(object):
     def get_exons_data_by_name(self, name):
         return self.get_exons_data_by_ID(self.id(name))
 
+    def gen_features_by_interval(self, scaffold, start, end, featureType=None, completely_within=False):
+        return self.db().region((scaffold, start, end), featureType, completely_within)
+
+    def get_features_data_by_interval(self, scaffold, start, end, featureType=None, completely_within=False):
+        return [ { 'type': f.featuretype,
+                   'span': (f.start, f.stop),
+                   'id': f.id,
+                   'strand': f.strand } for f
+                 in self.gen_features_by_interval(scaffold, start, end,
+                                                  featureType=featureType,
+                                                  completely_within=completely_within) ]
 
 def main(argv):
     from pprint import pprint

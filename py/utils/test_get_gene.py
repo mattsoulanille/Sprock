@@ -34,6 +34,30 @@ class GetGeneTestCase(unittest.TestCase):
                                    'SPU_022066:2"': [11875, 11997],
                                    'SPU_022066:3"': [12713, 12826],
                                    'SPU_022066:4"': [13329, 13541]}}
+
+    def testGetFeaturesDataByInterval(self):
+        data = db.get_features_data_by_interval('Scaffold1', 0, 50000, featureType='transcript')
+        assert data == [{'span': (28271, 32294), 'type': 'transcript', 'id': 'SPU_001114-tr', 'strand': '+'},
+                        {'span': (13028, 18195), 'type': 'transcript', 'id': 'SPU_016802-tr', 'strand': '-'}]
+        data = db.get_features_data_by_interval('Scaffold1', 0, 50000, featureType='gene')
+        assert data == [{'span': (28271, 32294), 'type': 'gene', 'id': 'SPU_001114gn', 'strand': '+'},
+                        {'span': (13028, 18195), 'type': 'gene', 'id': 'SPU_016802gn', 'strand': '-'}]
+        data = db.get_features_data_by_interval('Scaffold1', 0, 50000)
+        assert data == [{'span': (28271, 32294), 'type': 'gene', 'id': 'SPU_001114gn', 'strand': '+'},
+                        {'span': (28271, 32294), 'type': 'transcript', 'id': 'SPU_001114-tr', 'strand': '+'},
+                        {'span': (28271, 28616), 'type': 'exon', 'id': 'SPU_001114:0', 'strand': '+'},
+                        {'span': (28905, 29027), 'type': 'exon', 'id': 'SPU_001114:1', 'strand': '+'},
+                        {'span': (30064, 30272), 'type': 'exon', 'id': 'SPU_001114:2', 'strand': '+'},
+                        {'span': (32106, 32294), 'type': 'exon', 'id': 'SPU_001114:3', 'strand': '+'},
+                        {'span': (13028, 18195), 'type': 'gene', 'id': 'SPU_016802gn', 'strand': '-'},
+                        {'span': (13028, 18195), 'type': 'transcript', 'id': 'SPU_016802-tr', 'strand': '-'},
+                        {'span': (18163, 18195), 'type': 'exon', 'id': 'SPU_016802:0', 'strand': '-'},
+                        {'span': (15818, 16028), 'type': 'exon', 'id': 'SPU_016802:1', 'strand': '-'},
+                        {'span': (15263, 15412), 'type': 'exon', 'id': 'SPU_016802:2', 'strand': '-'},
+                        {'span': (13880, 13989), 'type': 'exon', 'id': 'SPU_016802:3', 'strand': '-'},
+                        {'span': (13028, 13193), 'type': 'exon', 'id': 'SPU_016802:4', 'strand': '-'}]
+
+
 def main():
     unittest.main()
 
