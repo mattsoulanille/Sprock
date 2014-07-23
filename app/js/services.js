@@ -37,4 +37,20 @@ angular.module('sprock.services', []).
 	});
       return deferred.promise;
     };
+  }]).
+
+  factory('getFeatures', ['$http', '$q', function($http, $q) {
+    return function (scaffold, start, end) {
+      var deferred = $q.defer();
+      $http.post('/data/getFeatures', {scaffold: scaffold, start: start, end: end}).
+	success(function (v) {
+	  deferred.resolve(v['results']);
+	}).
+	error(function(data, status, headers, config) {
+	  console.log(data);
+	  deferred.reject(data);
+	});
+      return deferred.promise;
+    };
   }]);
+

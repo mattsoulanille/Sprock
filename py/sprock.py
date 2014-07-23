@@ -79,6 +79,20 @@ class DataService(object):
                              }
                  }
 
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def getFeatures(self):
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"scaffold":"Scaffold1", "start":0, "end":18000}' 'http://localhost:8082/data/getFeatures'
+        argd = cherrypy.request.json
+        scaffold = argd['scaffold']
+        start = int(argd['start'])
+        end = int(argd['end'])
+        features = self.gene_db.get_features_data_by_interval(scaffold, start, end)
+        return { 'request': argd,
+                 'results': features }
+
+
 def serve(g):
     # Set up site-wide config first so we get a log if errors occur.
     cherrypy.config.update({#'environment': 'production',
