@@ -100,4 +100,33 @@ describe('service', function() {
     }));
   });
 
+  describe('convertFeaturesToEvents', function() {
+    it('should be a function', inject(function(convertFeaturesToEvents) {
+      expect(convertFeaturesToEvents).toBeFunction();
+    }));
+    it('should do the right thing', inject(function(convertFeaturesToEvents) {
+      var features = [{"span": [13028, 18195], "type": "gene", "id": "SPU_016802gn", "strand": "-"},
+		      {"span": [13028, 18195], "type": "transcript", "id": "SPU_016802-tr", "strand": "-"},
+		      {"span": [15818, 16028], "type": "exon", "id": "SPU_016802:1", "strand": "-"},
+		      {"span": [15263, 15412], "type": "exon", "id": "SPU_016802:2", "strand": "-"},
+		      {"span": [13880, 13989], "type": "exon", "id": "SPU_016802:3", "strand": "-"},
+		      {"span": [13028, 13193], "type": "exon", "id": "SPU_016802:4", "strand": "-"}];
+
+      expect(convertFeaturesToEvents(features, 13000)).toEqual({"events":
+								[[28,{"gene":"gene"}],
+								 [28,{"transcript":"transcript"}],
+								 [28,{"exon":"exon"}],
+								 [193,{"exon":null}],
+								 [880,{"exon":"exon"}],
+								 [989,{"exon":null}],
+								 [2263,{"exon":"exon"}],
+								 [2412,{"exon":null}],
+								 [2818,{"exon":"exon"}],
+								 [3028,{"exon":null}],
+								 [5195,{"gene":null}],
+								 [5195,{"transcript":null}]]});
+
+    }));
+  });
+
 });

@@ -105,4 +105,20 @@ angular.module('sprock.utilities', ['underscore']).
       });
       return {'events': events};
     };
+  }]).
+
+  factory('convertFeaturesToEvents', ['eachInOrder', '_', function(eachInOrder, _) {
+    return function convertFeatures(features, offset) {
+
+//{"request": {"start": 0, "scaffold": "Scaffold1", "end": 18000}, "results": [{"span": [13028, 18195], "type": "gene", "id": "SPU_016802gn", "strand": "-"}, {"span": [13028, 18195], "type": "transcript", "id": "SPU_016802-tr", "strand": "-"}, {"span": [15818, 16028], "type": "exon", "id": "SPU_016802:1", "strand": "-"}, {"span": [15263, 15412], "type": "exon", "id": "SPU_016802:2", "strand": "-"}, {"span": [13880, 13989], "type": "exon", "id": "SPU_016802:3", "strand": "-"}, {"span": [13028, 13193], "type": "exon", "id": "SPU_016802:4", "strand": "-"}]}
+
+      offset = offset || 0;
+      var events = [];
+      _.each(features, function(f) {
+	var t;
+	events.push([f.span[0] - offset, (t={},t[f.type]=f.type,t)]);
+	events.push([f.span[1] - offset, (t={},t[f.type]=null,t)]);
+      });
+      return {'events': _.sortBy(events, function(e) { return e[0]})};
+    };
   }]);
