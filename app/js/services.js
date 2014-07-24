@@ -25,17 +25,38 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
-  factory('getSeqInfo', ['$http', '$q', 'SequenceInfo', function($http, $q, SequenceInfo) {
+  factory('getFeatures', ['$http', '$q', function($http, $q) {
     return function (scaffold, start, end) {
       var deferred = $q.defer();
-      $http.post('/data/getSeq', {scaffold: scaffold, start: start, end: end}).
+      $http.post('/data/getFeatures', {scaffold: scaffold, start: start, end: end}).
 	success(function (v) {
-	  deferred.resolve(new SequenceInfo(v['results']));
-	})
-	.error(function(data, status, headers, config) {
+	  deferred.resolve(v['results']);
+	}).
+	error(function(data, status, headers, config) {
 	  console.log(data);
 	  deferred.reject(data);
 	});
+      return deferred.promise;
+    };
+  }]).
+
+  factory('getSeqInfo', ['$http', '$q', 'getSequence', 'getFeatures', 'SequenceInfo',
+			 function($http, $q, getSequence, getFeatures, SequenceInfo) {
+    return function (scaffold, start, end) {
+      var deferred = $q.defer();
+      var sequence_p = getSequence(scaffold, start, end);
+      var features_p = getFeatures(scaffold, start, end);
+      $q.all([sequence_p, features_p]).
+       then(function (values) {
+         var sequenceData = values[0];
+         var featuresData = values[1];
+	 var si = new SequenceInfo(sequenceData).add_features(featuresData);
+	 deferred.resolve(si);
+       },
+       function(data) {
+         console.log(data);
+	 deferred.reject(data);
+       });
       return deferred.promise;
     };
   }]).
@@ -53,20 +74,4 @@ angular.module('sprock.services', ['sprock.utilities']).
 	});
       return deferred.promise;
     };
-  }]).
-
-  factory('getFeatures', ['$http', '$q', function($http, $q) {
-    return function (scaffold, start, end) {
-      var deferred = $q.defer();
-      $http.post('/data/getFeatures', {scaffold: scaffold, start: start, end: end}).
-	success(function (v) {
-	  deferred.resolve(v['results']);
-	}).
-	error(function(data, status, headers, config) {
-	  console.log(data);
-	  deferred.reject(data);
-	});
-      return deferred.promise;
-    };
   }]);
-
