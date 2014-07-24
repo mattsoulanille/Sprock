@@ -40,47 +40,40 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 	    ['_', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML',
 	     function factory(_, differentiateSequenceToEvents, integrateSequenceEventsToHTML ) {
 	       var directiveDefinitionObject = {
-//		 template: '<div></div>', // or // function(tElement, tAttrs) { ... },
+		 //template: '<div></div>', // or // function(tElement, tAttrs) { ... },
 		 restrict: 'E',
+
 		 scope: {
-		   sd: '=sequenceData',
-		   //cuties: '=kittens',
-		   kittens: '=',
-		   essdee: '=essdee'
+		   sequenceData: '=',
+		   featuresData: '='
 		 },
+
 		 link: function postLink(scope, iElement, iAttrs, controller) { 
 		   function updateSequenceDisplay(something) {
 		     iElement.empty();
-		     iElement.append('<p>Hello there! ' + _.uniqueId() + '</p>');
-//		     iElement.append('<p>something is ' + something + '</p>');
-//       iElement.append('<p>scope.cuties is ' + scope.cuties);
-		     iElement.append('<p>scope.kittens is ' + scope.kittens + '</p>');
-//		       iElement.append('<p>scope.sd is <pre>' + JSON.stringify(scope.sd) + '</pre></p>')
-//		       iElement.append('<p>scope.essdee is <pre>' + JSON.stringify(scope.essdee) + '</pre></p>');
-		     iElement.append('<p>scope is <pre>' + scope + '</pre></p>');
-		     //console.log(scope);
-
-//		       scope.seqData && iElement.append(function(data) {
-//			 return integrateSequenceEventsToHTML(differentiateSequenceToEvents(data));
-//		       }(scope.seqData));
-
+		     //iElement.append('<p>Hello there! ' + _.uniqueId() + '</p>');
+		     //iElement.append('<p>something is ' + something + '</p>');
+		     iElement.append('<h3>format-science</h3>');
+		     scope.sequenceData && iElement.
+		       append(
+			 integrateSequenceEventsToHTML(
+			   differentiateSequenceToEvents(
+			     scope.sequenceData
+			   )));
 		   };
 
-//		     updateSequenceDisplay();
-//		     scope.$watch(iAttrs.essdee, function(foo) {
-//		     scope.$watch(scope.cuties, function(newValue, oldValue) {
-		   scope.$watch(
-		     'kittens',	// NOT 'scope.kittens'!!
-		     // alternately can do: function(scope) { return scope.kittens },
-		     function(newValue, oldValue) {
-		     console.log('watch scope.kittens ' + _.uniqueId());
-		     console.log(scope.kittens);
-		     updateSequenceDisplay(newValue);
+		   // I wish for $watchGroup(), but don't find it, hence this:
+		   scope.tickle = 0;
+		   scope.$watch('sequenceData', function(newVal, oldVal, scope) {
+		     scope.tickle++;
 		   });
-
+		   scope.$watch('featuresData', function(newVal, oldVal, scope) {
+		     scope.tickle++;
+		   });
+		   scope.$watch('tickle', updateSequenceDisplay);
 		 }
-		 // or
-		 // link: function postLink( ... ) { ... }
 	       };
+
 	       return directiveDefinitionObject;
+
 	     }]);
