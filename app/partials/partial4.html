@@ -4,7 +4,7 @@
   <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
 </form>
 <form ng-submit="getSequenceInformation()">
-  Scaffold:<input type="text" ng-model="scaffold" size="10" placeholder="scaffold">
+  <input type="text" ng-model="scaffold" size="10" placeholder="scaffold">
   <input type="text" ng-model="start" size="6" placeholder="start">
   <input type="text" ng-model="end" size="6" placeholder="end">
   <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
@@ -29,8 +29,11 @@
 <h1>The Sequence</h1>
 <p>sophie is {{sophie}}</p>
 -->
-<a href="http://www.echinobase.org/Echinobase/JBrowse-1.10.9/index.html?data=data_sp&loc={{scaffold}}%3A{{start}}..{{end}}&tracks=DNA%2CGLEAN%2CTranscriptome"
-target="_blank">JBrowse</a>
+<p>See it on
+  <a href="http://www.echinobase.org/Echinobase/JBrowse-1.10.9/index.html?data=data_sp&loc={{scaffold}}%3A{{start}}..{{end}}&tracks=DNA%2CGLEAN%2CTranscriptome"
+     target="_blank">JBrowse</a>
+  Legend: <span class="seq gene">GENE</span>&nbsp;<span class="seq transcript">TRANSCRIPT</span>&nbsp;<span class="seq exon">EXON</span>
+</p>
 <hr/>
 
 <!-- <format-science sequence-data="sequenceData" features-data="featuresData"></format-science> -->
