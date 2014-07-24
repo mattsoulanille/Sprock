@@ -32,3 +32,31 @@ angular.module('sprock', [
     })
     .otherwise({redirectTo: '/view1'})
 }]);
+
+// some console hacks.. TODO put somewhere better
+var $a = function () {
+  return angular.element.apply(angular,_.toArray(arguments));
+};
+
+var $i = function (elem) {
+  elem = elem || document.getElementsByTagName('body')[0];
+  return $a(elem).injector();
+};
+
+var $injector,
+    $browser,
+    $location;
+
+var init = function () {
+  $injector = $i();
+
+  if (!$injector) return setTimeout(init,100);
+
+  $injector.invoke(function (_$browser_, _$location_) {
+    $browser  = _$browser_;
+    $location = _$location_;
+  });
+  return null;
+};
+
+init();
