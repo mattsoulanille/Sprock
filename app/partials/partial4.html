@@ -1,0 +1,41 @@
+<p>This is the partial for view 4.</p>
+<form ng-submit="getGene()">
+  <input type="text" ng-model="gene_name" size="16" placeholder="Gene name"> e.g. SPU_022067
+  <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
+</form>
+<form ng-submit="getSequenceInformation()">
+  Scaffold:<input type="text" ng-model="scaffold" size="10" placeholder="scaffold">
+  <input type="text" ng-model="start" size="6" placeholder="start">
+  <input type="text" ng-model="end" size="6" placeholder="end">
+  <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
+</form>
+<pre>{{serverError}}</pre>
+<!--
+<form>
+  <input type="text" ng-model="sophie" size="16" placeholder="kittens">
+  <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
+</form>
+<div class="gene" ng-show="gene">
+<h1>Gene {{gene.name}}</h1>
+<p>On {{gene.scaffold}} from {{gene.start | number}} to {{gene.end | number}} ({{gene.end - gene.start | number}}bp)</p>
+<h2>Exons</h2>
+<ul>
+  <li ng-repeat="exon in gene_exons_pairs">{{exon[0]}}: {{exon[1] | json}}</li>
+</ul>
+<h2>JSON of gene</h2>
+{{gene | json}}
+</div>
+<pre>{{serverError}}</pre>
+<h1>The Sequence</h1>
+<p>sophie is {{sophie}}</p>
+-->
+<hr/>
+
+<!-- <format-science sequence-data="sequenceData" features-data="featuresData"></format-science> -->
+<format-science sequence-info="sequenceInformation"></format-science>
+<hr/>
+<!--
+<h3>format-sequence</h3>
+<div format-sequence="sequenceData"></div>
+<hr/>
+-->

@@ -103,4 +103,40 @@ angular.module('sprock.utilities', ['underscore']).
       });
       return {'events': _.sortBy(events, function(e) { return e[0]})};
     };
+  }]).
+
+  factory('ObjPlay', ['_', function(_) {
+    function si(foo) {
+      this.foo = foo || 'fooless';
+    };
+
+    si.prototype.tell =
+      function(bar) {
+	return this.foo + ' walks into ' + bar;
+      };
+
+    return si;
+
+  }]).
+
+  factory('SequenceInfo', ['_', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents', function(_, differentiateSequenceToEvents, integrateSequenceEventsToHTML, convertFeaturesToEvents ) {
+
+    function si(seqInfo) {
+      _.extend(this, seqInfo);
+      return this;
+    };
+
+    si.prototype.render_to_html =
+      function() {
+	//return '<strong><blink>Unimplemented</blink></strong>'
+	return integrateSequenceEventsToHTML(differentiateSequenceToEvents(this));
+      };
+
+    si.prototype.add_features =
+      function(features) {
+	//Unimplemented
+	return this
+      };
+
+    return si;
   }]);

@@ -37,15 +37,16 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		      }]).
 
   directive('formatScience',
-	    ['_', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML',
-	     function factory(_, differentiateSequenceToEvents, integrateSequenceEventsToHTML ) {
+	    ['_', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents',
+	     function factory(_, differentiateSequenceToEvents, integrateSequenceEventsToHTML, convertFeaturesToEvents ) {
 	       var directiveDefinitionObject = {
 		 //template: '<div></div>', // or // function(tElement, tAttrs) { ... },
 		 restrict: 'E',
 
 		 scope: {
-		   sequenceData: '=',
-		   featuresData: '='
+		   //sequenceData: '=',
+		   //featuresData: '=',
+		   sequenceInfo: '='
 		 },
 
 		 link: function postLink(scope, iElement, iAttrs, controller) { 
@@ -54,14 +55,18 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     //iElement.append('<p>Hello there! ' + _.uniqueId() + '</p>');
 		     //iElement.append('<p>something is ' + something + '</p>');
 		     iElement.append('<h3>format-science</h3>');
-		     scope.sequenceData && iElement.
-		       append(
-			 integrateSequenceEventsToHTML(
-			   differentiateSequenceToEvents(
-			     scope.sequenceData
-			   )));
+//		     scope.sequenceData && iElement.
+//		       append(
+//			 integrateSequenceEventsToHTML(
+//			   differentiateSequenceToEvents(
+//			     scope.sequenceData
+//			   )));
+		     if (scope.sequenceInfo) {
+		       //console.log(scope.sequenceInfo);
+		       iElement.append(scope.sequenceInfo.render_to_html());
+		     };
 		   };
-
+/*
 		   // I wish for $watchGroup(), but don't find it, hence this:
 		   scope.tickle = 0;
 		   scope.$watch('sequenceData', function(newVal, oldVal, scope) {
@@ -71,7 +76,10 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     scope.tickle++;
 		   });
 		   scope.$watch('tickle', updateSequenceDisplay);
+*/
+		   scope.$watch('sequenceInfo', updateSequenceDisplay);
 		 }
+
 	       };
 
 	       return directiveDefinitionObject;

@@ -130,4 +130,52 @@ describe('service', function() {
     }));
   });
 
+  describe('ObjPlay', function() {
+    it('should be a function', inject(function(ObjPlay) {
+      expect(ObjPlay).toBeFunction();
+    }));
+    it('should construct with an arg', inject(function(ObjPlay) {
+      var t = new ObjPlay('some foo');
+      expect(t).toBeAwesome();
+    }));
+    it('should tell',  inject(function(ObjPlay) {
+      var t = new ObjPlay('some foo');
+      expect(t.tell('some bar')).toEqual("some foo walks into some bar");
+    }));
+    it('should have a default for contruction',  inject(function(ObjPlay) {
+      var t = new ObjPlay();
+      expect(t.tell('some bar')).toEqual("fooless walks into some bar");
+    }));
+  });
+
+  describe('SequenceInfo', function() {
+    var si;
+
+    beforeEach(inject(function(SequenceInfo) {
+      var t = {"request":
+	       {"start": 67, "scaffold": "Scaffold12345", "end": 89},
+	       "results": {"start": 67, "scaffold": "Scaffold12345", "end": 89,
+			   "quality": [56, 51, 51, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 51, 51, 51, 51],
+			   "sequence": "TCATTTATATTATTTAGATGTG"}};
+      si = new SequenceInfo(t.results);
+    }));
+
+    it('should be a function', inject(function(SequenceInfo) {
+      expect(SequenceInfo).toBeFunction();
+    }));
+    it('should render to HTML', inject(function(SequenceInfo) {
+      var html = si.render_to_html();
+      expect(html).toBeString();
+      expect(html).toEqual('<span class="seq qual56">T</span><span class="seq qual51">CA</span><span class="seq qual45">TTTATATTATTTAGA</span><span class="seq qual51">TGTG</span>');
+    }));
+    it('should accept addition of features', inject(function(SequenceInfo) {
+      expect(si.add_features('TBS')).toBe(si);
+    }));
+
+    it('should ', inject(function(SequenceInfo) {
+      expect().toBe();
+    }));
+
+  });
+
 });

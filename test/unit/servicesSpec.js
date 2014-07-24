@@ -26,6 +26,23 @@ describe('service', function() {
       $rootScope.$apply();
       expect(sequence).toBe('getSequence happy');
     }));
+  });
+
+  describe('getSeqInfo', function() {
+    it('should be a function', inject(function(getSeqInfo) {
+      expect(getSeqInfo).toBeFunction();
+    }));
+    it('should return a promise', inject(function(getSeqInfo) {
+      expect(getSeqInfo()).toBeAPromise();
+    }));
+    xit('should produce good sequence data', inject(function(getSeqInfo, $rootScope, $httpBackend) {
+      // FIXME
+      var sequence;
+      getSeqInfo('Scaffold1', 2, 34).then(function(v) { sequence = v; });
+      expect(sequence).toBeUndefined();
+      $rootScope.$apply();
+      expect(sequence).toBe('getSeqInfo happy');
+    }));
 
   });
 
