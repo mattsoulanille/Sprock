@@ -113,19 +113,20 @@ describe('service', function() {
 		      {"span": [13880, 13989], "type": "exon", "id": "SPU_016802:3", "strand": "-"},
 		      {"span": [13028, 13193], "type": "exon", "id": "SPU_016802:4", "strand": "-"}];
 
-      expect(convertFeaturesToEvents(features, 13000)).toEqual({"events":
-								[[28,{"gene":"gene"}],
-								 [28,{"transcript":"transcript"}],
-								 [28,{"exon":"exon"}],
-								 [193,{"exon":null}],
-								 [880,{"exon":"exon"}],
-								 [989,{"exon":null}],
-								 [2263,{"exon":"exon"}],
-								 [2412,{"exon":null}],
-								 [2818,{"exon":"exon"}],
-								 [3028,{"exon":null}],
-								 [5195,{"gene":null}],
-								 [5195,{"transcript":null}]]});
+      var f_etc = {features: features, start: 13000};
+      expect(convertFeaturesToEvents(f_etc)).toEqual({"events":
+						      [[28,{"gene":"gene"}],
+						       [28,{"transcript":"transcript"}],
+						       [28,{"exon":"exon"}],
+						       [193,{"exon":null}],
+						       [880,{"exon":"exon"}],
+						       [989,{"exon":null}],
+						       [2263,{"exon":"exon"}],
+						       [2412,{"exon":null}],
+						       [2818,{"exon":"exon"}],
+						       [3028,{"exon":null}],
+						       [5195,{"gene":null}],
+						       [5195,{"transcript":null}]]});
 
     }));
   });

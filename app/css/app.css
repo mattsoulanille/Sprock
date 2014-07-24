@@ -34,6 +34,18 @@
   word-wrap: break-word;
 }
 
+.exon {
+    background: #cce9ca;
+}
+
+.transcript {
+    text-decoration: underline;
+}
+
+.gene {
+    font-style: italic;
+}
+
 .qual0 {
   color: #ececec;
 }
