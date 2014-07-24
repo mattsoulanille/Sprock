@@ -63,6 +63,8 @@ angular.module('sprock.controllers', [])
 			  function($scope, $http, $q, _,
 				   getSequence, getGene, getFeatures) {
     $scope.serverError = null;
+//    $scope.sophie = 'black and white'; //DEBUG
+    $scope.sophie = 42; //DEBUG
     $scope.getGene = function() {
       getGene($scope.gene_name).
 	then(function (gene) {

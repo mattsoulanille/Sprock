@@ -37,11 +37,11 @@ describe('directives', function() {
 //    });
 //  });
 
-//  describe('formatSequence', function() {
-
-//    it('should exist', inject(function(formatSequence) {
-//      expect(formatSequence).toBeDefined();
 /*
+  describe('formatSequence', function() {
+
+    it('should exist', inject(function(formatSequence) {
+      expect(formatSequence).toBeDefined();
       module(function($provide) {
         $provide.value('version', 'TEST_VER');
       });
@@ -49,7 +49,8 @@ describe('directives', function() {
         var element = $compile('<span app-version></span>')($rootScope);
         expect(element.text()).toEqual('TEST_VER');
       });
+    }));
+  });
 */
-//    }));
-//  });
+
 });
