@@ -57,8 +57,12 @@ class DataService(object):
         scaffold = argd['scaffold']
         start = int(argd['start'])
         end = int(argd['end'])
+        seq_data = self.fqdb.get_sequence_data(scaffold, start, end)
+        seq_data['scaffold'] = scaffold
+        seq_data['start'] = start
+        seq_data['end'] = end
         return { 'request': argd,
-                 'results': self.fqdb.get_sequence_data(scaffold, start, end) }
+                 'results': seq_data }
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -89,8 +93,11 @@ class DataService(object):
         start = int(argd['start'])
         end = int(argd['end'])
         features = self.gene_db.get_features_data_by_interval(scaffold, start, end)
-        return { 'request': argd,
-                 'results': features }
+        return {
+            'request': argd,
+            'results': { 'scaffold': scaffold, 'start': start, 'end': end, 'features': features },
+            'notes': ['"span" is with respect to the scaffold, not the start of the requested range']
+        }
 
 
 def serve(g):
