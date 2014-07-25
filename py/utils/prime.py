@@ -14,21 +14,32 @@ class Prime(object):
         self.primer_windows =  [(start1, end1), (start2, end2), ...]
         # then primer maker gets called with this Prime object
         # it retrieves what data it needs
-        
-    def flush_existing_primers(self):
-        # clear out the recorded primers if any
-        # primer maker calls this, and maybe sometimes UI
-
-
-    def here_is_a_primer_pair(self, primer_pair):
-        # record, invoke callbacks, etc
-        # primer maker calls this with results one at a time
-
-    def all_primed(self):
-        # notify there's no more
 
 
 class PrimerMaker(object):
-    def make_primers_according_to(self, some_Prime_object_you_get_passed):
-        for primer_pair in gimmie_primers(some_Prime):
-            some_Prime.here_is_a_primer_pair(primer_pair
+    """Make primers for a Prime object
+
+    Operates as an iterator. Typical use like:
+    >>> prime = Prime()
+    >>> prime.set_up_to_prime('SPU_008174', 30000) # UI does this
+    >>> pm = PrimerMaker()
+    >>> pm.config_for(prime)
+    >>> t0 = time.time()
+    >>> for primer_pair in pm:
+    ...   print("Got primer_pair %r" % (time.time() - t0, primer_pair)
+    """
+    def __init__(self, setup_info):
+        #get set up, do expensive things once
+
+    def config_for(self, prime):
+        # Do what you need to absorb the particulars
+        self.prime = prime
+
+    def __iter__(self):
+        # set up to make the primers
+        return self             # or whatever the primer iterator is
+
+    def next(self):
+        # return the next primer pair (if you're the iterator)
+        if no_more_primer_pairs_to_provide:
+            raise StopIteration
