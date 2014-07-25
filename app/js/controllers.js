@@ -58,9 +58,10 @@ angular.module('sprock.controllers', []).
 	});
     };
   }]).
-  controller('MyCtrl4', ['$scope', '$http', '$q', '_', 'getGene', 'getSeqInfo',
-			 function($scope, $http, $q, _, getGene, getSeqInfo) {
+  controller('MyCtrl4', ['$scope', '$http', '$q', '_', 'getGene', 'getContextSeqInfo', 'getSeqInfo',
+			 function($scope, $http, $q, _, getGene, getContextSeqInfo, getSeqInfo) {
     $scope.serverError = null;
+    $scope.margin = 500;	//FIXME
 
     $scope.getGene = function() {
       getGene($scope.gene_name).
@@ -72,6 +73,24 @@ angular.module('sprock.controllers', []).
 	  $scope.start = Math.max(gene.start - 500, 0);
 	  $scope.end = gene.end + 500;
 	  $scope.getSequenceInformation();
+	},
+	function(data) {
+	  console.log(data);
+	  angular.element(data);
+	  $scope.serverError = data;
+	  $scope.gene = null;
+	  $scope.gene_exons_pairs = null;
+	});
+    };
+
+    $scope.getContextInformation = function() {
+      getContextSeqInfo($scope.gene_name, $scope.margin).
+	then(function (si) {
+	  $scope.sequenceInformation = si;
+	  $scope.serverError = null;
+	  $scope.scaffold = si.scaffold;
+	  $scope.start = si.span[0]
+	  $scope.end = si.span[1]
 	},
 	function(data) {
 	  console.log(data);

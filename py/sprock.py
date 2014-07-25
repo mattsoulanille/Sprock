@@ -5,6 +5,7 @@ import cherrypy
 
 from utils.get_sequence import FQDB # FIXME: names
 from utils.get_gene import GeneDB
+from utils.bio_db import BioDB
 
 
 # An object to hold things
@@ -37,6 +38,7 @@ class DataService(object):
         cherrypy.log("FASTQ %s " % fqdb_filename)
         self.fqdb = FQDB(fqdb_filename)
         self.gene_db = GeneDB(self.g.gffdb_filename)
+        self.bioDB = BioDB(self.fqdb, self.gene_db)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -98,6 +100,21 @@ class DataService(object):
             'results': { 'scaffold': scaffold, 'start': start, 'end': end, 'features': features },
             'notes': ['"span" is with respect to the scaffold, not the start of the requested range']
         }
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def getContext(self):
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"name":"SPU_008174", "margin":300}' 'http://localhost:8082/data/getContext'
+        argd = cherrypy.request.json
+        gene_name = argd['name']
+        margin = int(argd['margin'])
+        context = self.bioDB.get_context_by_name(gene_name, margin)
+        return {
+            'request': argd,
+            'results': context
+        }
+
 
 
 def serve(g):

@@ -123,6 +123,7 @@ angular.module('sprock.utilities', ['underscore']).
     function si(seqInfo) {
       _.extend(this, seqInfo);
       _.extend(this,  differentiateSequenceToEvents(this));
+      _.has(this, 'features') && this.add_features(this.features);
       return this;
     };
 
@@ -135,12 +136,12 @@ angular.module('sprock.utilities', ['underscore']).
 
     si.prototype.add_features =
       function(features) {
-	console.log(this);
-	console.log(features);
-	console.log(_.uniq(_.flatten(_.map(this.events, function(v) { return _.keys(v[1]) }))));
-	console.log(convertFeaturesToEvents(features));
+	//console.log(this);
+	//console.log(features);
+	//console.log(_.uniq(_.flatten(_.map(this.events, function(v) { return _.keys(v[1]) }))));
+	//console.log(convertFeaturesToEvents(features));
 	this.events = _.union(this.events, convertFeaturesToEvents(features).events); //FIXME: screwy what's an event
-	console.log(_.uniq(_.flatten(_.map(this.events, function(v) { return _.keys(v[1]) }))));
+	//console.log(_.uniq(_.flatten(_.map(this.events, function(v) { return _.keys(v[1]) }))));
 	//Unimplemented
 	return this
       };

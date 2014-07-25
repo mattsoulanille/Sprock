@@ -13,6 +13,7 @@
     "html5-boilerplate": "~4.3.0",
     "underscore": "~1.6.0",
     "angular-underscore-module": "*",
-    "chai": "^1.9.1"
+    "chai": "^1.9.1",
+    "angular-ui-bootstrap-bower": "~0.11.0"
   }
 }

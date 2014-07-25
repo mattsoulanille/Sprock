@@ -5,6 +5,7 @@
 angular.module('sprock', [
   'ngRoute',
   'underscore',
+  'ui.bootstrap',
   'sprock.filters',
   'sprock.services',
   'sprock.directives',

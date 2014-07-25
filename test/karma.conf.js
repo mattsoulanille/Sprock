@@ -9,6 +9,7 @@ module.exports = function(config){
       'app/bower_components/angular-mocks/angular-mocks.js',
       'app/bower_components/underscore/underscore.js',
       'app/bower_components/angular-underscore-module/angular-underscore-module.js',
+      'app/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
       'app/js/**/*.js',
       'test/unit/**/*.js'
     ],

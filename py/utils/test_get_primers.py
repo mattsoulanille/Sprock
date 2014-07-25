@@ -10,7 +10,7 @@ gff_name = 'data/GLEAN-UTR-3.1.db'
 sequence_name = 'data/Spur_3.1.LinearScaffold.fq'
 prime = get_primers(4000, 50000, 'Scaffold1')
 fqdb = FQDB(sequence_name)
-primers = open('test_data/get_primers_test_data.txt', 'r')
+primers = open('py/utils/test_data/get_primers_test_data.txt', 'r')
 
 class GetGeneTestCase(unittest.TestCase):
     def setUp(self):

@@ -74,4 +74,22 @@ angular.module('sprock.services', ['sprock.utilities']).
 	});
       return deferred.promise;
     };
+  }]).
+
+  factory('getContextSeqInfo', ['$http', '$q', 'SequenceInfo',
+			 function($http, $q, SequenceInfo) {
+    return function (name, margin) {
+      var deferred = $q.defer();
+      $http.post('/data/getContext', {name: name, margin: margin}).
+	success(function (v) {
+	  var results = v['results']
+	  var si = new SequenceInfo(results);//.add_features(featuresData);
+	  deferred.resolve(si);
+	}).
+	error(function(data, status, headers, config) {
+	  console.log(data);
+	  deferred.reject(data);
+	});
+      return deferred.promise;
+    };
   }]);

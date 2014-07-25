@@ -43,7 +43,23 @@ describe('service', function() {
       $rootScope.$apply();
       expect(sequence).toBe('getSeqInfo happy');
     }));
+  });
 
+  describe('getContextSeqInfo', function() {
+    it('should be a function', inject(function(getContextSeqInfo) {
+      expect(getContextSeqInfo).toBeFunction();
+    }));
+    it('should return a promise', inject(function(getContextSeqInfo) {
+      expect(getContextSeqInfo()).toBeAPromise();
+    }));
+    xit('should produce good context data', inject(function(getContextSeqInfo, $rootScope, $httpBackend) {
+      // FIXME
+      var sequence;
+      getContextSeqInfo('Scaffold1', 2, 34).then(function(v) { sequence = v; });
+      expect(sequence).toBeUndefined();
+      $rootScope.$apply();
+      expect(sequence).toBe('getContextSeqInfo happy');
+    }));
   });
 
 });
