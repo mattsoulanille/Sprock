@@ -117,7 +117,13 @@ angular.module('sprock.controllers', []).
 
   }]).
 
-  controller('Tester1', ['$scope', '$http', '$q', '$timeout', '_', 'getGene', 'getContextSeqInfo', 'getSeqInfo', function($scope, $http, $q, $timeout, _, getGene, getContextSeqInfo, getSeqInfo) {
+  controller('Tester1',
+    ['$scope', '$http', '$q', '$timeout', '_',
+     'data_getSeq_test',
+     'getGene', 'getContextSeqInfo', 'getSeqInfo',
+     function($scope, $http, $q, $timeout, _,
+	      data_getSeq_test,
+	      getGene, getContextSeqInfo, getSeqInfo) {
     var expect = chai.expect;
     var tests = [
 
@@ -184,6 +190,7 @@ angular.module('sprock.controllers', []).
 
       },
 
+      data_getSeq_test
     ];
     console.log(tests);
 

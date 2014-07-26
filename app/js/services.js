@@ -10,6 +10,19 @@ angular.module('sprock.services', ['sprock.utilities']).
   value('version', '0.0.3').
 
 // FIXME: DRY
+
+  factory('data_getSeq_test', ['$http', function($http) {
+    return function() {
+      return chai.expect($http.post('/data/getSeq', {scaffold: 'Scaffold1', start: 2, end: 34})).
+	to.eventually.have.property('data').and.
+	to.eql({"request": {"start":2, "scaffold":"Scaffold1","end":34},
+		"results": {"start":2,"scaffold":"Scaffold1","end":34,
+			    "quality":[35,35,32,35,53,47,41,42,46,45,29,29,29,32,33,51,51,51,
+				       51,51,51,46,46,46,46,40,40,40,44,44,39,32],
+			    "sequence":"CATTTTATCACCAGTTCGATTTTCCCCTTGTT"}});
+    };
+  }]).
+
   factory('getSequence', ['$http', '$q', function($http, $q) {
     return function (scaffold, start, end) {
       var deferred = $q.defer();
