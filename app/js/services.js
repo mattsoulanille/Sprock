@@ -38,6 +38,23 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
+  factory('data_getFeatures_test', ['$http', function($http) {
+    return function() {
+      return chai.expect($http.post('/data/getFeatures', {scaffold: 'Scaffold1', start: 1000, end: 18000})).
+	to.eventually.have.property('data').and.
+	to.have.property('results').and.
+	to.eql({"start":1000,
+		"scaffold":"Scaffold1",
+		"end":18000,
+		"features":[{"span":[13028,18195],"type":"gene","id":"SPU_016802gn","strand":"-"},
+			    {"span":[13028,18195],"type":"transcript","id":"SPU_016802-tr","strand":"-"},
+			    {"span":[15818,16028],"type":"exon","id":"SPU_016802:1","strand":"-"},
+			    {"span":[15263,15412],"type":"exon","id":"SPU_016802:2","strand":"-"},
+			    {"span":[13880,13989],"type":"exon","id":"SPU_016802:3","strand":"-"},
+			    {"span":[13028,13193],"type":"exon","id":"SPU_016802:4","strand":"-"}]});
+    };
+  }]).
+
   factory('getFeatures', ['$http', '$q', function($http, $q) {
     return function (scaffold, start, end) {
       var deferred = $q.defer();
@@ -71,6 +88,19 @@ angular.module('sprock.services', ['sprock.utilities']).
 	 deferred.reject(data);
        });
       return deferred.promise;
+    };
+  }]).
+
+  factory('data_getGene_test', ['$http', function($http) {
+    return function() {
+      return chai.expect($http.post('/data/getGene', {name: 'SPU_008174'})).
+	to.eventually.have.property('data').and.
+	to.have.property('results').and.
+	to.eql({"start":168842,"scaffold":"Scaffold743","end":188364,"name":"SPU_008174",
+		"exons":{"ID":"SPU_008174-tr",
+			 "exons":{"SPU_008174:2":[188281,188364],
+				  "SPU_008174:1":[185066,185375],
+				  "SPU_008174:0":[168842,169029]}}});
     };
   }]).
 

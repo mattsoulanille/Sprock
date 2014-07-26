@@ -1,7 +1,12 @@
 <p>This is the partial for test 1.</p>
 <h1>Test</h1>
 <p>Open the console window and check for AssertionErrors.</p>
+<ul>
+  <li ng-repeat="result in named_test_results track by $index">{{result[0]}}:<pre>{{result[1]}}</pre></li>
+</ul>
+
 <pre>{{test_results}}</pre>
+<pre>{{named_test_results}}</pre>
 <hr/>
 <form ng-submit="getContextInformation()">
   <input type="text" ng-model="gene_name" size="16" placeholder="Gene name"> e.g. SPU_022067, SPU_008174
