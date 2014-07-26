@@ -115,4 +115,56 @@ angular.module('sprock.controllers', []).
 	});
     };
 
-  }]);
+  }]).
+
+  controller('Tester1', ['$scope', '$http', '$q', '$timeout', '_', 'getGene', 'getContextSeqInfo', 'getSeqInfo', function($scope, $http, $q, $timeout, _, getGene, getContextSeqInfo, getSeqInfo) {
+    var expect = chai.expect;
+    var tests = [
+
+      function test1() {
+	return expect(1+1).to.equal(2);
+      },
+
+      function test2() {
+	return expect('foo').to.be.a('string');
+      },
+
+      function() {
+	var tp = $timeout(function() { return 'good' }, 0);
+	return chai.assert.eventually.equal(tp, 'good', 'bad goodness expectable');
+      },
+
+      function() {
+	var tp = $timeout(function() { return 'happy' }, 1000);
+	return expect(tp).to.eventually.equal('happy');
+      },
+
+      function() {
+	return expect($http.post('/data/getSeq', {scaffold: 'Scaffold1', start: 2, end: 34})).
+	  to.eventually.have.property('data').and.
+	  deep.equal({"request": {"start":2, "scaffold":"Scaffold1","end":34},
+		      "results": {"start":2,"scaffold":"Scaffold1","end":34,
+				  "quality":[35,35,32,35,53,47,41,42,46,45,29,29,29,32,33,51,51,51,
+					     51,51,51,46,46,46,46,40,40,40,44,44,39,32],
+				  "sequence":"CATTTTATCACCAGTTCGATTTTCCCCTTGTT"}});
+      },
+
+      function() {
+
+      },
+
+    ];
+    console.log(tests);
+
+    $scope.test_results = function(tests) {
+      var results = _.map(tests, function(test) { return test.call(test) });
+      return results;
+    }(tests);
+
+/*    describe('/data/getSeq', function() {
+      it('should give a good answer', inject(function($http, $q) {
+      }));
+
+    });
+*/
+}]);

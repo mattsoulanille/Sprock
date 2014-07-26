@@ -11,6 +11,26 @@ describe('service', function() {
     }));
   });
 
+  describe('/data/getSeq', function() {
+    it('should give a good answer', inject(function($http, $q) {
+      var scaffold = 'Scaffold1';
+      var start = 2;
+      var end = 34;
+      //var deferred = $q.defer();
+      $http.post('/data/getSeq', {scaffold: scaffold, start: start, end: end}).
+	success(function (v) {
+	  expect(v).toEqual('fun');
+	  //deferred.resolve(v['results']);
+	})
+	.error(function(data, status, headers, config) {
+	  console.log(data);
+	  expect(v).toEqual('fail');
+	  //deferred.reject(data);
+	});
+      }));
+    });
+
+
   describe('getSequence', function() {
     it('should be a function', inject(function(getSequence) {
       expect(getSequence).toBeFunction();
