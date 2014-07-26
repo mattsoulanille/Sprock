@@ -142,11 +142,42 @@ angular.module('sprock.controllers', []).
       function() {
 	return expect($http.post('/data/getSeq', {scaffold: 'Scaffold1', start: 2, end: 34})).
 	  to.eventually.have.property('data').and.
-	  deep.equal({"request": {"start":2, "scaffold":"Scaffold1","end":34},
-		      "results": {"start":2,"scaffold":"Scaffold1","end":34,
-				  "quality":[35,35,32,35,53,47,41,42,46,45,29,29,29,32,33,51,51,51,
-					     51,51,51,46,46,46,46,40,40,40,44,44,39,32],
-				  "sequence":"CATTTTATCACCAGTTCGATTTTCCCCTTGTT"}});
+	  to.eql({"request": {"start":2, "scaffold":"Scaffold1","end":34},
+		  "results": {"start":2,"scaffold":"Scaffold1","end":34,
+			      "quality":[35,35,32,35,53,47,41,42,46,45,29,29,29,32,33,51,51,51,
+					 51,51,51,46,46,46,46,40,40,40,44,44,39,32],
+			      "sequence":"CATTTTATCACCAGTTCGATTTTCCCCTTGTT"}});
+      },
+
+      function() {
+	return expect($http.post('/data/getFeatures', {scaffold: 'Scaffold1', start: 1000, end: 18000})).
+	  to.eventually.have.property('data').and.
+	  to.have.property('results').and.
+	  to.eql({"start":1000,
+		"scaffold":"Scaffold1",
+		"end":18000,
+		"features":[{"span":[13028,18195],"type":"gene","id":"SPU_016802gn","strand":"-"},
+			    {"span":[13028,18195],"type":"transcript","id":"SPU_016802-tr","strand":"-"},
+			    {"span":[15818,16028],"type":"exon","id":"SPU_016802:1","strand":"-"},
+			    {"span":[15263,15412],"type":"exon","id":"SPU_016802:2","strand":"-"},
+			    {"span":[13880,13989],"type":"exon","id":"SPU_016802:3","strand":"-"},
+			    {"span":[13028,13193],"type":"exon","id":"SPU_016802:4","strand":"-"}]});
+      },
+
+      function() {
+	return "NOT DONE";
+	return expect($http.post('/data/getGene', {name: 'SPU_008174'})).
+	  to.eventually.have.property('data').and.
+	  to.have.property('results').and.
+	  to.eql({"start":1000,
+		"scaffold":"Scaffold1",
+		"end":18000,
+		"features":[{"span":[13028,18195],"type":"gene","id":"SPU_016802gn","strand":"-"},
+			    {"span":[13028,18195],"type":"transcript","id":"SPU_016802-tr","strand":"-"},
+			    {"span":[15818,16028],"type":"exon","id":"SPU_016802:1","strand":"-"},
+			    {"span":[15263,15412],"type":"exon","id":"SPU_016802:2","strand":"-"},
+			    {"span":[13880,13989],"type":"exon","id":"SPU_016802:3","strand":"-"},
+			    {"span":[13028,13193],"type":"exon","id":"SPU_016802:4","strand":"-"}]});
       },
 
       function() {
@@ -157,7 +188,9 @@ angular.module('sprock.controllers', []).
     console.log(tests);
 
     $scope.test_results = function(tests) {
-      var results = _.map(tests, function(test) { return test.call(test) });
+      var results = _.map(tests, function(test) {
+	return test.call(test);
+      });
       return results;
     }(tests);
 
