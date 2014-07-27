@@ -159,7 +159,7 @@ angular.module('sprock.controllers', []).
 
     $scope.named_test_results = function(names) {
       return _.map(names, function(test_name) {
-	return [test_name, $injector.invoke([test_name, function(test) { return test.call(test); }])];
+	return [test_name, $injector.invoke([test_name, function(test) { return test.call(test) }])];
       })}(test_names);
     
 }]);

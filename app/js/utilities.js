@@ -13,18 +13,52 @@ angular.module('sprock.utilities', ['underscore']).
 				  [0, {a: 'seq'}],
 				  [5, {q: 'qual70'}]
 				 ],
-			 seq: 'GACCTACATCAGGCT' };
+			 sequence: 'GACCTACATCAGGCT' };
     };*/
     return function integrate(seq_events) {
-      var sequence = seq_events['seq'];
+      console.log('A: ' + JSON.stringify(seq_events.events));
+      var sequence = seq_events['sequence'];
       var len_sequence = sequence.length;
+//      var grouped_events = _.sortBy(_.groupBy(seq_events['events'],
+//					      function(pep) { return pep[0] }),
+//				    function(g) { return g[0][0] });
       var grouped_events = _.groupBy(seq_events['events'],
-				     function(pep) { return pep[0] })//.sort();
+				     function(pep) { return pep[0] });
+//      console.log('B: ' + JSON.stringify(grouped_events));
+//      var t1 = _.map(grouped_events, function(event_array, pos) {
+      var t2 = _.groupBy(seq_events['events'], _.property(0))
+      console.log('t2: ' + JSON.stringify(t2));
+//      expect(grouped_events).toBeAngularEqual(t2);
+//      console.log('D: ' + JSON.stringify(function(t) {return _.flatten(_.map(_.pluck(t, 1), _.pairs), true)}(t2[0])));
+//      console.log('E: ' + JSON.stringify(_.flatten(_.map(_.pluck(t2[0], 1), _.pairs), true)));
+
+//      var t3 = _.map(t2, function(t) {return _.flatten(_.map(_.pluck(t, 1), _.pairs), true)});
+//      console.log('t3: ' + JSON.stringify(t3));
+
+//      var t4 = _.map(t2, function(t) {return _.sortBy(_.flatten(_.map(_.pluck(t, 1), _.pairs), true), _.property(0))});
+//      console.log('t4: ' + JSON.stringify(t4));
+
+//      var t5 = _.map(t2, function(t) {return _.flatten(_.map(_.pluck(t, 1), _.pairs), true).sort()});
+//      console.log('t5: ' + JSON.stringify(t5));
+//      expect(t4).toEqual(t5);
+
+//      var t6 = _.map(t2, function(t) {
+//	return [t[0][0], _.sortBy(_.flatten(_.map(_.pluck(t, 1), _.pairs), true), _.property(0))];
+//      });
+//      console.log('t6: ' + JSON.stringify(t6));
+
+      var t7 = _.sortBy(_.map(t2, function(t) {
+	return [t[0][0], _.sortBy(_.flatten(_.map(_.pluck(t, 1), _.pairs), true), _.property(0))];
+      }), _.property(0));
+      console.log('t7: ' + JSON.stringify(t7));
+
+
       var sequence_index = 0;
       var s = '';
       var state = {};
 
       function classes_string(state) {
+	//console.log('classes_string: ' + JSON.stringify(state));
 	var rv = '';
 	_.each(_.pairs(state).sort(), function(p) {
 	  if (p[1]) {
@@ -36,24 +70,31 @@ angular.module('sprock.utilities', ['underscore']).
       };
 
       _.each(grouped_events, function(event_group) {
-	var event_position = event_group[0][0];
-	state = _.reduce(event_group,
-			 function(state, pep) {
-			   return _.extend(state, pep[1]);
-			 },
-			 state);
-	if (s) {
-	  while (sequence_index < event_position) {
-	    s += sequence[sequence_index++];
-	  };
-	  s += '</span>'; 
-	};
-	s += '<span class="' + classes_string(state) + '">';
+	if (sequence_index < len_sequence) {
+	  var event_position = event_group[0][0];
+	  state = _.reduce(event_group,
+			   function(state, pep) {
+			     return _.extend(state, pep[1]);
+			   },
+//			   state);
+			   {});
+	  if (event_position >= 0) { //just integrate state until we actually get to the sequence
+	    if (s) {
+	      while (sequence_index < event_position && sequence_index < len_sequence) {
+		s += sequence[sequence_index++];
+	      };
+	      s += '</span>'; 
+	    };
+	    if (sequence_index < len_sequence) {
+	      s += '<span class="' + classes_string(state) + '">';
+	    }}};
       });
-      while (sequence_index < len_sequence) {
-	s += sequence[sequence_index++];
+      if (sequence_index < len_sequence) {
+	while (sequence_index < len_sequence) {
+	  s += sequence[sequence_index++];
+	};
+	s += '</span>'; 
       };
-      s += '</span>'; 
       return s;
     }
   }]).
@@ -71,15 +112,12 @@ angular.module('sprock.utilities', ['underscore']).
 	};
 	prior_quality = q;
       };
-      return {events: events, seq: seqInfo.sequence};
+      return {events: events, sequence: seqInfo.sequence};
     };
   }]).
 
   factory('convertExonsToEvents', ['_', function(_) {
     return function convertExons(exons, offset) {
-
-//{"request": {"name": "SPU_022066"}, "results": {"start": 10480, "scaffold": "Scaffold694", "end": 18337, "name": "SPU_022066", "exons": {"ID": "SPU_022066gn", "exons": {"SPU_022066:5\"": [14180, 14538], "SPU_022066:6\"": [17988, 18337], "SPU_022066:0\"": [10514, 10683], "SPU_022066:1\"": [11406, 11633], "SPU_022066:2\"": [11875, 11997], "SPU_022066:3\"": [12713, 12826], "SPU_022066:4\"": [13329, 13541]}}}}
-
       offset = offset || 0;
       var events = [];
       _.each(exons.exons, function(exon) {
@@ -91,8 +129,6 @@ angular.module('sprock.utilities', ['underscore']).
 
   factory('convertFeaturesToEvents', ['_', function(_) {
     return function convertFeatures(features, offset) {
-
-//"results" member of: {"notes": ["\"span\" is with respect to the scaffold, not the start of the requested range"], "request": {"start": 0, "scaffold": "Scaffold1", "end": 18000}, "results": {"start": 0, "scaffold": "Scaffold1", "end": 18000, "features": [{"span": [13028, 18195], "type": "gene", "id": "SPU_016802gn", "strand": "-"}, {"span": [13028, 18195], "type": "transcript", "id": "SPU_016802-tr", "strand": "-"}, {"span": [15818, 16028], "type": "exon", "id": "SPU_016802:1", "strand": "-"}, {"span": [15263, 15412], "type": "exon", "id": "SPU_016802:2", "strand": "-"}, {"span": [13880, 13989], "type": "exon", "id": "SPU_016802:3", "strand": "-"}, {"span": [13028, 13193], "type": "exon", "id": "SPU_016802:4", "strand": "-"}]}}
       offset = offset || features.start || 0;
       var events = [];
       _.each(features.features, function(f) {
@@ -100,7 +136,8 @@ angular.module('sprock.utilities', ['underscore']).
 	events.push([f.span[0] - offset, (t={},t[f.type]=f.type,t)]);
 	events.push([f.span[1] - offset, (t={},t[f.type]=null,t)]);
       });
-      return {'events': _.sortBy(events, function(e) { return e[0]})};
+      var rv = {'events': _.sortBy(events, function(e) { return e[0]})};
+      return rv;
     };
   }]).
 
@@ -123,7 +160,7 @@ angular.module('sprock.utilities', ['underscore']).
     function si(seqInfo) {
       _.extend(this, seqInfo);
       _.extend(this,  differentiateSequenceToEvents(this));
-      _.has(this, 'features') && this.add_features(this.features);
+      _.has(this, 'features') && this.add_features(this);
       return this;
     };
 
@@ -136,8 +173,6 @@ angular.module('sprock.utilities', ['underscore']).
 
     si.prototype.add_features =
       function(features) {
-	//console.log(this);
-	//console.log(features);
 	//console.log(_.uniq(_.flatten(_.map(this.events, function(v) { return _.keys(v[1]) }))));
 	//console.log(convertFeaturesToEvents(features));
 	this.events = _.union(this.events, convertFeaturesToEvents(features).events); //FIXME: screwy what's an event

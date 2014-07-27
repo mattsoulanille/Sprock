@@ -39,6 +39,7 @@ describe('service', function() {
     it('should be a function', inject(function(integrateSequenceEventsToHTML) {
       expect(integrateSequenceEventsToHTML).toBeFunction();
     }));
+
     it('should do the right thing with events in sequence', inject(function(integrateSequenceEventsToHTML) {
       var seq_events = { events: [[0, {a: 'seq'}],
 				  [0, {q: 'qual90', x: 'exon'}],
@@ -46,13 +47,14 @@ describe('service', function() {
 				  [11, {x: null}],
 				  [14, {q: 'qual20'}]
 				 ],
-			 seq: 'GACCTACATCAGGCT' }
+			 sequence: 'GACCTACATCAGGCT' }
       var html = integrateSequenceEventsToHTML(seq_events);
       expect(html).toBe('<span class="seq qual90 exon">GACCT</span>' +
 			'<span class="seq qual70 exon">ACATCA</span>' +
 			'<span class="seq qual70">GGC</span>' +
 			'<span class="seq qual20">T</span>');
     }));
+
     it('should do the right thing with events out of sequence', inject(function(integrateSequenceEventsToHTML) {
       var seq_events = { events: [[11, {x: null}],
 				  [0, {q: 'qual90', x: 'exon'}],
@@ -60,13 +62,40 @@ describe('service', function() {
 				  [0, {a: 'seq'}],
 				  [5, {q: 'qual70'}]
 				 ],
-			 seq: 'GACCTACATCAGGCT' }
+			 sequence: 'GACCTACATCAGGCT' }
       var html = integrateSequenceEventsToHTML(seq_events);
       expect(html).toBe('<span class="seq qual90 exon">GACCT</span>' +
 			'<span class="seq qual70 exon">ACATCA</span>' +
 			'<span class="seq qual70">GGC</span>' +
 			'<span class="seq qual20">T</span>');
     }));
+
+    iit('should do the right thing with complex events', inject(function(integrateSequenceEventsToHTML) {
+      var seq_events = { events: [[0, {qual: 'qual90', exon: 'exon'}],
+				  [5, {qual: 'qual70'}],
+				  [11, {exon: null}],
+				  [14, {qual: 'qual20'}],
+				  [ -63, { gene : 'gene' } ],
+				  [ -63, { transcript : 'transcript' } ],
+				  [ -63, { exon : 'exon' } ],
+				  [ 3, { exon : null } ],
+				  [ 13, { exon : 'exon' } ],
+				  [ 33, { gene : null } ],
+				  [ 33, { transcript : null } ],
+				  [ 33, { exon : null } ],
+				  [ 111, { fun: 'fun' } ]
+				 ],
+			 sequence: 'GACCTACATCAGGCT' }
+      var html = integrateSequenceEventsToHTML(seq_events);
+      expect(html).toBe(
+
+
+'<span class="seq qual90 exon">GACCT</span>' +
+			'<span class="seq qual70 exon">ACATCA</span>' +
+			'<span class="seq qual70">GGC</span>' +
+			'<span class="seq qual20">T</span>');
+    }));
+
   });
 
   describe('differentiateSequenceToEvents', function() {
@@ -82,7 +111,7 @@ describe('service', function() {
 									 [3, {q: 'qual45'}],
 									 [18, {q: 'qual51'}]
 									],
-								seq: 'TCATTTATATTATTTAGATGTG' });
+								sequence: 'TCATTTATATTATTTAGATGTG' });
     }));
   });
 
@@ -105,7 +134,32 @@ describe('service', function() {
     it('should be a function', inject(function(convertFeaturesToEvents) {
       expect(convertFeaturesToEvents).toBeFunction();
     }));
-    it('should do the right thing', inject(function(convertFeaturesToEvents) {
+
+    it('should create events from basic features', inject(function(convertFeaturesToEvents) {
+      var t = {"request": {"start": 67, "scaffold": "Scaffold12345", "end": 89},
+	       "results": {"start": 67, "scaffold": "Scaffold12345", "end": 89,
+			   "quality": [56, 51, 51, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 51, 51, 51, 51],
+			   "sequence": "TCATTTATATTATTTAGATGTG",
+			   features: [{"span": [4, 100], "type": "gene", "id": "SPU_Random-gn", "strand": "+"},
+				      {"span": [4, 100], "type": "transcript", "id": "SPU_Random-tr", "strand": "+"},
+				      {"span": [4, 70], "type": "exon", "id": "SPU_Random:0", "strand": "+"},
+				      {"span": [80, 100], "type": "exon", "id": "SPU_Random:1", "strand": "+"}]
+
+			  }
+	      };
+
+      expect(convertFeaturesToEvents(t.results)).toEqual({ events : [ [ -63, { gene : 'gene' } ],
+								      [ -63, { transcript : 'transcript' } ],
+								      [ -63, { exon : 'exon' } ],
+								      [ 3, { exon : null } ],
+								      [ 13, { exon : 'exon' } ],
+								      [ 33, { gene : null } ],
+								      [ 33, { transcript : null } ],
+								      [ 33, { exon : null } ]
+								    ] });
+    }));
+
+    it('should create events from interesting features', inject(function(convertFeaturesToEvents) {
       var features = [{"span": [13028, 18195], "type": "gene", "id": "SPU_016802gn", "strand": "-"},
 		      {"span": [13028, 18195], "type": "transcript", "id": "SPU_016802-tr", "strand": "-"},
 		      {"span": [15818, 16028], "type": "exon", "id": "SPU_016802:1", "strand": "-"},
@@ -153,11 +207,18 @@ describe('service', function() {
     var si;
 
     beforeEach(inject(function(SequenceInfo) {
-      var t = {"request":
-	       {"start": 67, "scaffold": "Scaffold12345", "end": 89},
+      var t = {"request": {"start": 67, "scaffold": "Scaffold12345", "end": 89},
 	       "results": {"start": 67, "scaffold": "Scaffold12345", "end": 89,
 			   "quality": [56, 51, 51, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 51, 51, 51, 51],
-			   "sequence": "TCATTTATATTATTTAGATGTG"}};
+			   "sequence": "TCATTTATATTATTTAGATGTG",
+			   features: [{"span": [4, 100], "type": "gene", "id": "SPU_Random-gn", "strand": "+"},
+				      {"span": [4, 100], "type": "transcript", "id": "SPU_Random-tr", "strand": "+"},
+				      {"span": [4, 70], "type": "exon", "id": "SPU_Random:0", "strand": "+"},
+				      {"span": [80, 100], "type": "exon", "id": "SPU_Random:1", "strand": "+"}]
+
+			  }
+	      };
+
       si = new SequenceInfo(t.results);
     }));
 
