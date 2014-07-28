@@ -76,6 +76,33 @@ class GeneDB(object):
                                                   featureType=featureType,
                                                   completely_within=completely_within) ]
 
+    def get_tree_by_name(self, name):
+        """returns a tree of features that are descendents of name"""
+        feature = self.get_feature_by_name(name)
+        return { 'feature': feature,
+                 'children' :
+                 map(self.get_tree_by_name,
+                     (v['Name'][0] for v in self.db().children(self.id(name), 1))) }
+
+    def get_tree_data_by_name(self, name):
+        """returns a tree of data of features that are descendents of name"""
+        def children_sort(d):
+            d['children'].sort(key=lambda x: x['span'][0])
+            for c in d['children']:
+                children_sort(c)
+
+        feature = self.get_feature_by_name(name)
+        rv = { 'name': name,
+               'type': feature.featuretype,
+               'strand': feature.strand,
+               'span': (feature.start, feature.end),
+               'children' :
+               map(self.get_tree_data_by_name,
+                   (v['Name'][0] for v in self.db().children(self.id(name), 1))) }
+        children_sort(rv)
+        return rv
+
+
 def main(argv):
     from pprint import pprint
     import sys
