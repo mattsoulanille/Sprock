@@ -91,8 +91,9 @@ class GeneDB(object):
             for c in d['children']:
                 datify(c)
             f = d['feature']
-            d['name'] = f.attributes['Name']
+            d['name'] = f.attributes['Name'][0]
             d['type'] = f.featuretype
+            d['scaffold'] = f.seqid
             d['strand'] = f.strand
             d['span'] = (f.start, f.end)
             d['feature'] = None
@@ -107,7 +108,7 @@ class GeneDB(object):
 
         def children_relative_span(d, parent_start):
             start = d['span'][0]
-            print('children_relative_span(%s, %d)' % (d['name'], parent_start))
+            #print('children_relative_span(%s, %d)' % (d['name'], parent_start))
             for c in d['children']:
                 children_relative_span(c, start)
             t = d['span']

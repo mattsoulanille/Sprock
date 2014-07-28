@@ -88,6 +88,17 @@ class DataService(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
+    def getTree(self):
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"name":"SPU_022066"}' 'http://localhost:8082/data/getTree'
+        argd = cherrypy.request.json
+        name = argd['name']
+        return ({ 'request': argd,
+                'results': self.gene_db.get_tree_data_by_name(name) })
+
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
     def getFeatures(self):
         #curl -i -X POST -H "Content-Type: application/json" -d '{"scaffold":"Scaffold1", "start":0, "end":18000}' 'http://localhost:8082/data/getFeatures'
         argd = cherrypy.request.json
