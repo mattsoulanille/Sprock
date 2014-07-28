@@ -86,20 +86,36 @@ class GeneDB(object):
 
     def get_tree_data_by_name(self, name):
         """returns a tree of data of features that are descendents of name"""
+        tree = self.get_tree_by_name(name)
+        def datify(d):
+            for c in d['children']:
+                datify(c)
+            f = d['feature']
+            d['name'] = f.attributes['Name']
+            d['type'] = f.featuretype
+            d['strand'] = f.strand
+            d['span'] = (f.start, f.end)
+            d['feature'] = None
+            del(d['feature'])
+            return d
+
         def children_sort(d):
             d['children'].sort(key=lambda x: x['span'][0])
             for c in d['children']:
                 children_sort(c)
+            return d
 
-        feature = self.get_feature_by_name(name)
-        rv = { 'name': name,
-               'type': feature.featuretype,
-               'strand': feature.strand,
-               'span': (feature.start, feature.end),
-               'children' :
-               map(self.get_tree_data_by_name,
-                   (v['Name'][0] for v in self.db().children(self.id(name), 1))) }
+        def children_relative_span(d, parent_start):
+            start = d['span'][0]
+            print('children_relative_span(%s, %d)' % (d['name'], parent_start))
+            for c in d['children']:
+                children_relative_span(c, start)
+            t = d['span']
+            d['span'] = t[0] - parent_start, t[1] - parent_start
+
+        rv = datify(tree)
         children_sort(rv)
+        children_relative_span(rv, 0)
         return rv
 
 
