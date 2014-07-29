@@ -16,6 +16,12 @@ class GetSequenceTestCase(unittest.TestCase):
         assert seq == {'quality': [35, 35, 35, 32, 35, 53, 47, 41, 42, 46, 45, 29, 29, 29, 32, 33, 51, 51, 51, 51, 51, 51],
                        'sequence': 'ACATTTTATCACCAGTTCGATT'}
 
+    def testGetSequenceDatq2(self):
+        seq = self.db.get_sequence_data('Scaffold1', 2, 34)
+        assert seq == {'quality': [35, 35, 32, 35, 53, 47, 41, 42, 46, 45,
+                                   29, 29, 29, 32, 33, 51, 51, 51, 51, 51, 51, 46,
+                                   46, 46, 46, 40, 40, 40, 44, 44, 39, 32],
+                       'sequence': 'CATTTTATCACCAGTTCGATTTTCCCCTTGTT'}
 
 def main():
     unittest.main()

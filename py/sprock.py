@@ -38,6 +38,8 @@ class DataService(object):
         cherrypy.log("FASTQ %s " % fqdb_filename)
         self.fqdb = FQDB(fqdb_filename)
         self.gene_db = GeneDB(self.g.gffdb_filename)
+        cherrypy.log('Building gene_db name_to_ID_dict')
+        self.gene_db.name_to_ID_dict() # get this built before accepting connections
         self.bioDB = BioDB(self.fqdb, self.gene_db)
 
     @cherrypy.expose
@@ -137,6 +139,7 @@ def serve(g):
 
     global_config = {'server.socket_host': '0.0.0.0',
                      'server.socket_port': 8082,
+                     #'server.thread_pool': 2, # DEBUG
                      #'server.environment': 'development',
                      'server.ssl_module': 'pyopenssl',
                      #'server.ssl_module': 'builtin',
