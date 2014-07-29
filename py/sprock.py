@@ -1,4 +1,4 @@
-#curl -i -X POST -H "Content-Type: application/json" -d '{"key":"val", "N":5}' 'http://localhost:8082/data/n'import os.path
+import os.path
 
 import os
 import cherrypy
@@ -93,7 +93,7 @@ class DataService(object):
         argd = cherrypy.request.json
         name = argd['name']
         return ({ 'request': argd,
-                'results': self.gene_db.get_tree_data_by_name(name) })
+                  'results': self.gene_db.get_tree_data_by_name(name) })
 
 
     @cherrypy.expose
