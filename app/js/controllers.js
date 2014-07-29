@@ -58,25 +58,24 @@ angular.module('sprock.controllers', []).
 	});
     };
   }]).
-  controller('MyCtrl4', ['$scope', '$http', '$q', '_', 'getGene', 'getContextSeqInfo', 'getSeqInfo',
-			 function($scope, $http, $q, _, getGene, getContextSeqInfo, getSeqInfo) {
+  controller('MyCtrl4', ['$scope', '$http', '$q', '_', 'GeneSequenceInfo',
+			 function($scope, $http, $q, _, GeneSequenceInfo) {
     $scope.serverError = null;
     $scope.margin = 500;	//FIXME
 
     $scope.getGene = function() {
-      getGene($scope.gene_name).
-	then(function (gene) {
-	  $scope.gene = gene;
-	  $scope.gene_exons_pairs = _.pairs($scope.gene.exons);
+      $scope.gsi = new GeneSequenceInfo($scope.gene_name);
+      $scope.gsi.get_feature_tree().
+	then(function (ft) {
+	  chai.expect(ft).property('type').to.equal('gene');
 	  $scope.serverError = null;
-	  $scope.scaffold = gene.scaffold;
-	  $scope.start = Math.max(gene.start - 500, 0);
-	  $scope.end = gene.end + 500;
-	  $scope.getSequenceInformation();
+	  $scope.scaffold = ft.scaffold;
+//	  $scope.start = Math.max(ft.span[0].start - $scope.margin, 0);
+//	  $scope.end = ft.span[1] + $scope.margin;
+//	  $scope.getSequenceInformation();
 	},
 	function(data) {
 	  console.log(data);
-	  angular.element(data);
 	  $scope.serverError = data;
 	  $scope.gene = null;
 	  $scope.gene_exons_pairs = null;
@@ -84,20 +83,23 @@ angular.module('sprock.controllers', []).
     };
 
     $scope.getContextInformation = function() {
-      getContextSeqInfo($scope.gene_name, $scope.margin).
-	then(function (si) {
-	  $scope.sequenceInformation = si;
+      $scope.gsi = new GeneSequenceInfo($scope.gene_name, $scope.margin);
+      $scope.gsi.get_feature_tree().
+	then(function (ft) {
+	  chai.expect(ft).property('type').to.equal('gene');
+	  $scope.scaffold = ft.scaffold;
 	  $scope.serverError = null;
-	  $scope.scaffold = si.scaffold;
-	  $scope.start = si.span[0]
-	  $scope.end = si.span[1]
 	},
 	function(data) {
 	  console.log(data);
-	  angular.element(data);
 	  $scope.serverError = data;
 	  $scope.gene = null;
 	  $scope.gene_exons_pairs = null;
+	});
+      $scope.gsi.get_sequence().
+	then(function(si) {
+	  $scope.start = si.start;
+	  $scope.end = si.end;
 	});
     };
 

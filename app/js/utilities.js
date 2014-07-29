@@ -188,12 +188,14 @@ angular.module('sprock.utilities', ['underscore']).
     return function() {
       var expect = chai.expect;
       var g = new GeneSequenceInfo('SPU_022066');
+      g.margin = 1000;
       expect(g.get_sequence()).eventually.to.have.property('scaffold').equal('Scaffold694');
-      expect(g.get_sequence()).eventually.to.have.property('start').equal(10480);
-      expect(g.get_sequence()).eventually.to.have.property('sequence').a('string').of.length(7857);
+      expect(g.get_sequence()).eventually.to.have.property('start').equal(9480);
+      expect(g.get_sequence()).eventually.to.have.property('end').equal(9480+9857);
+      expect(g.get_sequence()).eventually.to.have.property('sequence').a('string').of.length(9857);
       expect(g.get_sequence()).eventually.to.have.property('sequence').to.contain('ATGGCTGATGCTGGCTTATTGTTGGGTCTGTTTTTACAGAACTTCATGACCAGGTAATGGGAACCTTACAGCAAAAGATTCGACCTCCTTTTCAAGGGCAGCAAGTTTGGA');
       expect(g.get_sequence()).eventually.to.have.property('sequence').to.contain('GACTCCCATCGCCATTGCCATTGCTAACTTTCTTGAGACTCCCATCACCATTGCCATTGGTGACTGTCTTTAGACTCCCATCACCATTCATCGCTGTCTTGATCACTGTCTTGGTTCCGTTAACAGTAGCCAT');
-      expect(g.get_sequence()).eventually.to.have.property('quality').an('array').of.length(7857);
+      expect(g.get_sequence()).eventually.to.have.property('quality').an('array').of.length(9857);
 
       expect(g.get_feature_tree()).eventually.to.have.property('name').equal('SPU_022066');
       expect(g.get_feature_tree()).eventually.to.have.property('scaffold').equal('Scaffold694');
@@ -206,16 +208,24 @@ angular.module('sprock.utilities', ['underscore']).
 
   factory('GeneSequenceInfo', ['_', '$q', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents', 'getTree', 'getSequence', function(_, $q, differentiateSequenceToEvents, integrateSequenceEventsToHTML, convertFeaturesToEvents, getTree, getSequence ) {
 
-    function gsi(name) {
+    function gsi(name, margin) {
       this.gene_name = name;
+      this.margin = margin || 500;	//FIXME: biologically-appropriate default
       return this;
     };
 
     gsi.prototype.render_to_html =
-      function() {
+      function(callback) {
 	//return '<strong><blink>Unimplemented</blink></strong>'
 	//return integrateSequenceEventsToHTML(differentiateSequenceToEvents(this));
-	return integrateSequenceEventsToHTML(this);
+	this.get_informed().then(function(v) {
+	  var feature_tree = v[0];
+	  var sequence_info = v[1];
+	  //var html = integrateSequenceEventsToHTML(differentiateSequenceToEvents(sequence_info));
+	  var html = '<strong><blink><code>gsi.prototype.render_to_html</code> is NOT working code</blink></strong>'
+	  console.log('GeneSequenceInfo.render_to_html() callback with:' + html);
+	  callback(html);
+	});
       };
 
     gsi.prototype.get_sequence =
@@ -226,7 +236,9 @@ angular.module('sprock.utilities', ['underscore']).
 	var that = this;
 	this.sequence_promise = this.get_feature_tree().
 	  then(function(ft) {
-	    return getSequence(ft.scaffold, ft.span[0], ft.span[1]). //FIXME: margins
+	    return getSequence(ft.scaffold,
+			       Math.max(0, ft.span[0] - that.margin),
+			       ft.span[1] + that.margin).
 	      then(function(si) {
 		return that.sequence_info = si;
 	      });
@@ -238,7 +250,7 @@ angular.module('sprock.utilities', ['underscore']).
       function() {
 	if (this.feature_tree_promise && this.feature_tree_promise !== null)
 	  return this.feature_tree_promise;
-	this.feature_tree_promise = getTree(this.gene_name);
+	this.feature_tree_promise = getTree(this.gene_name)
 	return this.feature_tree_promise;
       };
 
