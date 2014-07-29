@@ -167,7 +167,7 @@ angular.module('sprock.utilities', ['underscore']).
     si.prototype.render_to_html =
       function() {
 	//return '<strong><blink>Unimplemented</blink></strong>'
-	//return integrateSequenceEventsToHTML(differentiateSequenceToEvents(this));
+	//return integrateSequenceEventsToHTML(differntiateSequenceToEvents(this));
 	return integrateSequenceEventsToHTML(this);
       };
 
@@ -182,4 +182,85 @@ angular.module('sprock.utilities', ['underscore']).
       };
 
     return si;
+  }]).
+
+  factory('GeneSequenceInfo_test', ['GeneSequenceInfo', function(GeneSequenceInfo) {
+    return function() {
+      var expect = chai.expect;
+      var g = new GeneSequenceInfo('SPU_022066');
+      expect(g.get_sequence()).eventually.to.have.property('scaffold').equal('Scaffold694');
+      expect(g.get_sequence()).eventually.to.have.property('start').equal(10480);
+      expect(g.get_sequence()).eventually.to.have.property('sequence').a('string').of.length(7857);
+      expect(g.get_sequence()).eventually.to.have.property('sequence').to.contain('ATGGCTGATGCTGGCTTATTGTTGGGTCTGTTTTTACAGAACTTCATGACCAGGTAATGGGAACCTTACAGCAAAAGATTCGACCTCCTTTTCAAGGGCAGCAAGTTTGGA');
+      expect(g.get_sequence()).eventually.to.have.property('sequence').to.contain('GACTCCCATCGCCATTGCCATTGCTAACTTTCTTGAGACTCCCATCACCATTGCCATTGGTGACTGTCTTTAGACTCCCATCACCATTCATCGCTGTCTTGATCACTGTCTTGGTTCCGTTAACAGTAGCCAT');
+      expect(g.get_sequence()).eventually.to.have.property('quality').an('array').of.length(7857);
+
+      expect(g.get_feature_tree()).eventually.to.have.property('name').equal('SPU_022066');
+      expect(g.get_feature_tree()).eventually.to.have.property('scaffold').equal('Scaffold694');
+      expect(g.get_feature_tree()).eventually.to.have.property('type').equal('gene');
+      expect(g.get_feature_tree()).eventually.to.have.property('children').of.length(1);
+      expect(g.get_feature_tree()).eventually.to.have.property('children').property(0).property('children').of.length(8);
+
+      };
+    }]).
+
+  factory('GeneSequenceInfo', ['_', '$q', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents', 'getTree', 'getSequence', function(_, $q, differentiateSequenceToEvents, integrateSequenceEventsToHTML, convertFeaturesToEvents, getTree, getSequence ) {
+
+    function gsi(name) {
+      this.gene_name = name;
+      return this;
+    };
+
+    gsi.prototype.render_to_html =
+      function() {
+	//return '<strong><blink>Unimplemented</blink></strong>'
+	//return integrateSequenceEventsToHTML(differentiateSequenceToEvents(this));
+	return integrateSequenceEventsToHTML(this);
+      };
+
+    gsi.prototype.get_sequence =
+      function() {
+	if (this.sequence_promise && this.sequence_promise !== null)
+	  return this.sequence_promise;
+
+	var that = this;
+	this.sequence_promise = this.get_feature_tree().
+	  then(function(ft) {
+	    return getSequence(ft.scaffold, ft.span[0], ft.span[1]). //FIXME: margins
+	      then(function(si) {
+		return that.sequence_info = si;
+	      });
+	  });
+	return this.sequence_promise;
+      };
+
+    gsi.prototype.get_feature_tree =
+      function() {
+	if (this.feature_tree_promise && this.feature_tree_promise !== null)
+	  return this.feature_tree_promise;
+	this.feature_tree_promise = getTree(this.gene_name);
+	return this.feature_tree_promise;
+      };
+
+    gsi.prototype.get_informed =
+      function() {
+	if (this.informed_promise && this.informed_promise !== null)
+	  return this.informed_promise;
+	this.informed_promise = $q.all(this.get_feature_tree,
+				       this.get_sequence);
+	return this.informed_promise;
+      };
+
+    //OLD:
+    gsi.prototype.add_features =
+      function(features) {
+	//console.log(_.uniq(_.flatten(_.map(this.events, function(v) { return _.keys(v[1]) }))));
+	//console.log(convertFeaturesToEvents(features));
+	this.events = _.union(this.events, convertFeaturesToEvents(features).events); //FIXME: screwy what's an event
+	//console.log(_.uniq(_.flatten(_.map(this.events, function(v) { return _.keys(v[1]) }))));
+	//Unimplemented
+	return this
+      };
+
+    return gsi;
   }]);

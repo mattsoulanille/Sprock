@@ -88,6 +88,27 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
+  factory('getSeqInfo_v2', ['$http', '$q', 'getSequence', 'getTree', 'GeneSequenceInfo',
+			 function($http, $q, getSequence, getTree, GeneSequenceInfo) {
+    return function (name, margin) {
+      var deferred = $q.defer();
+      var tree_p = getTree(name);
+      var sequence_p = getSequence(scaffold, start, end);
+      $q.all([sequence_p, features_p]).
+       then(function (values) {
+         var sequenceData = values[0];
+         var featuresData = values[1];
+	 var si = new SequenceInfo(sequenceData).add_features(featuresData);
+	 deferred.resolve(si);
+       },
+       function(data) {
+         console.log(data);
+	 deferred.reject(data);
+       });
+      return deferred.promise;
+    };
+  }]).
+
   factory('data_getGene_test', ['$http', function($http) {
     return function() {
       return chai.expect($http.post('/data/getGene', {name: 'SPU_008174'})).
@@ -256,8 +277,6 @@ angular.module('sprock.services', ['sprock.utilities']).
       $http.post('/data/getTree', {name: name}).
 	success(function (v) {
 	  var results = v['results']
-	  //var si = new SequenceInfo(results);//.add_features(featuresData);
-	  //deferred.resolve(si);
 	  deferred.resolve(results);
 	}).
 	error(function(data, status, headers, config) {

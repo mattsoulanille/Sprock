@@ -123,7 +123,8 @@ angular.module('sprock.controllers', []).
 		      'data_getContext_test',
 		      'data_getGene_test',
 		      'data_getFeatures_test',
-		      'data_getSeq_test'
+		      'data_getSeq_test',
+		      'GeneSequenceInfo_test'
 		     ];
 
     var test_functions = [

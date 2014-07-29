@@ -70,7 +70,7 @@ describe('service', function() {
 			'<span class="seq qual20">T</span>');
     }));
 
-    iit('should do the right thing with complex events', inject(function(integrateSequenceEventsToHTML) {
+    it('should do the right thing with complex events', inject(function(integrateSequenceEventsToHTML) {
       var seq_events = { events: [[0, {qual: 'qual90', exon: 'exon'}],
 				  [5, {qual: 'qual70'}],
 				  [11, {exon: null}],
