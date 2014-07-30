@@ -1,6 +1,7 @@
-import os.path
-
 import os
+import os.path
+import time
+
 import cherrypy
 
 from utils.get_sequence import FQDB # FIXME: names
@@ -126,6 +127,50 @@ class DataService(object):
         return {
             'request': argd,
             'results': context
+        }
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def test1(self):
+        #curl -s -i -X POST -H "Content-Type: application/json" -d '{"n":5, "interval":1.2}' 'http://localhost:8082/data/test1'
+        argd = cherrypy.request.json
+        n = argd['n']
+        interval = argd['interval']
+
+        def muk(count, t):
+            for n in xrange(count):
+                time.sleep(t)
+                yield "muk %d" % n
+
+        self.g.mukmuk = []
+        mukmuk = self.g.mukmuk
+        for s in muk(n, interval):
+            mukmuk.append(s)
+
+        return {
+            'request': argd,
+            'results': mukmuk
+        }
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def test2(self):
+        #curl -s -i -X POST -H "Content-Type: application/json" -d '{"from":2}' 'http://localhost:8082/data/test2'
+        argd = cherrypy.request.json
+        n = argd['from']
+        if hasattr(self.g, 'mukmuk'):
+            muks = self.g.mukmuk[n:]
+        else:
+            muks = None
+
+        results = {
+            'muks': muks
+            }
+        return {
+            'request': argd,
+            'results': results
         }
 
 
