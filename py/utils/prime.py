@@ -1,17 +1,21 @@
+import primer3
+from math import ceil
 
 class Prime(object):
     def __init__(self):
         pass
 
-    def set_up_to_prime(self, gene_name, margin):
+    def set_up_to_prime(self):
         # UI causes this to be called
         # calcs & retrievals, then:
-        self.whole_sequence =
-        self.whole_quality =
-        self.minimum_overlap = integer
-        self.maximum_primer_span = integer
-        self.target_primer_span = integer
-        self.primer_windows =  [(start1, end1), (start2, end2), ...]
+        
+        self.whole_sequence = str()
+        self.whole_quality = str()
+        self.minimum_overlap = int()
+        self.maximum_primer_span = int()
+        self.target_primer_span = int()
+        self.primer_windows =  list()
+
         # then primer maker gets called with this Prime object
         # it retrieves what data it needs
 
@@ -28,18 +32,46 @@ class PrimerMaker(object):
     >>> for primer_pair in pm:
     ...   print("Got primer_pair %r" % (time.time() - t0, primer_pair)
     """
-    def __init__(self, setup_info):
-        #get set up, do expensive things once
+    def __init__(self):
+        self.seq_args = dict()
+
 
     def config_for(self, prime):
         # Do what you need to absorb the particulars
         self.prime = prime
+#        self.seq_args['SEQUENCE_TEMPLATE'] = prime_object.whole_sequence
+#        self.seq_args['SEQUENCE_QUALITY'] = ' '.join([str(x) for x in prime_object.whole_quality])
 
     def __iter__(self):
         # set up to make the primers
-        return self             # or whatever the primer iterator is
+        #return self.make_primers_according_to(self.prime) # or whatever the primer iterator is
+        return self.make_primers_according_to()
 
     def next(self):
         # return the next primer pair (if you're the iterator)
-        if no_more_primer_pairs_to_provide:
-            raise StopIteration
+        return self.primer_iterator.next()
+        
+        
+    def split_interval(self):
+        for window in self.prime.primer_windows:
+            window_length = window[1] - window[0]
+            start = window[0]
+            number_of_intervals = int(ceil(float(window_length)/float(self.prime.target_primer_span - self.prime.minimum_overlap)))
+            overlap = self.prime.target_primer_span - (window_length / number_of_intervals)
+            
+            progress = (self.prime.target_primer_span - overlap)
+            for x in range(0, number_of_intervals):
+                yield [x*progress + start, x*progress + self.prime.target_primer_span + start]
+
+    def make_primers_according_to(self):
+
+        self.seq_args['SEQUENCE_TEMPLATE'] = self.prime.whole_sequence
+        self.seq_args['SEQUENCE_QUALITY'] = ' '.join([str(x) for x in self.prime.whole_quality])
+
+        for target in self.split_interval():
+            length = target[1] - target[0]
+            self.seq_args['PRIMER_PRODUCT_SIZE_RANGE'] = str(length) + '-' + str(length + 500)
+            self.seq_args['SEQUENCE_TARGET'] = str(target[0]) + ',' + str(length)
+            
+            primers = primer3.wrappers.designPrimers(self.seq_args)
+            yield primers

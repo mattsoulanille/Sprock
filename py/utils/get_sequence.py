@@ -14,6 +14,10 @@ class FQDB(object):
     def get_sequence_data(self, scaffold, start_position, end_position):
         snippedRecord = self.get_seq_object(scaffold, start_position, end_position)
         return {'sequence': str(snippedRecord.seq), 'quality': snippedRecord.letter_annotations["phred_quality"]}
+    
+    def get_sequence_data_entire_scaffold(self, scaffold):
+        record = self.get_seq_object_entire_scaffold(scaffold)
+        return {'sequence': str(record.seq), 'quality': record.letter_annotations["phred_quality"]}
 
     def get_seq_object(self, scaffold, start_position, end_position):
         if self.cache[0] == scaffold:
