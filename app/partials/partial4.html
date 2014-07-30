@@ -1,14 +1,19 @@
 <p>This is the partial for view 4.</p>
 <form ng-submit="getContextInformation()">
-  <input type="text" ng-model="gene_name" size="16" placeholder="Gene name"> e.g. SPU_022067, SPU_008174
+  <input type="text" ng-model="gene_name" size="16" placeholder="Gene name"> e.g. SPU_022066
+  margin:<input type="number" ng-model="margin" min="0" size="6" placeholder="margin">
   <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
 </form>
+<p ng-show="scaffold">{{scaffold}} from {{start}} to {{end}}</p>
+
+<!--
 <form ng-submit="getSequenceInformation()">
   <input type="text" ng-model="scaffold" size="10" placeholder="scaffold">
   <input type="text" ng-model="start" size="6" placeholder="start">
   <input type="text" ng-model="end" size="6" placeholder="end">
   <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
 </form>
+-->
 <pre>{{serverError}}</pre>
 <!--
 <form>
@@ -37,7 +42,7 @@
 <hr/>
 
 <!-- <format-science sequence-data="sequenceData" features-data="featuresData"></format-science> -->
-<format-science sequence-info="sequenceInformation"></format-science>
+<format-science sequence-info="gsi"></format-science>
 <hr/>
 <!--
 <h3>format-sequence</h3>

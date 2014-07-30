@@ -7,10 +7,21 @@ from Bio import SeqIO
 from Bio.Alphabet import IUPAC
 
 class FQDB(object):
+    """A FASTQ database using Biopython.
+
+    SeqIO.index_db uses SQLite, which is not threadsafe. We
+    connect every time as a workaround.
+    """
     def __init__(self, filename):
-        self.fastqDB = SeqIO.index(filename, 'fastq', alphabet=IUPAC.ambiguous_dna)
+#DEBUG        self.fastqDB = SeqIO.index(filename, 'fastq', alphabet=IUPAC.ambiguous_dna)
+# works but takes 8GB:        self.fastqDB = SeqIO.to_dict(SeqIO.parse(filename, 'fastq', alphabet=IUPAC.ambiguous_dna)) # DEBUG
+# fail "SQLite objects created in a thread can only be used in that same thread."        self.fastqDB = SeqIO.index_db('t2.db', filename, 'fastq', alphabet=IUPAC.ambiguous_dna) # DEBUG
+        self.filename = filename
         self.cache = (None, None)
     
+    def fastqDB(self):
+        return SeqIO.index_db('t2.db', self.filename, 'fastq', alphabet=IUPAC.ambiguous_dna)
+
     def get_sequence_data(self, scaffold, start_position, end_position):
         snippedRecord = self.get_seq_object(scaffold, start_position, end_position)
         return {'sequence': str(snippedRecord.seq), 'quality': snippedRecord.letter_annotations["phred_quality"]}
@@ -23,14 +34,16 @@ class FQDB(object):
         if self.cache[0] == scaffold:
             record = self.cache[1]
         else:
-            record = self.fastqDB[scaffold]
+            record = self.fastqDB()[scaffold]
             self.cache = (scaffold, record)
         return record[start_position:end_position]
+
+    # FIXME
     def get_seq_object_entire_scaffold(self, scaffold):
         if self.cache[0] == scaffold:
             record = self.cache[1]
         else:
-            record = self.fastqDB[scaffold]
+            record = self.fastqDB()[scaffold]
             self.cache = (scaffold, record)
         return record
     

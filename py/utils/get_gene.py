@@ -76,6 +76,50 @@ class GeneDB(object):
                                                   featureType=featureType,
                                                   completely_within=completely_within) ]
 
+    def get_tree_by_name(self, name):
+        """returns a tree of features that are descendents of name"""
+        feature = self.get_feature_by_name(name)
+        return { 'feature': feature,
+                 'children' :
+                 map(self.get_tree_by_name,
+                     (v['Name'][0] for v in self.db().children(self.id(name), 1))) }
+
+    def get_tree_data_by_name(self, name):
+        """returns a tree of data of features that are descendents of name"""
+        tree = self.get_tree_by_name(name)
+        def datify(d):
+            for c in d['children']:
+                datify(c)
+            f = d['feature']
+            d['name'] = f.attributes['Name'][0]
+            d['type'] = f.featuretype
+            d['scaffold'] = f.seqid
+            d['strand'] = f.strand
+            d['span'] = (f.start, f.end)
+            d['feature'] = None
+            del(d['feature'])
+            return d
+
+        def children_sort(d):
+            d['children'].sort(key=lambda x: x['span'][0])
+            for c in d['children']:
+                children_sort(c)
+            return d
+
+        def children_relative_span(d, parent_start):
+            start = d['span'][0]
+            #print('children_relative_span(%s, %d)' % (d['name'], parent_start))
+            for c in d['children']:
+                children_relative_span(c, start)
+            t = d['span']
+            d['span'] = t[0] - parent_start, t[1] - parent_start
+
+        rv = datify(tree)
+        children_sort(rv)
+        children_relative_span(rv, 0)
+        return rv
+
+
 def main(argv):
     from pprint import pprint
     import sys

@@ -1,4 +1,4 @@
-#curl -i -X POST -H "Content-Type: application/json" -d '{"key":"val", "N":5}' 'http://localhost:8082/data/n'import os.path
+import os.path
 
 import os
 import cherrypy
@@ -38,6 +38,8 @@ class DataService(object):
         cherrypy.log("FASTQ %s " % fqdb_filename)
         self.fqdb = FQDB(fqdb_filename)
         self.gene_db = GeneDB(self.g.gffdb_filename)
+        cherrypy.log('Building gene_db name_to_ID_dict')
+        self.gene_db.name_to_ID_dict() # get this built before accepting connections
         self.bioDB = BioDB(self.fqdb, self.gene_db)
 
     @cherrypy.expose
@@ -88,6 +90,17 @@ class DataService(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
+    def getTree(self):
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"name":"SPU_022066"}' 'http://localhost:8082/data/getTree'
+        argd = cherrypy.request.json
+        name = argd['name']
+        return ({ 'request': argd,
+                  'results': self.gene_db.get_tree_data_by_name(name) })
+
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
     def getFeatures(self):
         #curl -i -X POST -H "Content-Type: application/json" -d '{"scaffold":"Scaffold1", "start":0, "end":18000}' 'http://localhost:8082/data/getFeatures'
         argd = cherrypy.request.json
@@ -126,6 +139,7 @@ def serve(g):
 
     global_config = {'server.socket_host': '0.0.0.0',
                      'server.socket_port': 8082,
+                     #'server.thread_pool': 2, # DEBUG
                      #'server.environment': 'development',
                      'server.ssl_module': 'pyopenssl',
                      #'server.ssl_module': 'builtin',

@@ -53,7 +53,11 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     iElement.append('<h3>format-science</h3>');
 		     if (scope.sequenceInfo) {
 		       //console.log(scope.sequenceInfo);
-		       iElement.append(scope.sequenceInfo.render_to_html());
+		       //iElement.append(scope.sequenceInfo.render_to_html());
+		       //DEBUG scope.sequenceInfo.render_to_html(iElement.append); //inverted control, with iElement.append as the callback
+		       //scope.sequenceInfo.render_to_html(console.log); //DEBUG
+		       //scope.sequenceInfo.render_to_html(function(v) {console.log(v)}); //DEBUG
+		       scope.sequenceInfo.render_to_html(function(v) { iElement.append(v) });
 		     };
 		   };
 		   scope.$watch('sequenceInfo', updateSequenceDisplay);

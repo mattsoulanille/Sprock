@@ -15,6 +15,10 @@ angular.module('sprock', [
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider
+    .when('/test1', {
+	templateUrl: 'partials/partest1.html',
+	controller: 'Tester1'
+    })
     .when('/view1', {
 	templateUrl: 'partials/partial1.html',
 	controller: 'MyCtrl1'

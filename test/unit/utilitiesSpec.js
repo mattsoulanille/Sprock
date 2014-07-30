@@ -35,10 +35,54 @@ describe('service', function() {
        }));
   });
 
-  describe('integrateSequenceEventsToHTML', function() {
+  describe('compareSpans', function() {
+    var s1, s2;
+    it('should be a function', inject(function(compareSpans) {
+      expect(compareSpans).toBeFunction();
+    }));
+    // these are in terms of half-open spans, e.g. [start, end), as in Python
+    it('should recognize span completely below span', inject(function(compareSpans) {
+      expect(compareSpans([-3,7], [9,12])).toEqual('<<<<');
+    }));
+    it('should recognize span completely above span', inject(function(compareSpans) {
+      expect(compareSpans( [9,12], [-3,7])).toEqual('>>>>');
+    }));
+    it('should recognize span completely within span', inject(function(compareSpans) {
+      expect(compareSpans([-3,12], [7,9])).toEqual('<<>>');
+    }));
+    it('should recognize span completely surrounding span', inject(function(compareSpans) {
+      expect(compareSpans([7,9], [-3,12])).toEqual('><><');
+    }));
+    it('should recognize span equal to span', inject(function(compareSpans) {
+      expect(compareSpans([-3,12], [-3, 12])).toEqual('=<>=');
+    }));
+    it('should recognize span overlapping span from below', inject(function(compareSpans) {
+      expect(compareSpans([-3,7], [5,9])).toEqual('<<><');
+    }));
+    it('should recognize span overlapping span from above', inject(function(compareSpans) {
+      expect(compareSpans([5,9], [-3,7])).toEqual('><>>');
+    }));
+    it('should recognize span left-contiguous with span', inject(function(compareSpans) {
+      expect(compareSpans([5,9], [9,12])).toEqual('<<=<');
+    }));
+    it('should recognize span right-contiguous with span', inject(function(compareSpans) {
+      expect(compareSpans([9, 12], [5,9])).toEqual('>=>>');
+    }));
+    it('should recognize span that is left partial of span', inject(function(compareSpans) {
+      expect(compareSpans([3,5], [3,7])).toEqual('=<><');
+    }));
+    it('should recognize span that is right partial of span', inject(function(compareSpans) {
+      expect(compareSpans([5,7], [3,7])).toEqual('><>=');
+    }));
+
+
+  });
+
+  xdescribe('integrateSequenceEventsToHTML', function() {
     it('should be a function', inject(function(integrateSequenceEventsToHTML) {
       expect(integrateSequenceEventsToHTML).toBeFunction();
     }));
+
     it('should do the right thing with events in sequence', inject(function(integrateSequenceEventsToHTML) {
       var seq_events = { events: [[0, {a: 'seq'}],
 				  [0, {q: 'qual90', x: 'exon'}],
@@ -46,13 +90,14 @@ describe('service', function() {
 				  [11, {x: null}],
 				  [14, {q: 'qual20'}]
 				 ],
-			 seq: 'GACCTACATCAGGCT' }
+			 sequence: 'GACCTACATCAGGCT' }
       var html = integrateSequenceEventsToHTML(seq_events);
       expect(html).toBe('<span class="seq qual90 exon">GACCT</span>' +
 			'<span class="seq qual70 exon">ACATCA</span>' +
 			'<span class="seq qual70">GGC</span>' +
 			'<span class="seq qual20">T</span>');
     }));
+
     it('should do the right thing with events out of sequence', inject(function(integrateSequenceEventsToHTML) {
       var seq_events = { events: [[11, {x: null}],
 				  [0, {q: 'qual90', x: 'exon'}],
@@ -60,13 +105,40 @@ describe('service', function() {
 				  [0, {a: 'seq'}],
 				  [5, {q: 'qual70'}]
 				 ],
-			 seq: 'GACCTACATCAGGCT' }
+			 sequence: 'GACCTACATCAGGCT' }
       var html = integrateSequenceEventsToHTML(seq_events);
       expect(html).toBe('<span class="seq qual90 exon">GACCT</span>' +
 			'<span class="seq qual70 exon">ACATCA</span>' +
 			'<span class="seq qual70">GGC</span>' +
 			'<span class="seq qual20">T</span>');
     }));
+
+    it('should do the right thing with complex events', inject(function(integrateSequenceEventsToHTML) {
+      var seq_events = { events: [[0, {qual: 'qual90', exon: 'exon'}],
+				  [5, {qual: 'qual70'}],
+				  [11, {exon: null}],
+				  [14, {qual: 'qual20'}],
+				  [ -63, { gene : 'gene' } ],
+				  [ -63, { transcript : 'transcript' } ],
+				  [ -63, { exon : 'exon' } ],
+				  [ 3, { exon : null } ],
+				  [ 13, { exon : 'exon' } ],
+				  [ 33, { gene : null } ],
+				  [ 33, { transcript : null } ],
+				  [ 33, { exon : null } ],
+				  [ 111, { fun: 'fun' } ]
+				 ],
+			 sequence: 'GACCTACATCAGGCT' }
+      var html = integrateSequenceEventsToHTML(seq_events);
+      expect(html).toBe(
+
+
+'<span class="seq qual90 exon">GACCT</span>' +
+			'<span class="seq qual70 exon">ACATCA</span>' +
+			'<span class="seq qual70">GGC</span>' +
+			'<span class="seq qual20">T</span>');
+    }));
+
   });
 
   describe('differentiateSequenceToEvents', function() {
@@ -82,7 +154,7 @@ describe('service', function() {
 									 [3, {q: 'qual45'}],
 									 [18, {q: 'qual51'}]
 									],
-								seq: 'TCATTTATATTATTTAGATGTG' });
+								sequence: 'TCATTTATATTATTTAGATGTG' });
     }));
   });
 
@@ -105,7 +177,32 @@ describe('service', function() {
     it('should be a function', inject(function(convertFeaturesToEvents) {
       expect(convertFeaturesToEvents).toBeFunction();
     }));
-    it('should do the right thing', inject(function(convertFeaturesToEvents) {
+
+    it('should create events from basic features', inject(function(convertFeaturesToEvents) {
+      var t = {"request": {"start": 67, "scaffold": "Scaffold12345", "end": 89},
+	       "results": {"start": 67, "scaffold": "Scaffold12345", "end": 89,
+			   "quality": [56, 51, 51, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 51, 51, 51, 51],
+			   "sequence": "TCATTTATATTATTTAGATGTG",
+			   features: [{"span": [4, 100], "type": "gene", "id": "SPU_Random-gn", "strand": "+"},
+				      {"span": [4, 100], "type": "transcript", "id": "SPU_Random-tr", "strand": "+"},
+				      {"span": [4, 70], "type": "exon", "id": "SPU_Random:0", "strand": "+"},
+				      {"span": [80, 100], "type": "exon", "id": "SPU_Random:1", "strand": "+"}]
+
+			  }
+	      };
+
+      expect(convertFeaturesToEvents(t.results)).toEqual({ events : [ [ -63, { gene : 'gene' } ],
+								      [ -63, { transcript : 'transcript' } ],
+								      [ -63, { exon : 'exon' } ],
+								      [ 3, { exon : null } ],
+								      [ 13, { exon : 'exon' } ],
+								      [ 33, { gene : null } ],
+								      [ 33, { transcript : null } ],
+								      [ 33, { exon : null } ]
+								    ] });
+    }));
+
+    it('should create events from interesting features', inject(function(convertFeaturesToEvents) {
       var features = [{"span": [13028, 18195], "type": "gene", "id": "SPU_016802gn", "strand": "-"},
 		      {"span": [13028, 18195], "type": "transcript", "id": "SPU_016802-tr", "strand": "-"},
 		      {"span": [15818, 16028], "type": "exon", "id": "SPU_016802:1", "strand": "-"},
@@ -149,15 +246,22 @@ describe('service', function() {
     }));
   });
 
-  describe('SequenceInfo', function() {
+  xdescribe('SequenceInfo', function() {
     var si;
 
     beforeEach(inject(function(SequenceInfo) {
-      var t = {"request":
-	       {"start": 67, "scaffold": "Scaffold12345", "end": 89},
+      var t = {"request": {"start": 67, "scaffold": "Scaffold12345", "end": 89},
 	       "results": {"start": 67, "scaffold": "Scaffold12345", "end": 89,
 			   "quality": [56, 51, 51, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 51, 51, 51, 51],
-			   "sequence": "TCATTTATATTATTTAGATGTG"}};
+			   "sequence": "TCATTTATATTATTTAGATGTG",
+			   features: [{"span": [4, 100], "type": "gene", "id": "SPU_Random-gn", "strand": "+"},
+				      {"span": [4, 100], "type": "transcript", "id": "SPU_Random-tr", "strand": "+"},
+				      {"span": [4, 70], "type": "exon", "id": "SPU_Random:0", "strand": "+"},
+				      {"span": [80, 100], "type": "exon", "id": "SPU_Random:1", "strand": "+"}]
+
+			  }
+	      };
+
       si = new SequenceInfo(t.results);
     }));
 
@@ -179,4 +283,186 @@ describe('service', function() {
 
   });
 
+  describe('GeneSequenceInfo', function() {
+    var gsi, t1, t2, t3;
+
+
+    beforeEach(inject(function(GeneSequenceInfo) {
+      gsi = new GeneSequenceInfo('test');
+
+      // tree spans are half-open, in the style of Array.prototype.slice()
+
+      //  0  1  2  3  4  5  6  7  8  9 10 11
+      // [-  -  -] .  . [-  -  -] .  .  .  .
+      t1 = {type: 't1_root', span: [10, 21],
+	    children: [{type: 't1_c1', span: [0, 3]}, {type: 't1_c2', span: [5, 8]}] };
+
+      //  0  1  2  3  4  5  6  7  8  9 10 11 12 13
+      // [A  B  C][D][E  F  G  H][I  J  K  L][M]
+      //  q1       q2 q3          q4          q5
+      t2 = {type: 'seq', span: [7, 13],
+	    children: [{type: 'q1', span: [0,3], data: 'ABC'},
+		       {type: 'q2', span: [3,4], data: 'D' },
+		       {type: 'q3', span: [4,8], data: 'EFGH' },
+		       {type: 'q4', span: [8,12], data: 'IJKL' },
+		       {type: 'q5', span: [12,13], data: 'M'}]};
+			
+
+
+      t3 = {type: 't1_root', span: [7, 21],
+	    children: [{type: 'seq', span: [0, 3],
+			children: [{type: 'q1', span: [0,3], data: 'ABC'}]},
+		       {type: 't1_c1', span: [3, 6],
+			children: [{type: 'seq', span: [0,3],
+				   children: [{type: 'q2', span: [0,1], data: 'D'},
+					      {type: 'q3', span: [1,3], data: 'EF'}]}
+				  ]},
+		       {type: 'seq', span: [6, 8],
+			children: [{type: 'q3', span: [0,2], data: 'GH'}]},
+		       {type: 't1_c2', span: [8, 11],
+			children: [{type: 'seq', span: [0,3],
+				   children: [{type: 'q4', span: [0,3], data: 'IJK'}]}
+				  ]},
+		       {type: 'seq', span: [11, 13],
+			children: [{type: 'seq', span: [0,2],
+				   children: [{type: 'q4', span: [0,1], data: 'L'},
+					      {type: 'q5', span: [1,2], data: 'M'}]}
+				   ]}
+		      ]};
+		       
+    }));
+
+    describe('_merge_tree_into_tree', function() {
+      it('should exist', inject(function(GeneSequenceInfo) {
+	expect(GeneSequenceInfo).toBeDefined();
+      }));
+
+      it('should exist', function() {
+	expect(gsi._merge_tree_into_tree).toBeFunction();
+      });
+
+      xit('should not alter a tree when empty tree merged in', function() {
+	expect(gsi._merge_tree_into_tree(t1, {})).toEqual(t1);
+      });
+
+      xit('should handle simple disjoint case', function() {
+	var t11 = {type: 'foo', span: [10,13]};
+	var t12 = {type: 'bar', span: [15,20]};
+	expect(gsi._merge_tree_into_tree(t11, t12)).
+	  toEqual({children:[{type: 'foo', span: [10,13] },
+			     {type: 'bar', span: [15,20] }]
+		  });
+      });
+
+      xit('should handle complex case', function() {
+	expect(gsi._merge_tree_into_tree(t1, t2)).toEqual(t3);
+      });
+    });	   
+
+    describe('_render_soa_to_html', function() {
+      it('should exist', function() {
+	expect(gsi._render_soa_to_html).toBeFunction();
+      });
+      it('should handle a trivial case', function() {
+	var soa = [];
+	expect(gsi._render_soa_to_html(soa)).toBe('<span class="seq"></span>');
+      });
+      it('should handle a teeny case', function() {
+	var soa = [{b: 'A', q: 90}];
+	expect(gsi._render_soa_to_html(soa)).
+	  toBe('<span class="seq"><span class="q90">A</span></span>');
+      });
+      it('should handle a small case', function() {
+	var soa = [{b: 'A', q: 90},
+		   {b: 'T', q: 90},
+		   {b: 'C', q: 90},
+		   {b: 'G', q: 90}
+		  ];
+	expect(gsi._render_soa_to_html(soa)).
+	  toBe('<span class="seq"><span class="q90">ATCG</span></span>');
+      });
+      it('should handle a simple case', function() {
+	var soa = [{b: 'A', q: 90},
+		   {b: 'T', q: 90},
+		   {b: 'C', q: 90},
+		   {b: 'G', q: 90},
+		   {b: 'N', q: 0}
+		  ];
+	expect(gsi._render_soa_to_html(soa)).
+	  toBe('<span class="seq"><span class="q90">ATCG</span>' +
+	       '<span class="q0">N</span></span>');
+      });
+      it('should handle simple case 2', function() {
+	var soa = [{b: 'A', q: 90},
+		   {b: 'T', q: 45},
+		   {b: 'C', q: 90},
+		   {b: 'G', q: 90},
+		   {b: 'N', q: 0},
+		   {b: 'G', q: 20}
+		  ];
+	expect(gsi._render_soa_to_html(soa)).
+	  toBe('<span class="seq">' +
+	       '<span class="q90">A</span>' +
+	       '<span class="q45">T</span>' +
+	       '<span class="q90">CG</span>' +
+	       '<span class="q0">N</span>' +
+	       '<span class="q20">G</span>' +
+	       '</span>');
+      });
+      it('should handle modest case 1', function() {
+	var soa = [{b: 'A', q: 90, gene: 'gene', transcript: 'transcript'},
+		   {b: 'T', q: 45},
+		   {b: 'C', q: 90},
+		   {b: 'G', q: 90},
+		   {b: 'N', q: 0},
+		   {b: 'G', q: 20},
+		   {b: 'C', q: 90, gene: null, transcript: null}
+		  ];
+	expect(gsi._render_soa_to_html(soa)).
+	  toBe('<span class="seq">' +
+	         '<span class="gene">' +
+	           '<span class="transcript">' +
+	             '<span class="q90">A</span>' +
+	             '<span class="q45">T</span>' +
+	             '<span class="q90">CG</span>' +
+	             '<span class="q0">N</span>' +
+	             '<span class="q20">G</span>' +
+	           '</span>' +
+	         '</span>' +
+	         '<span class="q90">C</span>' +
+	       '</span>');
+      });
+      it('should handle modest case 2', function() {
+	var soa = [{b: 'A', q: 90, gene: 'gene', transcript: 'transcript'},
+		   {b: 'T', q: 45},
+		   {b: 'C', q: 90, exon: 'exon'},
+		   {b: 'G', q: 90},
+		   {b: 'G', q: 90},
+		   {b: 'G', q: 90, exon: null},
+		   {b: 'G', q: 90},
+		   {b: 'N', q: 0},
+		   {b: 'G', q: 20},
+		   {b: 'C', q: 90, gene: null, transcript: null}
+		  ];
+	expect(gsi._render_soa_to_html(soa)).
+	  toBe('<span class="seq">' +
+	         '<span class="gene">' +
+	           '<span class="transcript">' +
+	             '<span class="q90">A</span>' +
+	             '<span class="q45">T</span>' +
+	             '<span class="exon">' +
+	               '<span class="q90">CGG</span>' +
+	             '</span>' +
+	             '<span class="q90">GG</span>' +
+	             '<span class="q0">N</span>' +
+	             '<span class="q20">G</span>' +
+	           '</span>' +
+	         '</span>' +
+	         '<span class="q90">C</span>' +
+	       '</span>');
+      });
+
+    });
+
+  });
 });

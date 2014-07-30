@@ -11,7 +11,8 @@ class get_features(object):
         self.database = get_gene.GeneDB(databasePath)
     def open(self):
         return self.database.open()
-    def featuregen(self, scaffold, start, end, featureType=None, completely_within=False): # featureType of None means all features are included. Returns a list
+    def featuregen(self, scaffold, start, end, featureType=None, completely_within=False):
+        # featureType of None means all features are included. Returns a list
         self.features = self.open().region((scaffold, start, end), featureType, completely_within)
         self.featurelist = [x for x in self.features]
         return self.featurelist
