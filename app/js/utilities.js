@@ -224,7 +224,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       };
     }]).
 
-  factory('GeneSequenceInfo', ['_', '$q', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents', 'getTree', 'getSequence', function(_, $q, differentiateSequenceToEvents, integrateSequenceEventsToHTML, convertFeaturesToEvents, getTree, getSequence ) {
+  factory('GeneSequenceInfo', ['_', '$q', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents', 'getTree', 'getSequence', 'compareSpans', function(_, $q, differentiateSequenceToEvents, integrateSequenceEventsToHTML, convertFeaturesToEvents, getTree, getSequence, compareSpans ) {
 
     function gsi(name, margin) {
       this.gene_name = name;
@@ -324,10 +324,31 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 
 	function place_into(tree, leaf, position) {
 	  var leafSpan = [position + leaf.span[0], position + leaf.span[1]];
-	  switch (cmpSpan(leafSpan, tree.span)) {
-	    case '':
+	  switch (compareSpans(leafSpan, tree.span)) {
+	    case '<<<<': // leaf is completely below tree
+	    if (!_.has(tree, 'children')) tree.children = [];
+	    var delta = leaf.span[0] - tree.span[0];
+	    tree.span[0] = leaf.span[0];
+	    _.each(tree.children, function(c) {
+	      c.span[0] += delta;
+	      c.span[1] += delta;
+	    });
+	    tree.children.unshift(leaf);
 	    break;
+
+	    case '<<><': // leaf partially overlaps on bottom
+	    
+	    
+	    break;
+
+	    case '>>>>': // leaf is completely above tree
+	    if (!_.has(tree, 'children')) tree.children = [];
+	    tree.span[1] = leaf.span[1];
+	    tree.children.push(leaf);
+	    break;
+
 	    default:
+
 	    break;
 	  }
 	  

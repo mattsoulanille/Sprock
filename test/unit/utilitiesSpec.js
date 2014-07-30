@@ -40,6 +40,7 @@ describe('service', function() {
     it('should be a function', inject(function(compareSpans) {
       expect(compareSpans).toBeFunction();
     }));
+    // these are in terms of half-open spans, e.g. [start, end), as in Python
     it('should recognize span completely below span', inject(function(compareSpans) {
       expect(compareSpans([-3,7], [9,12])).toEqual('<<<<');
     }));
