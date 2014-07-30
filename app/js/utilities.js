@@ -243,7 +243,11 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 
     function gsi(name, margin) {
       this.gene_name = name;
-      this.margin = margin || 500;	//FIXME: biologically-appropriate default
+      if (margin === undefined) {
+	this.margin = 500; //FIXME: biologically-appropriate default
+      } else {
+	this.margin = margin;
+      }
       return this;
     };
 
