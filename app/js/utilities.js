@@ -203,7 +203,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       var expect = chai.expect;
       var g = new GeneSequenceInfo('SPU_022066', 1000);
       expect(g.get_informed()).eventually.to.have.property('feature_tree').to.have.property('name');
-      expect(g.get_informed()).eventually.to.have.property('sequence_info').to.have.property('scaffold');
+      expect(g.get_informed()).eventually.to.have.property('sequence_info_objects').to.have.property('scaffold');
 
       var g = new GeneSequenceInfo('SPU_022066', 1000);
       expect(g.get_sequence()).eventually.to.have.property('scaffold').equal('Scaffold694');
@@ -211,8 +211,21 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       expect(g.get_sequence()).eventually.to.have.property('end').equal(9480+9857);
       expect(g.get_sequence()).eventually.to.have.property('sequence').a('string').of.length(9857);
       expect(g.get_sequence()).eventually.to.have.property('sequence').to.contain('ATGGCTGATGCTGGCTTATTGTTGGGTCTGTTTTTACAGAACTTCATGACCAGGTAATGGGAACCTTACAGCAAAAGATTCGACCTCCTTTTCAAGGGCAGCAAGTTTGGA');
-      expect(g.get_sequence()).eventually.to.have.property('sequence').to.contain('GACTCCCATCGCCATTGCCATTGCTAACTTTCTTGAGACTCCCATCACCATTGCCATTGGTGACTGTCTTTAGACTCCCATCACCATTCATCGCTGTCTTGATCACTGTCTTGGTTCCGTTAACAGTAGCCAT');
+      expect(g.get_sequence()).eventually.to.have.property('sequence').to.contain('GACTCCCATCGCCATTGCCATTGCTAACTTTCTTGAGACTCCCATCACCATTGCCATTGGTGACTGTCTTTAGACTCCCATCACCATTCATCGCTGTCTTGATCACTGTCTTGGTTCCGTTAACA');
       expect(g.get_sequence()).eventually.to.have.property('quality').an('array').of.length(9857);
+
+
+
+      expect(g.get_sequence_objects()).eventually.to.have.property('span').property(0).equal(9480);
+      expect(g.get_sequence_objects()).eventually.to.have.property('span').property(1).equal(9480+9857);
+      expect(g.get_sequence_objects()).eventually.to.have.property('sequenceObjectsArray').
+	an('array').of.length(9857);
+      expect(g.get_sequence_objects()).eventually.to.have.property('sequenceObjectsArray').
+	property(0).to.contain.keys('b', 'q');
+      expect(g.get_sequence_objects()).eventually.to.have.property('sequenceObjectsArray').
+	property(0).property('q').within(0,90);
+      expect(g.get_sequence_objects()).eventually.to.have.property('sequenceObjectsArray').
+	property(0).property('b').to.match(/^[ATCGN]$/);
 
       var g = new GeneSequenceInfo('SPU_022066', 1000);
       expect(g.get_feature_tree()).eventually.to.have.property('name').equal('SPU_022066');
@@ -220,6 +233,8 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       expect(g.get_feature_tree()).eventually.to.have.property('type').equal('gene');
       expect(g.get_feature_tree()).eventually.to.have.property('children').of.length(1);
       expect(g.get_feature_tree()).eventually.to.have.property('children').property(0).property('children').of.length(8);
+
+      expect(g.get_featureful_sequence_objects()).eventually.to.have.property('sequence_info_objects');
 
       };
     }]).
@@ -232,11 +247,18 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       return this;
     };
 
+    gsi.prototype.get_feature_tree =
+      function() {
+	if (_.has(this, 'feature_tree_promise') && this.feature_tree_promise !== null)
+	  return this.feature_tree_promise;
+	this.feature_tree_promise = getTree(this.gene_name);
+	return this.feature_tree_promise;
+      };
+
     gsi.prototype.get_sequence =
       function() {
-	if (this.sequence_promise && this.sequence_promise !== null)
+	if (_.has(this, 'sequence_promise') && this.sequence_promise !== null)
 	  return this.sequence_promise;
-
 	var that = this;
 	this.sequence_promise = this.get_feature_tree().
 	  then(function(ft) {
@@ -250,38 +272,121 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	return this.sequence_promise;
       };
 
-    gsi.prototype.get_feature_tree =
+    gsi.prototype.get_sequence_objects =
       function() {
-	if (this.feature_tree_promise && this.feature_tree_promise !== null)
-	  return this.feature_tree_promise;
-	this.feature_tree_promise = getTree(this.gene_name)
-	return this.feature_tree_promise;
+	if (_.has(this, 'sequence_objects_promise') && this.sequence_objects_promise !== null)
+	  return this.sequence_objects_promise;
+	var that = this;
+	this.sequence_objects_promise = this.get_sequence().
+	  then(function(si) {
+	    var so = {};
+	    so.scaffold = si.scaffold;
+	    so.span = [si.start, si.end];
+	    so.sequenceObjectsArray =
+	      _.reduce(
+		_.map(
+		  _.zip(si.sequence, si.quality),
+		  function(sq) { return { b: sq[0], q: sq[1] }; }
+		),
+		function(memo, o) { memo.push(o); return memo; },
+		[]);
+	    return that.sequence_objects = so;
+	  });
+	return this.sequence_objects_promise;
       };
 
     gsi.prototype.get_informed =
       function() {
-	if (this.informed_promise && this.informed_promise !== null)
+	if (_.has(this, 'informed_promise') && this.informed_promise !== null)
 	  return this.informed_promise;
 	this.informed_promise = $q.all({ feature_tree: this.get_feature_tree(),
-					 sequence_info: this.get_sequence()});
+					 sequence_info_objects: this.get_sequence_objects()});
 	return this.informed_promise;
+      };
+
+
+    gsi.prototype.get_featureful_sequence_objects =
+      function() {
+	if (_.has(this, 'featureful_sequence_objects_promise') &&
+	    this.featureful_sequence_objects_promise !== null)
+	  return this.featureful_sequence_objects_promise;
+
+	// walk a tree depth-first, calling cb at every node
+	function walkDepthFirst(tree, cb, position_offset) {
+	  position_offset + tree.span[0];
+	  if (_.has(tree, 'children'))
+	    _.each(tree.children,
+		   _.partial(walkDepthFirst, _, cb,
+			     position_offset + tree.span[0])); //recurse
+	  cb(tree, position_offset);
+	}
+
+	//var that = this;
+	this.featureful_sequence_objects_promise = this.get_informed().
+	  then(function(v) {
+	    var ft = v.feature_tree;
+	    var so = v.sequence_info_objects;
+	    var soa = so.sequenceObjectsArray;
+	    walkDepthFirst(ft, function(node, pos) {
+	      // Mark beginning & end of the type represented by this node
+	      soa[node.span[0]+pos][node.type] = node.type;
+	      soa[node.span[1]+pos][node.type] = null;
+	    }, 0-so.span[0]);
+	    return v; //our work has updated an existing object, not created a new one
+	  });
+	return this.featureful_sequence_objects_promise;
       };
 
     gsi.prototype.render_to_html =
       function(callback) {
-	//return '<strong><blink>Unimplemented</blink></strong>'
-	//return integrateSequenceEventsToHTML(differentiateSequenceToEvents(this));
 	var that = this;
-	this.get_informed().then(function(v) {
-	  //debugger;
-	  //var ds = differentiateSequenceToEvents(v.sequence_info);
-	  //var html = integrateSequenceEventsToHTML(ds);
-	  //var html = integrateSequenceEventsToHTML(differentiateSequenceToEvents(sequence_info));
-	  var html = that._render_tree_to_html(v.feature_tree);
+	this.get_featureful_sequence_objects().then(function(v) {
+	  var soa = v.sequence_info_objects.sequenceObjectsArray;
+	  var html = that._render_soa_to_html(soa);
 	  //var html = '<strong><blink><code>gsi.prototype.render_to_html</code> is NOT working code</blink></strong>'
 	  //console.log('GeneSequenceInfo.render_to_html() callback with:' + html);
 	  callback(html);
 	});
+      };
+
+    gsi.prototype._render_soa_to_html =
+      function(soa) {
+	var rv = '<span class="seq">'; // it's all a sequence
+	var lastq = null;
+	var terminated_quality_span;
+	_.each(soa, function(o) {
+	  terminated_quality_span = false;
+	  if (o.q !== lastq && lastq !== null) {
+	    rv += '</span>';	// change of quality so terminate prior qual span
+	    terminated_quality_span = true;
+	  };
+	  var classes = _.difference(_.keys(o), ['b', 'q']).sort();
+	  if (classes.length > 0) {
+	    //console.log(classes); //DEBUG
+	    if (!terminated_quality_span && lastq !== null) {
+	      rv += '</span>';	// change of quality so terminate prior qual span
+	      terminated_quality_span = true;
+	    };
+	    _.each(classes.reverse(), function(k) {
+	      if (o[k] === null) {
+		rv += '</span>'; // close indicated classes in reverse alphabetic order
+	      }});
+	    _.each(classes.reverse(), function(k) { // this second reverse restores original order
+	      if (_.isString(o[k])) {
+		rv += '<span class="' + o[k] + '">'; // open indicated classes
+	      }});
+	  };
+	  if (terminated_quality_span || lastq === null) {
+	    rv += '<span class="q' + o.q + '">'; // open the quality class span
+	    lastq = o.q;
+	  };
+	  rv += o.b;
+	});
+	if (lastq !== null) {
+	  rv += '</span>';	// close quality class
+	}
+	rv += '</span>';	// close seq class
+	return rv;
       };
 
     gsi.prototype._render_tree_to_html =
