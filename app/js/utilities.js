@@ -1,7 +1,7 @@
 'use strict';
 
 
-angular.module('sprock.utilities', ['underscore']).
+angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 
   factory('integrateSequenceEventsToHTML', ['_', function(_) {
     /*
@@ -184,6 +184,20 @@ angular.module('sprock.utilities', ['underscore']).
     return si;
   }]).
 
+  factory('compareSpans', ['_', function(_) {
+    return function(a, b) {
+      var a_start = a[0];
+      var a_end = a[1];
+      var b_start = b[0];
+      var b_end = b[1];
+      var rv = a_start < b_start ? '<' : a_start > b_start ? '>' : '=';
+      rv += a_start < b_end ? '<' : a_start > b_end ? '>' : '=';
+      rv += a_end < b_start ? '<' : a_end > b_start ? '>' : '=';
+      rv += a_end < b_end ? '<' : a_end > b_end ? '>' : '=';
+      return rv;
+    }
+  }]).
+
   factory('GeneSequenceInfo_test', ['GeneSequenceInfo', function(GeneSequenceInfo) {
     return function() {
       var expect = chai.expect;
@@ -217,21 +231,6 @@ angular.module('sprock.utilities', ['underscore']).
       this.margin = margin || 500;	//FIXME: biologically-appropriate default
       return this;
     };
-
-    gsi.prototype.render_to_html =
-      function(callback) {
-	//return '<strong><blink>Unimplemented</blink></strong>'
-	//return integrateSequenceEventsToHTML(differentiateSequenceToEvents(this));
-	this.get_informed().then(function(v) {
-	  debugger;
-	  var ds = differentiateSequenceToEvents(v.sequence_info);
-	  //var html = integrateSequenceEventsToHTML(ds);
-	  //var html = integrateSequenceEventsToHTML(differentiateSequenceToEvents(sequence_info));
-	  var html = '<strong><blink><code>gsi.prototype.render_to_html</code> is NOT working code</blink></strong>'
-	  console.log('GeneSequenceInfo.render_to_html() callback with:' + html);
-	  callback(html);
-	});
-      };
 
     gsi.prototype.get_sequence =
       function() {
@@ -268,15 +267,87 @@ angular.module('sprock.utilities', ['underscore']).
 	return this.informed_promise;
       };
 
-    //OLD:
-    gsi.prototype.add_features =
-      function(features) {
-	//console.log(_.uniq(_.flatten(_.map(this.events, function(v) { return _.keys(v[1]) }))));
-	//console.log(convertFeaturesToEvents(features));
-	this.events = _.union(this.events, convertFeaturesToEvents(features).events); //FIXME: screwy what's an event
-	//console.log(_.uniq(_.flatten(_.map(this.events, function(v) { return _.keys(v[1]) }))));
-	//Unimplemented
-	return this
+    gsi.prototype.render_to_html =
+      function(callback) {
+	//return '<strong><blink>Unimplemented</blink></strong>'
+	//return integrateSequenceEventsToHTML(differentiateSequenceToEvents(this));
+	var that = this;
+	this.get_informed().then(function(v) {
+	  //debugger;
+	  //var ds = differentiateSequenceToEvents(v.sequence_info);
+	  //var html = integrateSequenceEventsToHTML(ds);
+	  //var html = integrateSequenceEventsToHTML(differentiateSequenceToEvents(sequence_info));
+	  var html = that._render_tree_to_html(v.feature_tree);
+	  //var html = '<strong><blink><code>gsi.prototype.render_to_html</code> is NOT working code</blink></strong>'
+	  //console.log('GeneSequenceInfo.render_to_html() callback with:' + html);
+	  callback(html);
+	});
+      };
+
+    gsi.prototype._render_tree_to_html =
+      function(tree) {
+	// this inner function exists so we don't have to know to what property name we've been assigned
+	function render_tree(tree) {
+	  var rv = '<span class="' + tree.type + '">';
+	  if (_.has(tree, 'before_children')) {
+	    rv += tree.before_children;
+	  }
+	  rv = _.reduce(_.map(tree.children, render_tree), function(memo, s) { return memo + s }, rv);
+	  if (_.has(tree, 'after_children')) {
+	    rv += tree.after_children;
+	  }
+	  rv += '</span>';
+	  return rv;
+	};
+	console.log(tree);
+	//var html = '<strong><blink><code>gsi.prototype._render_tree_to_html</code> is NOT working code</blink></strong>'
+	var html = render_tree(tree);
+	return html;
+      };
+
+    gsi.prototype._merge_tree_into_tree =
+      function(target, arrow) {
+	var rv = {}
+
+	// walk a tree, calling cb with only the leaf nodes
+	function eachLeaf(tree, cb, position) {
+	  var pos = position + tree.span[0];
+	  if (_.has(tree, 'children')) {
+	    _.each(tree.children, _.partial(eachLeaf, _, cb, pos)); //recurse
+	  } else {
+	    cb(tree, pos);
+	  }
+	}
+
+	// DEBUG test
+	//eachLeaf(target, function(t, p) { console.log('at ' + p); console.log(t); }, 0);
+
+	function place_into(tree, leaf, position) {
+	  var leafSpan = [position + leaf.span[0], position + leaf.span[1]];
+	  switch (cmpSpan(leafSpan, tree.span)) {
+	    case '':
+	    break;
+	    default:
+	    break;
+	  }
+	  
+	}
+
+	eachLeaf(target, function(t, p) {
+	  console.log('at ' + p); console.log(t);
+	}, 0);
+
+
+	if (arrow.span && target.span) {
+	  if (arrow.span[0] >= target.span[1]) {
+	    rv.children = [target, arrow];
+	  }
+	  else if (target.span[0] > arrow.span[1]) {
+	    rv.children = [arrow, target];
+	  }
+	};
+
+	return rv;
       };
 
     return gsi;

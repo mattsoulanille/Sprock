@@ -35,6 +35,48 @@ describe('service', function() {
        }));
   });
 
+  ddescribe('compareSpans', function() {
+    var s1, s2;
+    it('should be a function', inject(function(compareSpans) {
+      expect(compareSpans).toBeFunction();
+    }));
+    it('should recognize span completely below span', inject(function(compareSpans) {
+      expect(compareSpans([-3,7], [9,12])).toEqual('<<<<');
+    }));
+    it('should recognize span completely above span', inject(function(compareSpans) {
+      expect(compareSpans( [9,12], [-3,7])).toEqual('>>>>');
+    }));
+    it('should recognize span completely within span', inject(function(compareSpans) {
+      expect(compareSpans([-3,12], [7,9])).toEqual('<<>>');
+    }));
+    it('should recognize span completely surrounding span', inject(function(compareSpans) {
+      expect(compareSpans([7,9], [-3,12])).toEqual('><><');
+    }));
+    it('should recognize span equal to span', inject(function(compareSpans) {
+      expect(compareSpans([-3,12], [-3, 12])).toEqual('=<>=');
+    }));
+    it('should recognize span overlapping span from below', inject(function(compareSpans) {
+      expect(compareSpans([-3,7], [5,9])).toEqual('<<><');
+    }));
+    it('should recognize span overlapping span from above', inject(function(compareSpans) {
+      expect(compareSpans([5,9], [-3,7])).toEqual('><>>');
+    }));
+    it('should recognize span left-contiguous with span', inject(function(compareSpans) {
+      expect(compareSpans([5,9], [9,12])).toEqual('<<=<');
+    }));
+    it('should recognize span right-contiguous with span', inject(function(compareSpans) {
+      expect(compareSpans([9, 12], [5,9])).toEqual('>=>>');
+    }));
+    it('should recognize span that is left partial of span', inject(function(compareSpans) {
+      expect(compareSpans([3,5], [3,7])).toEqual('=<><');
+    }));
+    it('should recognize span that is right partial of span', inject(function(compareSpans) {
+      expect(compareSpans([5,7], [3,7])).toEqual('><>=');
+    }));
+
+
+  });
+
   describe('integrateSequenceEventsToHTML', function() {
     it('should be a function', inject(function(integrateSequenceEventsToHTML) {
       expect(integrateSequenceEventsToHTML).toBeFunction();
@@ -240,4 +282,82 @@ describe('service', function() {
 
   });
 
+  describe('GeneSequenceInfo', function() {
+    var gsi, t1, t2, t3;
+
+
+    beforeEach(inject(function(GeneSequenceInfo) {
+      gsi = new GeneSequenceInfo('test');
+      // tree spans are half-open, in the style of Array.prototype.slice()
+
+      //  0  1  2  3  4  5  6  7  8  9 10 11
+      // [-  -  -] .  . [-  -  -] .  .  .  .
+      t1 = {type: 't1_root', span: [10, 21],
+	    children: [{type: 't1_c1', span: [0, 3]}, {type: 't1_c2', span: [5, 8]}] };
+
+      //  0  1  2  3  4  5  6  7  8  9 10 11 12 13
+      // [A  B  C][D][E  F  G  H][I  J  K  L][M]
+      //  q1       q2 q3          q4          q5
+      t2 = {type: 'seq', span: [7, 13],
+	    children: [{type: 'q1', span: [0,3], data: 'ABC'},
+		       {type: 'q2', span: [3,4], data: 'D' },
+		       {type: 'q3', span: [4,8], data: 'EFGH' },
+		       {type: 'q4', span: [8,12], data: 'IJKL' },
+		       {type: 'q5', span: [12,13], data: 'M'}]};
+			
+
+
+      t3 = {type: 't1_root', span: [7, 21],
+	    children: [{type: 'seq', span: [0, 3],
+			children: [{type: 'q1', span: [0,3], data: 'ABC'}]},
+		       {type: 't1_c1', span: [3, 6],
+			children: [{type: 'seq', span: [0,3],
+				   children: [{type: 'q2', span: [0,1], data: 'D'},
+					      {type: 'q3', span: [1,3], data: 'EF'}]}
+				  ]},
+		       {type: 'seq', span: [6, 8],
+			children: [{type: 'q3', span: [0,2], data: 'GH'}]},
+		       {type: 't1_c2', span: [8, 11],
+			children: [{type: 'seq', span: [0,3],
+				   children: [{type: 'q4', span: [0,3], data: 'IJK'}]}
+				  ]},
+		       {type: 'seq', span: [11, 13],
+			children: [{type: 'seq', span: [0,2],
+				   children: [{type: 'q4', span: [0,1], data: 'L'},
+					      {type: 'q5', span: [1,2], data: 'M'}]}
+				   ]}
+		      ]};
+		       
+    }));
+
+    describe('_merge_tree_into_tree', function() {
+
+      it('should exist', inject(function(GeneSequenceInfo) {
+	expect(GeneSequenceInfo).toBeDefined();
+      }));
+
+      it('should exist', function() {
+	expect(gsi._merge_tree_into_tree).toBeFunction();
+      });
+
+      xit('should not alter a tree when empty tree merged in', function() {
+	expect(gsi._merge_tree_into_tree(t1, {})).toEqual(t1);
+      });
+
+      xit('should handle simple disjoint case', function() {
+	var t11 = {type: 'foo', span: [10,13]};
+	var t12 = {type: 'bar', span: [15,20]};
+	expect(gsi._merge_tree_into_tree(t11, t12)).
+	  toEqual({children:[{type: 'foo', span: [10,13] },
+			     {type: 'bar', span: [15,20] }]
+		  });
+      });
+
+      xit('should handle complex case', function() {
+	expect(gsi._merge_tree_into_tree(t1, t2)).toEqual(t3);
+      });
+
+    });	   
+
+  });
 });
