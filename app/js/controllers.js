@@ -152,7 +152,9 @@ angular.module('sprock.controllers', []).
 }]).
 
   controller('Tester2', ['$scope', 'mukmuk', function($scope, mukmuk) {
+    $scope.done = false;
     mukmuk(10, 1, function(mm, mmnew) {
       $scope.muks = mm;
-    }, 0.5);
+    }, 0.5).
+      then(function(v) {$scope.done = true});
   }]);

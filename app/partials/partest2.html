@@ -1,0 +1,11 @@
+<h1>Test 2: watching results grow</h1>
+<p>
+  <span ng-show="!done">Still looking for muks...
+    <span ng-show="muks.length > 0">found {{muks.length}} so far:</span>
+  </span>
+  <span ng-show="done">Found {{muks.length}} muks in total:</span>
+</p>
+<ul>
+  <li ng-repeat="muk in muks">{{muk}}</li>
+</ul>
+<pre>{{serverError}}</pre>
