@@ -306,12 +306,14 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
-  factory('mukmuk_test', ['mukmuk', function(mukmuk) {
+  factory('mukmuk_test', ['_', 'mukmuk', function(_, mukmuk) {
     return function() {
       var expect = chai.expect;
       var mmp = mukmuk(10, 0.5, function(mm, mmnew) {
-	console.log('new: ' + JSON.stringify(mmnew));
-	console.log('mm: ' + JSON.stringify(mm));
+	//console.log('new: ' + JSON.stringify(mmnew));
+	//console.log('mm: ' + JSON.stringify(mm));
+	expect(mmnew).to.be.an('array').of.length.above(0);
+	expect(_.last(mm, mmnew.length)).to.eql(mmnew);
       });
       expect(mmp).eventually.to.be.an('array').of.length(10);
     };
