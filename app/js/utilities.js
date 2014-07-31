@@ -333,8 +333,9 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	    var soa = so.sequenceObjectsArray;
 	    walkDepthFirst(ft, function(node, pos) {
 	      // Mark beginning & end of the type represented by this node
-	      soa[node.span[0]+pos][node.type] = node.type;
-	      soa[node.span[1]+pos][node.type] = null;
+	      var k = {gene:'g', transcript:'t', exon:'x'}[node.type] || node.type;
+	      soa[node.span[0]+pos][k] = node.type;
+	      soa[node.span[1]+pos][k] = null;
 	    }, 0-so.span[0]);
 	    return v; //our work has updated an existing object, not created a new one
 	  });
