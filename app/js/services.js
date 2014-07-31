@@ -285,4 +285,76 @@ angular.module('sprock.services', ['sprock.utilities']).
 	});
       return deferred.promise;
     };
+  }]).
+
+  factory('data_test1_test', ['$http', function($http) {
+    return function() {
+      var expect = chai.expect;
+      var t1 = $http.post('/data/test1', {n: 10, interval:1.2});
+      var t2 = $http.post('/data/test2', {from: 0});
+      expect(t2).eventually.to.have.property('data').property('results').
+	property('muks').an('array').of.length(0);
+      expect(t1).to.be.fulfilled.then(function(v) {
+	expect(v).to.have.property('data').property('results').
+	  an('array').of.length(10).
+	  property(0).a.string('muk 0');
+	expect($http.post('/data/test2', {from: 5})).
+	  eventually.to.have.property('data').property('results').
+	  property('muks').an('array').of.length(5).
+	  property(0).a.string('muk 5');
+      });
+    };
+  }]).
+
+  factory('mukmuk_test', ['mukmuk', function(mukmuk) {
+    return function() {
+      var expect = chai.expect;
+      var mmp = mukmuk(10, 0.5, function(mm, mmnew) {
+	console.log('new: ' + JSON.stringify(mmnew));
+	console.log('mm: ' + JSON.stringify(mm));
+      });
+      expect(mmp).eventually.to.be.an('array').of.length(10);
+    };
+  }]).
+
+  factory('mukmuk', ['_', '$http', '$q', '$timeout',
+			 function(_, $http, $q, $timeout) {
+    return function (n, dt, cb) {
+      cb = cb || _.identity;
+      var deferred = $q.defer();
+
+      $http.post('/data/test1', {n:n, interval:dt}).
+	success(function (v) {
+	  var results = v['results']
+	  deferred.resolve(results);
+	}).
+	error(function(data, status, headers, config) {
+	  console.log(data);
+	  deferred.reject(data);
+	});
+
+      var mukmuk = [];
+      function poll_more(from) {
+	return $http.post('/data/test2', {from:from}).
+	  then(function(v) {
+	    var muks_increment = v.data.results.muks;
+	    return muks_increment;
+	  });
+      };
+
+      function get_hunks_until_done(wait, cb) {
+	$timeout(function() {
+	  poll_more(mukmuk.length).then(function(more) {
+	    _.each(more, function(muk) { mukmuk.push(muk) });
+	    cb(mukmuk, more);
+	    if (mukmuk.length < n) {
+	      get_hunks_until_done(wait, cb);
+	    };
+	  });
+	}, wait);
+      };
+
+      get_hunks_until_done(1000, cb);
+      return deferred.promise;
+    };
   }]);

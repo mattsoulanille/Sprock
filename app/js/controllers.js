@@ -63,25 +63,6 @@ angular.module('sprock.controllers', []).
     $scope.serverError = null;
     $scope.margin = 500;	//FIXME
 
-    $scope.getGene = function() {
-      $scope.gsi = new GeneSequenceInfo($scope.gene_name);
-      $scope.gsi.get_feature_tree().
-	then(function (ft) {
-	  chai.expect(ft).property('type').to.equal('gene');
-	  $scope.serverError = null;
-	  $scope.scaffold = ft.scaffold;
-//	  $scope.start = Math.max(ft.span[0].start - $scope.margin, 0);
-//	  $scope.end = ft.span[1] + $scope.margin;
-//	  $scope.getSequenceInformation();
-	},
-	function(data) {
-	  console.log(data);
-	  $scope.serverError = data;
-	  $scope.gene = null;
-	  $scope.gene_exons_pairs = null;
-	});
-    };
-
     $scope.getContextInformation = function() {
       $scope.gsi = new GeneSequenceInfo($scope.gene_name, $scope.margin);
       $scope.gsi.get_feature_tree().
@@ -121,7 +102,9 @@ angular.module('sprock.controllers', []).
 
   controller('Tester1', ['$scope', '$injector', function($scope, $injector) {
     var expect = chai.expect;
-    var test_names = ['data_getTree_test',
+    var test_names = ['data_test1_test',
+		      'mukmuk_test',
+		      'data_getTree_test',
 		      'data_getContext_test',
 		      'data_getGene_test',
 		      'data_getFeatures_test',
