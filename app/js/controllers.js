@@ -149,4 +149,10 @@ angular.module('sprock.controllers', []).
 	return [test_name, $injector.invoke([test_name, function(test) { return test.call(test) }])];
       })}(test_names);
     
-}]);
+}]).
+
+  controller('Tester2', ['$scope', 'mukmuk', function($scope, mukmuk) {
+    mukmuk(10, 1, function(mm, mmnew) {
+      $scope.muks = mm;
+    });
+  }]);

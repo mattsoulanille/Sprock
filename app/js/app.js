@@ -19,6 +19,10 @@ angular.module('sprock', [
 	templateUrl: 'partials/partest1.html',
 	controller: 'Tester1'
     })
+    .when('/test2', {
+	templateUrl: 'partials/partest2.html',
+	controller: 'Tester2'
+    })
     .when('/view1', {
 	templateUrl: 'partials/partial1.html',
 	controller: 'MyCtrl1'
