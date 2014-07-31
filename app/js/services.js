@@ -321,8 +321,9 @@ angular.module('sprock.services', ['sprock.utilities']).
 
   factory('mukmuk', ['_', '$http', '$q', '$timeout',
 			 function(_, $http, $q, $timeout) {
-    return function (n, dt, cb) {
+    return function (n, dt, cb, poll_period_s) {
       cb = cb || _.identity;
+      poll_period_s = poll_period_s || 1.0;
       var deferred = $q.defer();
 
       $http.post('/data/test1', {n:n, interval:dt}).
@@ -345,6 +346,7 @@ angular.module('sprock.services', ['sprock.utilities']).
       };
 
       function get_hunks_until_done(wait, cb) {
+	console.log(wait);
 	$timeout(function() {
 	  poll_more(mukmuk.length).then(function(more) {
 	    _.each(more, function(muk) { mukmuk.push(muk) });
@@ -353,10 +355,10 @@ angular.module('sprock.services', ['sprock.utilities']).
 	      get_hunks_until_done(wait, cb);
 	    };
 	  });
-	}, wait);
+	}, wait * 1000);
       };
 
-      get_hunks_until_done(1000, cb);
+      get_hunks_until_done(poll_period_s, cb);
       return deferred.promise;
     };
   }]);
