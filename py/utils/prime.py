@@ -1,5 +1,5 @@
 import primer3
-from math import ceil
+from math import ceil, floor
 
 class Prime(object):
     def __init__(self):
@@ -54,12 +54,22 @@ class PrimerMaker(object):
         
     def split_interval(self):
         for window in self.prime.primer_windows:
-            window_length = window[1] - window[0] - self.prime.fuzz * 2
+            window_length = (window[1] - window[0]) - self.prime.fuzz * 2
             start = window[0] + self.prime.fuzz
-            number_of_intervals = int(ceil(float(window_length - self.prime.target_primer_span)/float(self.prime.target_primer_span - self.prime.minimum_overlap)))
-            overlap = (self.prime.target_primer_span - window_length / number_of_intervals)
-            
+            iterstart = start
+            stop = window[1] - self.prime.fuzz
+            end = self.prime.target_primer_span + start 
+            interval = [[start, end]]
+            while end < stop: # brute force :P If you know a prettier way, feel free to change it
+                iterstart = end - self.prime.minimum_overlap
+                end = iterstart + self.prime.target_primer_span
+                interval += [[iterstart, end]]
+            interval[-1][-1] = (stop)
+            number_of_intervals = len(interval)
+
+            overlap = int(ceil(float(self.prime.target_primer_span * number_of_intervals - window_length) / (float(number_of_intervals) - 1)))
             progress = (self.prime.target_primer_span - overlap)
+            #assert False
             for x in range(0, number_of_intervals):
                 yield [x*progress + start, x*progress + self.prime.target_primer_span + start]
 
@@ -76,9 +86,5 @@ class PrimerMaker(object):
             primers = primer3.wrappers.designPrimers(self.seq_args)
             del primers['SEQUENCE_QUALITY']
             del primers['SEQUENCE_TEMPLATE']
-
-
-
-
 
             yield primers
