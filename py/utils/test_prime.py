@@ -1,39 +1,44 @@
-import unittest, prime
+import unittest
 
 from get_sequence import FQDB
+from prime import Prime, PrimerMaker
+
+
 
 fqdb = FQDB("data/Spur_3.1.LinearScaffold.fq")
 d = fqdb.get_sequence_data('Scaffold1', 0, 50000)
-pdata = prime.Prime()
-pdata.set_up_to_prime()
-pdata.whole_sequence = d['sequence']
-pdata.whole_quality = d['quality']
-pdata.primer_windows = [[1337, 9001], [14493, 23757]]
-pdata.minimum_overlap = 1000
-pdata.maximum_primer_span = 4000
-pdata.target_primer_span = 2000
-pdata.fuzz = 500
-pmake = prime.PrimerMaker()
-pmake.config_for(pdata)
+prime = Prime()
+prime.set_up_to_prime()
+prime.whole_sequence = d['sequence']
+prime.whole_quality = d['quality']
+prime.primer_windows = [[1337, 9001], [14493, 23757]]
+prime.minimum_overlap = 1000
+prime.maximum_primer_span = 4000
+prime.target_primer_span = 2000
+prime.fuzz = 500
 
 
 class primeTestCase(unittest.TestCase):
+
     def setUp(self):
-        pass
+        self.maker = PrimerMaker()
+        self.maker.config_for(prime)
 
     def tearDown(self):
         pass
 
     def testSplitIntervals(self):
-        self.split_interval = pmake.split_interval()
-        assert [x for x in pmake.split_interval()] == [[6837, 8837], [7769, 9769], [8701, 10701], [9633, 11633], [10565, 12565], [11497, 13497], [21993, 23993], [22887, 24887], [23781, 25781], [24675, 26675], [25569, 27569], [26463, 28463], [27357, 29357], [28251, 30251]]
+        assert [x for x in self.maker.split_interval()] == \
+            [[1837, 3837], [2885, 4885], [3933, 5933], [4981, 6981], \
+             [6029, 8029], [7077, 9077], [8125, 10125], [14993, 16993], \
+             [16075, 18075], [17157, 19157], [18239, 20239], [19321, 21321], \
+             [20403, 22403], [21485, 23485], [22567, 24567], [23649, 25649]]
         
     def testMakePrimers(self):
-        #primers = [x for x in pmake]
-        #assert primers == 'kittens'
+        primers = [x for x in self.maker]
+        assert primers == 'kittens'
         return False
 
-        
 
 def main():
     unittest.main()

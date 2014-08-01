@@ -1,5 +1,8 @@
-import primer3
+from itertools import chain, groupby
 from math import ceil, floor
+from pprint import pprint       # DEUGGING
+
+import primer3
 
 class Prime(object):
     def __init__(self):
@@ -20,6 +23,79 @@ class Prime(object):
         # it retrieves what data it needs
 
 
+class Primer(object):
+    def __init__(self, **args):
+        self.__dict__.update(args)
+
+
+class PrimerPair(object):
+    def __init__(self, d, **args):
+        self.d = d
+        self.__dict__.update(args)
+
+        splits = set((tuple(k.split('_')), k) for k in d.keys())
+        splits_having_ppn = set(t for t in splits if len(t[0]) >=3 and t[0][2].isdigit())
+        splits_without_ppn = splits - splits_having_ppn
+        t2 = set(t[0][2] for t in splits_having_ppn)
+        assert len(t2) == 1, "should be just one primer-pair number"
+        ppns = t2.pop()
+        splits_that_had_ppn = set((tuple(chain(t[:2], t[3:])), k) \
+                                  for t, k in splits_having_ppn)
+        splits_n = splits_that_had_ppn | splits_without_ppn
+        primer_splits = set((t[1:], k) for t, k in splits_n if t[0] == 'PRIMER')
+        left_primer_splits = set((t[1:], k) for t, k in primer_splits if t[0] == 'LEFT')
+        right_primer_splits = set((t[1:], k) for t, k in primer_splits if t[0] == 'RIGHT')
+        pair_primer_splits = set((t[1:], k) for t, k in primer_splits if t[0] == 'PAIR')
+
+        def key_from(t):
+            rv = '_'.join(map(lambda s: s.lower(), t))
+            rv = rv or 'pos_len' # hack fixup
+            return rv
+
+        left_primer_key_map = [(key_from(t), k) for t,k in left_primer_splits]
+        right_primer_key_map = [(key_from(t), k) for t,k in right_primer_splits]
+        pair_primer_key_map = [(key_from(t), k) for t,k in pair_primer_splits]
+
+        self.left = Primer(**dict((child_key, d[k]) \
+                                         for child_key, k in left_primer_key_map))
+        self.right = Primer(**dict((child_key, d[k]) \
+                                         for child_key, k in right_primer_key_map))
+        self.__dict__.update(**dict((child_key, d[k]) \
+                                         for child_key, k in pair_primer_key_map))
+        
+
+class PrimerPairPossibilities(object):
+    def __init__(self, primer3_design, **args):
+        self.__dict__.update(args)
+        self.primer3_design = primer3_design
+        self.primer_pair_numbers = sorted(set(v[2] for v in (k.split('_') \
+                                                             for k in primer3_design.keys()) \
+                                              if len(v) >= 3 and v[2].isdigit()))
+        def f1(s):
+            v = s.split('_')
+            if len(v) >= 3 and v[2].isdigit():
+                return int(v[2])
+            else:
+                return -1
+
+        grouped_keys = list((k, set(g)) for k,g in \
+                            groupby(sorted(primer3_design.keys(), key=f1), f1))
+        if grouped_keys[0][0] == -1:
+            unnumbered_keys = grouped_keys.pop(0)[1]
+        else:
+            unnumbered_keys = set()
+
+        self.primer_pairs = list(PrimerPair(dict((k, primer3_design[k]) \
+                                                 for k in kst[1].union(unnumbered_keys)))
+                                 for kst in grouped_keys)
+
+        self.__dict__.update(dict((k.lower(), primer3_design[k]) \
+                                  for k in unnumbered_keys))
+        
+
+        assert False            # nosetest into pdb
+
+
 class PrimerMaker(object):
     """Make primers for a Prime object
 
@@ -35,7 +111,6 @@ class PrimerMaker(object):
     def __init__(self):
         self.seq_args = dict()
 
-
     def config_for(self, prime):
         # Do what you need to absorb the particulars
         self.prime = prime
@@ -49,8 +124,8 @@ class PrimerMaker(object):
 
     def next(self):
         # return the next primer pair (if you're the iterator)
-        return self.primer_iterator.next()
-        
+        #return self.primer_iterator.next()
+        pass
         
     def split_interval(self):
         for window in self.prime.primer_windows:
@@ -74,7 +149,6 @@ class PrimerMaker(object):
                 yield [x*progress + start, x*progress + self.prime.target_primer_span + start]
 
     def make_primers(self):
-
         self.seq_args['SEQUENCE_TEMPLATE'] = self.prime.whole_sequence
         self.seq_args['SEQUENCE_QUALITY'] = ' '.join([str(x) for x in self.prime.whole_quality])
 
@@ -87,4 +161,4 @@ class PrimerMaker(object):
             del primers['SEQUENCE_QUALITY']
             del primers['SEQUENCE_TEMPLATE']
 
-            yield primers
+            yield PrimerPairPossibilities(primers)
