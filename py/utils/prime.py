@@ -26,7 +26,10 @@ class Prime(object):
 class Primer(object):
     def __init__(self, **args):
         self.__dict__.update(args)
-
+        try:
+            self.start, self.length = map(int, self.pos_len.split(','))
+        except AttributeError:
+            pass
 
 class PrimerPair(object):
     def __init__(self, d, **args):
@@ -92,9 +95,6 @@ class PrimerPairPossibilities(object):
         self.__dict__.update(dict((k.lower(), primer3_design[k]) \
                                   for k in unnumbered_keys))
         
-
-        assert False            # nosetest into pdb
-
 
 class PrimerMaker(object):
     """Make primers for a Prime object
