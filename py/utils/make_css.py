@@ -2,7 +2,7 @@ import pdb
 
 def main():
     s = r"""
-.qual%d {
+.q%d {
   color: %s;
 }"""
 
@@ -10,7 +10,7 @@ def main():
 
     lightest = 234;
     scale = float(lightest - 0) / (20 - 90)
-    for q in xrange(21,91):
+    for q in xrange(20,91):
         c = int((q - 20) * scale + lightest)
         color_string = '#%x%x%x' % (c, c, c)
         print(s % (q, color_string))
