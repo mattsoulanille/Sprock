@@ -5,13 +5,13 @@ from pprint import pprint       # DEUGGING
 import primer3
 
 class Prime(object):
-    def __init__(self):
-        pass
+    def __init__(self, **args):
+        self.__dict__.update(args)
 
-    def set_up_to_prime(self):
+    def set_up_to_prime(self, **args):
         # UI causes this to be called
-        # calcs & retrievals, then:
-        
+        # then primer maker gets called with this Prime object
+        # it retrieves what data it needs
         self.whole_sequence = str()
         self.whole_quality = str()
         self.minimum_overlap = int()
@@ -19,8 +19,8 @@ class Prime(object):
         self.target_primer_span = int()
         self.primer_windows =  list()
         self.fuzz = int()
-        # then primer maker gets called with this Prime object
-        # it retrieves what data it needs
+        self.__dict__.update(args)
+        return self
 
 
 class Primer(object):
@@ -31,7 +31,10 @@ class Primer(object):
         except AttributeError:
             pass
 
+
+
 class PrimerPair(object):
+    """A pair of primers as produced by primer3"""
     def __init__(self, d, **args):
         self.d = d
         self.__dict__.update(args)
@@ -68,13 +71,16 @@ class PrimerPair(object):
         
 
 class PrimerPairPossibilities(object):
+    """From the output of primer3, create a list of PrimerPair objects"""
     def __init__(self, primer3_design, **args):
         self.__dict__.update(args)
         self.primer3_design = primer3_design
         self.primer_pair_numbers = sorted(set(v[2] for v in (k.split('_') \
                                                              for k in primer3_design.keys()) \
                                               if len(v) >= 3 and v[2].isdigit()))
-        def f1(s):
+        def primer_rank(s):
+            """Return the part of a primer3 return value key that
+            is the rank order of the primer pair to which it pertains"""
             v = s.split('_')
             if len(v) >= 3 and v[2].isdigit():
                 return int(v[2])
@@ -82,7 +88,7 @@ class PrimerPairPossibilities(object):
                 return -1
 
         grouped_keys = list((k, set(g)) for k,g in \
-                            groupby(sorted(primer3_design.keys(), key=f1), f1))
+                            groupby(sorted(primer3_design.keys(), key=primer_rank), primer_rank))
         if grouped_keys[0][0] == -1:
             unnumbered_keys = grouped_keys.pop(0)[1]
         else:

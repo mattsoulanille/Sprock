@@ -1,7 +1,8 @@
 import unittest
+from itertools import chain
 
 from get_sequence import FQDB
-from prime import Prime, PrimerMaker
+from prime import Prime, PrimerMaker, Primer, PrimerPair, PrimerPairPossibilities
 
 
 
@@ -28,16 +29,49 @@ class primeTestCase(unittest.TestCase):
         pass
 
     def testSplitIntervals(self):
-        assert [x for x in self.maker.split_interval()] == \
-            [[1837, 3837], [2885, 4885], [3933, 5933], [4981, 6981], \
+        t = list(self.maker.split_interval())
+        assert t == \
+            [[1337, 3837], [2885, 4885], [3933, 5933], [4981, 6981], \
              [6029, 8029], [7077, 9077], [8125, 10125], [14993, 16993], \
              [16075, 18075], [17157, 19157], [18239, 20239], [19321, 21321], \
              [20403, 22403], [21485, 23485], [22567, 24567], [23649, 25649]]
         
     def testMakePrimers(self):
         primers = [x for x in self.maker]
-        assert primers == 'kittens'
-        return False
+        assert len(primers) == 14
+        assert all(isinstance(x, PrimerPairPossibilities) for x in primers)
+
+        assert all(len(ppp.primer_pairs) == 5 for ppp in primers)
+        assert all(map(lambda x: isinstance(x, PrimerPair),
+                   chain.from_iterable(ppp.primer_pairs for ppp in primers)))
+        assert all(map(lambda x: set(['left',
+                                      'num_returned',
+                                      'penalty',
+                                      'product_size',
+                                      'right']) - set(dir(x)) == set(),
+                   chain.from_iterable(ppp.primer_pairs for ppp in primers)))
+        assert all(map(lambda x: isinstance(x, Primer),
+                       chain.from_iterable((pp.left, pp.right)
+                                           for ppp in primers
+                                           for pp in ppp.primer_pairs)))
+        assert all(map(lambda x: set(['end_stability',
+                                      'gc_percent',
+                                      'hairpin_th',
+                                      'length',
+                                      'min_seq_quality',
+                                      'num_returned',
+                                      'penalty',
+                                      'pos_len',
+                                      'self_any_th',
+                                      'self_end_th',
+                                      'sequence',
+                                      'start',
+                                      'tm']) - set(dir(x)) == set(),
+                       chain.from_iterable((pp.left, pp.right)
+                                           for ppp in primers
+                                           for pp in ppp.primer_pairs)))
+
+#        assert False            # to drop into pdb with --pdb switch to noestests
 
 
 def main():
