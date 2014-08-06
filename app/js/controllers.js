@@ -58,6 +58,7 @@ angular.module('sprock.controllers', []).
 	});
     };
   }]).
+
   controller('MyCtrl4', ['$scope', '$http', '$q', '_', 'GeneSequenceInfo',
 			 function($scope, $http, $q, _, GeneSequenceInfo) {
     $scope.serverError = null;
@@ -83,21 +84,6 @@ angular.module('sprock.controllers', []).
 	  $scope.end = si.end;
 	});
     };
-
-    $scope.getSequenceInformation = function() {
-      getSeqInfo($scope.scaffold, $scope.start, $scope.end).
-	then(function (v) {
-	  $scope.sequenceInformation = v;
-	  $scope.serverError = null;
-	},
-	function(data) {
-	  console.log(data);
-	  angular.element(data);
-	  $scope.serverError = data;
-	  $scope.results = null;
-	});
-    };
-
   }]).
 
   controller('Tester1', ['$scope', '$injector', function($scope, $injector) {

@@ -6,46 +6,12 @@
 </form>
 <p ng-show="scaffold">{{scaffold}} from {{start}} to {{end}}</p>
 
-<!--
-<form ng-submit="getSequenceInformation()">
-  <input type="text" ng-model="scaffold" size="10" placeholder="scaffold">
-  <input type="text" ng-model="start" size="6" placeholder="start">
-  <input type="text" ng-model="end" size="6" placeholder="end">
-  <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
-</form>
--->
 <pre>{{serverError}}</pre>
-<!--
-<form>
-  <input type="text" ng-model="sophie" size="16" placeholder="kittens">
-  <input class="btn-primary" type="submit" value="do" style="visibility:hidden">
-</form>
-<div class="gene" ng-show="gene">
-<h1>Gene {{gene.name}}</h1>
-<p>On {{gene.scaffold}} from {{gene.start | number}} to {{gene.end | number}} ({{gene.end - gene.start | number}}bp)</p>
-<h2>Exons</h2>
-<ul>
-  <li ng-repeat="exon in gene_exons_pairs">{{exon[0]}}: {{exon[1] | json}}</li>
-</ul>
-<h2>JSON of gene</h2>
-{{gene | json}}
-</div>
-<pre>{{serverError}}</pre>
-<h1>The Sequence</h1>
-<p>sophie is {{sophie}}</p>
--->
 <p>See it on
   <a href="http://www.echinobase.org/Echinobase/JBrowse-1.10.9/index.html?data=data_sp&loc={{scaffold}}%3A{{start}}..{{end}}&tracks=DNA%2CGLEAN%2CTranscriptome%2Ccontig%2CeBAC"
      target="_blank">JBrowse</a>
-  Legend: <span class="seq gene">GENE</span>&nbsp;<span class="seq transcript">TRANSCRIPT</span>&nbsp;<span class="seq exon">EXON</span>
+  Legend: <span class="seq"><span class="gene">GENE</span>&nbsp;<span class="transcript">TRANSCRIPT</span>&nbsp;<span class="exon">EXON</span></span>
 </p>
 <hr/>
-
-<!-- <format-science sequence-data="sequenceData" features-data="featuresData"></format-science> -->
 <format-science sequence-info="gsi"></format-science>
 <hr/>
-<!--
-<h3>format-sequence</h3>
-<div format-sequence="sequenceData"></div>
-<hr/>
--->
