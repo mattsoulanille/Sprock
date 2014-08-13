@@ -66,23 +66,6 @@ angular.module('sprock.controllers', []).
 
     $scope.getContextInformation = function() {
       $scope.gsi = new GeneSequenceInfo($scope.gene_name, $scope.margin);
-      $scope.gsi.get_feature_tree().
-	then(function (ft) {
-	  chai.expect(ft).property('type').to.equal('gene');
-	  $scope.scaffold = ft.scaffold;
-	  $scope.serverError = null;
-	},
-	function(data) {
-	  console.log(data);
-	  $scope.serverError = data;
-	  $scope.gene = null;
-	  $scope.gene_exons_pairs = null;
-	});
-      $scope.gsi.get_sequence().
-	then(function(si) {
-	  $scope.start = si.start;
-	  $scope.end = si.end;
-	});
     };
   }]).
 

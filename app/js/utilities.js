@@ -202,7 +202,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
     return function() {
       var expect = chai.expect;
       var g = new GeneSequenceInfo('SPU_022066', 1000);
-      expect(g.get_informed()).eventually.to.have.property('feature_tree').to.have.property('name');
+      expect(g.get_informed()).eventually.to.have.property('features').to.have.property('scaffold');
       expect(g.get_informed()).eventually.to.have.property('sequence_info_objects').to.have.property('scaffold');
 
       var g = new GeneSequenceInfo('SPU_022066', 1000);
@@ -239,7 +239,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       };
     }]).
 
-  factory('GeneSequenceInfo', ['_', '$q', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents', 'getTree', 'getSequence', 'compareSpans', function(_, $q, differentiateSequenceToEvents, integrateSequenceEventsToHTML, convertFeaturesToEvents, getTree, getSequence, compareSpans ) {
+  factory('GeneSequenceInfo', ['_', '$q', 'getTree', 'getGene', 'getFeatures', 'getSequence', function(_, $q, getTree, getGene, getFeatures, getSequence ) {
 
     function gsi(name, margin) {
       this.gene_name = name;
@@ -251,6 +251,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       return this;
     };
 
+
     gsi.prototype.get_feature_tree =
       function() {
 	if (_.has(this, 'feature_tree_promise') && this.feature_tree_promise !== null)
@@ -259,29 +260,44 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	return this.feature_tree_promise;
       };
 
+    gsi.prototype.get_gene =
+      function() {
+	if (_.has(this, 'gene_promise') && this.gene_promise !== null)
+	  return this.gene_promise;
+	return this.gene_promise = getGene(this.gene_name);
+      };
+
+    gsi.prototype.get_features =
+      function() {
+	if (_.has(this, 'features_promise') && this.features_promise !== null)
+	  return this.features_promise;
+	var that = this;
+	return this.features_promise = this.get_gene().
+	  then(function(gene) {
+	    return that.features = getFeatures(gene.scaffold,
+			       Math.max(0, gene.start - that.margin),
+			       gene.end + that.margin);
+	  });
+      };
+
     gsi.prototype.get_sequence =
       function() {
 	if (_.has(this, 'sequence_promise') && this.sequence_promise !== null)
 	  return this.sequence_promise;
 	var that = this;
-	this.sequence_promise = this.get_feature_tree().
-	  then(function(ft) {
-	    return getSequence(ft.scaffold,
-			       Math.max(0, ft.span[0] - that.margin),
-			       ft.span[1] + that.margin).
-	      then(function(si) {
-		return that.sequence_info = si;
-	      });
-	  });
-	return this.sequence_promise;
-      };
+	return this.sequence_promise = this.get_gene().
+	  then(function(gene) {
+	    return that.sequence_info = getSequence(gene.scaffold,
+			       Math.max(0, gene.start - that.margin),
+			       gene.end + that.margin);
+	  })};
 
     gsi.prototype.get_sequence_objects =
       function() {
 	if (_.has(this, 'sequence_objects_promise') && this.sequence_objects_promise !== null)
 	  return this.sequence_objects_promise;
 	var that = this;
-	this.sequence_objects_promise = this.get_sequence().
+	return this.sequence_objects_promise = this.get_sequence().
 	  then(function(si) {
 	    var so = {};
 	    so.scaffold = si.scaffold;
@@ -295,15 +311,13 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 		function(memo, o) { memo.push(o); return memo; },
 		[]);
 	    return that.sequence_objects = so;
-	  });
-	return this.sequence_objects_promise;
-      };
+	  })};
 
     gsi.prototype.get_informed =
       function() {
 	if (_.has(this, 'informed_promise') && this.informed_promise !== null)
 	  return this.informed_promise;
-	this.informed_promise = $q.all({ feature_tree: this.get_feature_tree(),
+	this.informed_promise = $q.all({ features: this.get_features(),
 					 sequence_info_objects: this.get_sequence_objects()});
 	return this.informed_promise;
       };
@@ -315,32 +329,19 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	    this.featureful_sequence_objects_promise !== null)
 	  return this.featureful_sequence_objects_promise;
 
-	// walk a tree depth-first, calling cb at every node
-	function walkDepthFirst(tree, cb, position_offset) {
-	  position_offset + tree.span[0];
-	  if (_.has(tree, 'children'))
-	    _.each(tree.children,
-		   _.partial(walkDepthFirst, _, cb,
-			     position_offset + tree.span[0])); //recurse
-	  cb(tree, position_offset);
-	}
-
-	//var that = this;
-	this.featureful_sequence_objects_promise = this.get_informed().
+	return this.featureful_sequence_objects_promise = this.get_informed().
 	  then(function(v) {
-	    var ft = v.feature_tree;
+	    var features = v.features;
 	    var so = v.sequence_info_objects;
 	    var soa = so.sequenceObjectsArray;
-	    walkDepthFirst(ft, function(node, pos) {
+	    _.each(features.features, function(f) {
 	      // Mark beginning & end of the type represented by this node
-	      var k = {gene:'g', transcript:'t', exon:'x'}[node.type] || node.type;
-	      soa[node.span[0]+pos][k] = node.type;
-	      soa[node.span[1]+pos][k] = null;
-	    }, 0-so.span[0]);
+	      var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
+	      soa[Math.max(0, f.span[0]-features.start)][k] = f.type;
+	      soa[Math.min(soa.length-1, f.span[1]-features.start)][k] = null;
+	    });
 	    return v; //our work has updated an existing object, not created a new one
-	  });
-	return this.featureful_sequence_objects_promise;
-      };
+	  })};
 
     gsi.prototype.render_to_html =
       function(callback) {
@@ -391,93 +392,6 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	  rv += '</span>';	// close quality class
 	}
 	rv += '</span>';	// close seq class
-	return rv;
-      };
-
-    gsi.prototype._render_tree_to_html =
-      function(tree) {
-	// this inner function exists so we don't have to know to what property name we've been assigned
-	function render_tree(tree) {
-	  var rv = '<span class="' + tree.type + '">';
-	  if (_.has(tree, 'before_children')) {
-	    rv += tree.before_children;
-	  }
-	  rv = _.reduce(_.map(tree.children, render_tree), function(memo, s) { return memo + s }, rv);
-	  if (_.has(tree, 'after_children')) {
-	    rv += tree.after_children;
-	  }
-	  rv += '</span>';
-	  return rv;
-	};
-	console.log(tree);
-	//var html = '<strong><blink><code>gsi.prototype._render_tree_to_html</code> is NOT working code</blink></strong>'
-	var html = render_tree(tree);
-	return html;
-      };
-
-    gsi.prototype._merge_tree_into_tree =
-      function(target, arrow) {
-	var rv = {}
-
-	// walk a tree, calling cb with only the leaf nodes
-	function eachLeaf(tree, cb, position) {
-	  var pos = position + tree.span[0];
-	  if (_.has(tree, 'children')) {
-	    _.each(tree.children, _.partial(eachLeaf, _, cb, pos)); //recurse
-	  } else {
-	    cb(tree, pos);
-	  }
-	}
-
-	// DEBUG test
-	//eachLeaf(target, function(t, p) { console.log('at ' + p); console.log(t); }, 0);
-
-	function place_into(tree, leaf, position) {
-	  var leafSpan = [position + leaf.span[0], position + leaf.span[1]];
-	  switch (compareSpans(leafSpan, tree.span)) {
-	    case '<<<<': // leaf is completely below tree
-	    if (!_.has(tree, 'children')) tree.children = [];
-	    var delta = leaf.span[0] - tree.span[0];
-	    tree.span[0] = leaf.span[0];
-	    _.each(tree.children, function(c) {
-	      c.span[0] += delta;
-	      c.span[1] += delta;
-	    });
-	    tree.children.unshift(leaf);
-	    break;
-
-	    case '<<><': // leaf partially overlaps on bottom
-	    
-	    
-	    break;
-
-	    case '>>>>': // leaf is completely above tree
-	    if (!_.has(tree, 'children')) tree.children = [];
-	    tree.span[1] = leaf.span[1];
-	    tree.children.push(leaf);
-	    break;
-
-	    default:
-
-	    break;
-	  }
-	  
-	}
-
-	eachLeaf(target, function(t, p) {
-	  console.log('at ' + p); console.log(t);
-	}, 0);
-
-
-	if (arrow.span && target.span) {
-	  if (arrow.span[0] >= target.span[1]) {
-	    rv.children = [target, arrow];
-	  }
-	  else if (target.span[0] > arrow.span[1]) {
-	    rv.children = [arrow, target];
-	  }
-	};
-
 	return rv;
       };
 

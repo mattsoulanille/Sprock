@@ -332,32 +332,6 @@ describe('service', function() {
 		       
     }));
 
-    describe('_merge_tree_into_tree', function() {
-      it('should exist', inject(function(GeneSequenceInfo) {
-	expect(GeneSequenceInfo).toBeDefined();
-      }));
-
-      it('should exist', function() {
-	expect(gsi._merge_tree_into_tree).toBeFunction();
-      });
-
-      xit('should not alter a tree when empty tree merged in', function() {
-	expect(gsi._merge_tree_into_tree(t1, {})).toEqual(t1);
-      });
-
-      xit('should handle simple disjoint case', function() {
-	var t11 = {type: 'foo', span: [10,13]};
-	var t12 = {type: 'bar', span: [15,20]};
-	expect(gsi._merge_tree_into_tree(t11, t12)).
-	  toEqual({children:[{type: 'foo', span: [10,13] },
-			     {type: 'bar', span: [15,20] }]
-		  });
-      });
-
-      xit('should handle complex case', function() {
-	expect(gsi._merge_tree_into_tree(t1, t2)).toEqual(t3);
-      });
-    });	   
 
     describe('_render_soa_to_html', function() {
       it('should exist', function() {
