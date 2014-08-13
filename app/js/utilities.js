@@ -50,7 +50,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       var t7 = _.sortBy(_.map(t2, function(t) {
 	return [t[0][0], _.sortBy(_.flatten(_.map(_.pluck(t, 1), _.pairs), true), _.property(0))];
       }), _.property(0));
-      console.log('t7: ' + JSON.stringify(t7));
+//      console.log('t7: ' + JSON.stringify(t7));
 
 
       var sequence_index = 0;
@@ -244,7 +244,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
     function gsi(name, margin) {
       this.gene_name = name;
       if (margin === undefined) {
-	this.margin = 500; //FIXME: biologically-appropriate default
+	this.margin = 500; //FIXME: choose biologically-appropriate default
       } else {
 	this.margin = margin;
       }

@@ -88,27 +88,6 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
-  factory('getSeqInfo_v2', ['$http', '$q', 'getSequence', 'getTree', 'GeneSequenceInfo',
-			 function($http, $q, getSequence, getTree, GeneSequenceInfo) {
-    return function (name, margin) {
-      var deferred = $q.defer();
-      var tree_p = getTree(name);
-      var sequence_p = getSequence(scaffold, start, end);
-      $q.all([sequence_p, features_p]).
-       then(function (values) {
-         var sequenceData = values[0];
-         var featuresData = values[1];
-	 var si = new SequenceInfo(sequenceData).add_features(featuresData);
-	 deferred.resolve(si);
-       },
-       function(data) {
-         console.log(data);
-	 deferred.reject(data);
-       });
-      return deferred.promise;
-    };
-  }]).
-
   factory('data_getGene_test', ['$http', function($http) {
     return function() {
       return chai.expect($http.post('/data/getGene', {name: 'SPU_008174'})).
@@ -130,57 +109,6 @@ angular.module('sprock.services', ['sprock.utilities']).
       $http.post('/data/getGene', {name: name}).
 	success(function (v) {
 	  deferred.resolve(v['results']);
-	}).
-	error(function(data, status, headers, config) {
-	  console.log(data);
-	  deferred.reject(data);
-	});
-      return deferred.promise;
-    };
-  }]).
-
-  factory('data_getContext_test', ['$http', function($http) {
-    return function() {
-      var expect = chai.expect;
-      return expect($http.post('/data/getContext', {name: 'SPU_008174', margin:500})).
-	to.be.fulfilled.then(function(v) {
-	  //console.log(v);
-	  expect(v).to.have.property('data').property('results');
-	  var r = v.data.results;
-
-	  // SPU_008174 is on Scaffold743
-	  expect(r).property('scaffold').to.equal('Scaffold743');
-
-	  // the span of the gene with the requested margins, on the scaffold:
-	  expect(r).property('span').to.eql([168342, 188864]);
-	  expect(r.span[1] - r.span[0]).to.eql(r.sequence.length);
-
-	  // Scaffold743 is 20,522bp long
-	  expect(r).property('sequence').to.have.length.of(20522);
-	  expect(r).property('quality').to.have.length.of(20522);
-
-	  // the features of the gene
-	  expect(r).property('features').
-	    eql([{"span": [168842, 188364], "type": "gene", "id": "SPU_008174gn", "strand": "+"},
-		 {"span": [168842, 188364], "type": "transcript", "id": "SPU_008174-tr", "strand": "+"},
-		 {"span": [168842, 169029], "type": "exon", "id": "SPU_008174:0", "strand": "+"},
-		 {"span": [185066, 185375], "type": "exon", "id": "SPU_008174:1", "strand": "+"},
-		 {"span": [188281, 188364], "type": "exon", "id": "SPU_008174:2", "strand": "+"}]);
-
-	});
-
-    };
-  }]).
-
-  factory('getContextSeqInfo', ['$http', '$q', 'SequenceInfo',
-			 function($http, $q, SequenceInfo) {
-    return function (name, margin) {
-      var deferred = $q.defer();
-      $http.post('/data/getContext', {name: name, margin: margin}).
-	success(function (v) {
-	  var results = v['results']
-	  var si = new SequenceInfo(results);//.add_features(featuresData);
-	  deferred.resolve(si);
 	}).
 	error(function(data, status, headers, config) {
 	  console.log(data);

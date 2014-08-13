@@ -91,7 +91,6 @@ angular.module('sprock.controllers', []).
     var test_names = ['data_test1_test',
 		      'mukmuk_test',
 		      'data_getTree_test',
-		      'data_getContext_test',
 		      'data_getGene_test',
 		      'data_getFeatures_test',
 		      'data_getSeq_test',

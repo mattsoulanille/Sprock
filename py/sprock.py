@@ -6,7 +6,6 @@ import cherrypy
 
 from utils.get_sequence import FQDB # FIXME: names
 from utils.get_gene import GeneDB
-from utils.bio_db import BioDB
 
 
 # An object to hold things
@@ -23,11 +22,6 @@ class HelloWorld(object):
     def index(self):
         return "Hello world!"
 
-    @cherrypy.expose
-    def whatzup(self):
-        return "good\n"
-
-
 class DataService(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -41,7 +35,6 @@ class DataService(object):
         self.gene_db = GeneDB(self.g.gffdb_filename)
         cherrypy.log('Building gene_db name_to_ID_dict')
         self.gene_db.name_to_ID_dict() # get this built before accepting connections
-        self.bioDB = BioDB(self.fqdb, self.gene_db)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -113,20 +106,6 @@ class DataService(object):
             'request': argd,
             'results': { 'scaffold': scaffold, 'start': start, 'end': end, 'features': features },
             'notes': ['"span" is with respect to the scaffold, not the start of the requested range']
-        }
-
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
-    @cherrypy.tools.json_out()
-    def getContext(self):
-        #curl -i -X POST -H "Content-Type: application/json" -d '{"name":"SPU_008174", "margin":300}' 'http://localhost:8082/data/getContext'
-        argd = cherrypy.request.json
-        gene_name = argd['name']
-        margin = int(argd['margin'])
-        context = self.bioDB.get_context_by_name(gene_name, margin)
-        return {
-            'request': argd,
-            'results': context
         }
 
     @cherrypy.expose
