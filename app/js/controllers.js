@@ -59,10 +59,13 @@ angular.module('sprock.controllers', []).
     };
   }]).
 
-  controller('MyCtrl4', ['$scope', '$http', '$q', '_', 'GeneSequenceInfo',
-			 function($scope, $http, $q, _, GeneSequenceInfo) {
+  controller('MyCtrl4', ['$scope', '$http', '$q', '_', 'GeneSequenceInfo', function($scope, $http, $q, _, GeneSequenceInfo) {
     $scope.serverError = null;
     $scope.margin = 500;	//FIXME
+    $scope.target_span = 2000;
+    $scope.max_span = 4000;
+    $scope.min_overlap = 1000;
+    $scope.fuzz = 500;
 
     $scope.getContextInformation = function() {
       $scope.gsi = new GeneSequenceInfo($scope.gene_name, $scope.margin);
