@@ -111,8 +111,8 @@ class DataService(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
-    def test1(self):
-        #curl -s -i -X POST -H "Content-Type: application/json" -d '{"n":5, "interval":1.2}' 'http://localhost:8082/data/test1'
+    def make_muks(self):
+        #curl -s -i -X POST -H "Content-Type: application/json" -d '{"n":5, "interval":1.2}' 'http://localhost:8082/data/make_muks'
         argd = cherrypy.request.json
         n = argd['n']
         interval = argd['interval']
@@ -135,8 +135,8 @@ class DataService(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
-    def test2(self):
-        #curl -s -i -X POST -H "Content-Type: application/json" -d '{"from":2}' 'http://localhost:8082/data/test2'
+    def get_muks(self):
+        #curl -s -i -X POST -H "Content-Type: application/json" -d '{"from":2}' 'http://localhost:8082/data/get_muks'
         argd = cherrypy.request.json
         n = argd['from']
         if hasattr(self.g, 'mukmuk'):

@@ -74,7 +74,7 @@ angular.module('sprock.controllers', []).
 
   controller('Tester1', ['$scope', '$injector', function($scope, $injector) {
     var expect = chai.expect;
-    var test_names = ['data_test1_test',
+    var test_names = ['data_muks_test',
 		      'mukmuk_test',
 		      'data_getTree_test',
 		      'data_getGene_test',

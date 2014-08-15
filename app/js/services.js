@@ -215,18 +215,18 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
-  factory('data_test1_test', ['$http', function($http) {
+  factory('data_muks_test', ['$http', function($http) {
     return function() {
       var expect = chai.expect;
-      var t1 = $http.post('/data/test1', {n: 10, interval:1.2});
-      var t2 = $http.post('/data/test2', {from: 0});
+      var t1 = $http.post('/data/make_muks', {n: 10, interval:1.2});
+      var t2 = $http.post('/data/get_muks', {from: 0});
       expect(t2).eventually.to.have.property('data').property('results').
 	property('muks').an('array').of.length(0);
       expect(t1).to.be.fulfilled.then(function(v) {
 	expect(v).to.have.property('data').property('results').
 	  an('array').of.length(10).
 	  property(0).a.string('muk 0');
-	expect($http.post('/data/test2', {from: 5})).
+	expect($http.post('/data/get_muks', {from: 5})).
 	  eventually.to.have.property('data').property('results').
 	  property('muks').an('array').of.length(5).
 	  property(0).a.string('muk 5');
@@ -247,14 +247,13 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
-  factory('mukmuk', ['_', '$http', '$q', '$timeout',
-			 function(_, $http, $q, $timeout) {
+  factory('mukmuk', ['_', '$http', '$q', '$timeout', function(_, $http, $q, $timeout) {
     return function (n, dt, cb, poll_period_s) {
       cb = cb || _.identity;
       poll_period_s = poll_period_s || 1.0;
       var deferred = $q.defer();
 
-      $http.post('/data/test1', {n:n, interval:dt}).
+      $http.post('/data/make_muks', {n:n, interval:dt}).
 	success(function (v) {
 	  var results = v['results']
 	  deferred.resolve(results);
@@ -266,7 +265,7 @@ angular.module('sprock.services', ['sprock.utilities']).
 
       var mukmuk = [];
       function poll_more(from) {
-	return $http.post('/data/test2', {from:from}).
+	return $http.post('/data/get_muks', {from:from}).
 	  then(function(v) {
 	    var muks_increment = v.data.results.muks;
 	    return muks_increment;
