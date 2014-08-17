@@ -290,31 +290,31 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
-  factory('each_test', ['_', 'each', function(_, each) {
+  factory('each_from_server_test', ['_', 'each_from_server', function(_, each_from_server) {
     return function() {
       var expect = chai.expect;
       var sum = 0;
 
-      expect(each('xrange', function(v) {
+      expect(each_from_server('xrange', function(v) {
 	sum += v;
       }, [5,0,-1]).then(function() {
 	return sum;
       })).eventually.to.eql(15);
 
       var s = '';
-      expect(each('str', function(v) {
+      expect(each_from_server('str', function(v) {
 	s += v;
       }, ['cat']).then(function() {
 	return s;
       })).eventually.to.eql('cat');
 
-      expect(each('exec', _.identity, ['sys.exit(1)'])).
+      expect(each_from_server('exec', _.identity, ['sys.exit(1)'])).
 	to.be.rejectedWith(403);
 
     };
   }]).
 
-  factory('each', ['_', '$http', '$q',  function(_, $http, $q) {
+  factory('each_from_server', ['_', '$http', '$q',  function(_, $http, $q) {
     return function(obj_name, fun, args) {
       fun = fun || _.identity;
       var deferred = $q.defer()
