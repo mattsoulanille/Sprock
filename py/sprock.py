@@ -160,9 +160,9 @@ class DataService(object):
         argd = cherrypy.request.json
         name = argd['name']
         args = argd['args']
-        if name in ('xrange', 'range'):
+        if name in ('xrange', 'str'):
             k = time_rand_str()
-            self.g.iter_things[k] = eval(name)(*args).__iter__()
+            self.g.iter_things[k] = iter(eval(name)(*args))
             return {'iter': k}
         else:
             raise cherrypy.HTTPError(403, "That iter is not allowed")
