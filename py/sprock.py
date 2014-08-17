@@ -6,7 +6,7 @@ import cherrypy
 
 from utils.get_sequence import FQDB # FIXME: names
 from utils.get_gene import GeneDB
-
+from utils.various_utils import time_rand_str
 
 # An object to hold things
 class Thing(object):
@@ -152,6 +152,39 @@ class DataService(object):
             'results': results
         }
 
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def iter(self):
+        #curl -s -i -X POST -H "Content-Type: application/json" -d '{"name":"xrange", "args":[0,5,2]}' 'http://localhost:8082/data/iter'
+        argd = cherrypy.request.json
+        name = argd['name']
+        args = argd['args']
+        if name in ('xrange', 'range'):
+            k = time_rand_str()
+            self.g.iter_things[k] = eval(name)(*args).__iter__()
+            return {'iter': k}
+        else:
+            raise cherrypy.HTTPError(403, "That iter is not allowed")
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def next(self):
+        #curl -s -i -X POST -H "Content-Type: application/json" -d '{"iter":"1408247325_t-Jy0k3lG7y7GmxDgB7lbg"}' 'http://localhost:8082/data/next'
+        argd = cherrypy.request.json
+        k = argd['iter']
+        rv = {}
+        try:
+            rv['value'] = self.g.iter_things[k].next()
+        except KeyError:
+            raise cherrypy.HTTPError(404, "Iter not found")
+        except StopIteration:
+            rv['stop'] = True
+            del self.g.iter_things[k]
+        except:
+            raise cherrypy.HTTPError(500, "Something went wrong with iter")
+        return rv
 
 
 def serve(g):
@@ -221,6 +254,7 @@ def create_global_state_object():
     g = Thing()
     g.cwd = os.path.abspath(os.getcwd()),
     g.rundir = os.path.dirname(os.path.abspath(__file__))
+    g.iter_things = {}
     return g
 
 def main():

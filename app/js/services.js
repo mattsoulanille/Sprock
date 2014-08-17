@@ -254,8 +254,8 @@ angular.module('sprock.services', ['sprock.utilities']).
       var deferred = $q.defer();
 
       $http.post('/data/make_muks', {n:n, interval:dt}).
-	success(function (v) {
-	  var results = v['results']
+	success(function(v) {
+	  var results = v['results'];
 	  deferred.resolve(results);
 	}).
 	error(function(data, status, headers, config) {
@@ -286,6 +286,73 @@ angular.module('sprock.services', ['sprock.utilities']).
       };
 
       get_hunks_until_done(poll_period_s, cb);
+      return deferred.promise;
+    };
+  }]).
+
+  factory('each_test', ['_', 'each', function(_, each) {
+    return function() {
+      var expect = chai.expect;
+      var sum = 0;
+
+      expect(each('xrange', function(v) {
+	sum += v;
+      }, [5,0,-1]).then(function() {
+	return sum;
+      })).eventually.to.eql(15);
+
+      var s = '';
+      expect(each('str', function(v) {
+	s += v;
+      }, ['cat']).then(function() {
+	return s;
+      })).eventually.to.eql('cat');
+
+    };
+  }]).
+
+  factory('was_each', ['_', '$http', function(_, $http) {
+    return function(obj_name, fun, args) {
+      fun = fun || _.identity;
+      return $http.post('/data/iter', {name: obj_name, args: args}).
+	then(function(v) {
+	  function do_next(iter) {
+	    return $http.post('/data/next', {iter: iter}).
+	      then(function(v) {
+		console.log(v.data);
+		if (v.data.stop) return 0;
+		fun(v.data.value);
+		return 1 + do_next(v.data.iter || iter);
+	      });
+	  };
+	  return do_next(v.data.iter);
+	});
+    };
+  }]).
+
+  factory('each', ['_', '$http', '$q',  function(_, $http, $q) {
+    return function(obj_name, fun, args) {
+      fun = fun || _.identity;
+      var deferred = $q.defer()
+      $http.post('/data/iter', {name: obj_name, args: args}).
+	then(function(v) {
+
+	  function do_next(iter) {
+	    return $http.post('/data/next', {iter: iter}).
+	      then(function(v) {
+		console.log(v.data);
+		if (v.data.stop) {
+		  deferred.resolve();
+		  return 0;
+		} else {
+		  fun(v.data.value);
+		  return 1 + do_next(v.data.iter || iter);
+		}
+	      });
+	  };
+
+	  return do_next(v.data.iter);
+	});
       return deferred.promise;
     };
   }]);
