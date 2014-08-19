@@ -288,7 +288,7 @@ describe('service', function() {
 
 
     beforeEach(inject(function(GeneSequenceInfo) {
-      gsi = new GeneSequenceInfo('test');
+      gsi = new GeneSequenceInfo('test', 500, {});
 
       // tree spans are half-open, in the style of Array.prototype.slice()
 

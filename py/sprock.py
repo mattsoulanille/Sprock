@@ -6,7 +6,11 @@ import cherrypy
 
 from utils.get_sequence import FQDB # FIXME: names
 from utils.get_gene import GeneDB
+from utils.prime import Prime, PrimerMaker, Primer, PrimerPair, PrimerPairPossibilities
 from utils.various_utils import time_rand_str
+from utils.various_utils import sleepy_range # for testing of iter
+
+
 
 # An object to hold things
 class Thing(object):
@@ -160,7 +164,7 @@ class DataService(object):
         argd = cherrypy.request.json
         name = argd['name']
         args = argd['args']
-        if name in ('xrange', 'str'):
+        if name in ('xrange', 'str', 'sleepy_range'):
             k = time_rand_str()
             self.g.iter_things[k] = iter(eval(name)(*args))
             return {'iter': k}
@@ -182,6 +186,7 @@ class DataService(object):
         except StopIteration:
             rv['stop'] = True
             del self.g.iter_things[k]
+            cherrypy.log("deleted iterable %s, %d remain" % (k, len(self.g.iter_things)))
         except:
             raise cherrypy.HTTPError(500, "Something went wrong with iter")
         return rv

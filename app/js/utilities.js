@@ -201,11 +201,11 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
   factory('GeneSequenceInfo_test', ['GeneSequenceInfo', function(GeneSequenceInfo) {
     return function() {
       var expect = chai.expect;
-      var g = new GeneSequenceInfo('SPU_022066', 1000);
+      var g = new GeneSequenceInfo('SPU_022066', 1000, {});
       expect(g.get_informed()).eventually.to.have.property('features').to.have.property('scaffold');
       expect(g.get_informed()).eventually.to.have.property('sequence_info_objects').to.have.property('scaffold');
 
-      var g = new GeneSequenceInfo('SPU_022066', 1000);
+      var g = new GeneSequenceInfo('SPU_022066', 1000, {});
       expect(g.get_sequence()).eventually.to.have.property('scaffold').equal('Scaffold694');
       expect(g.get_sequence()).eventually.to.have.property('start').equal(9480);
       expect(g.get_sequence()).eventually.to.have.property('end').equal(9480+9857);
@@ -227,7 +227,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       expect(g.get_sequence_objects()).eventually.to.have.property('sequenceObjectsArray').
 	property(0).property('b').to.match(/^[ATCGN]$/);
 
-      var g = new GeneSequenceInfo('SPU_022066', 1000);
+      var g = new GeneSequenceInfo('SPU_022066', 1000, {});
       expect(g.get_feature_tree()).eventually.to.have.property('name').equal('SPU_022066');
       expect(g.get_feature_tree()).eventually.to.have.property('scaffold').equal('Scaffold694');
       expect(g.get_feature_tree()).eventually.to.have.property('type').equal('gene');
@@ -241,16 +241,26 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 
   factory('GeneSequenceInfo', ['_', '$q', 'getTree', 'getGene', 'getFeatures', 'getSequence', function(_, $q, getTree, getGene, getFeatures, getSequence ) {
 
-    function gsi(name, margin) {
+    function gsi(name, margin, scope) {
       this.gene_name = name;
+      this.scope = scope;
       if (margin === undefined) {
 	this.margin = 500; //FIXME: choose biologically-appropriate default
       } else {
 	this.margin = margin;
       }
+      this.scope.foo = 'blurt';	//DEBUG
       return this;
     };
 
+    gsi.prototype.get_sequence_start =
+      function() {
+	var that = this;
+	return this.get_gene().
+	  then(function(gene) {
+//	    that.scope.start = Math.max(0, gene.start - that.margin);
+	  });
+      };
 
     gsi.prototype.get_feature_tree =
       function() {
@@ -264,7 +274,12 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       function() {
 	if (_.has(this, 'gene_promise') && this.gene_promise !== null)
 	  return this.gene_promise;
-	return this.gene_promise = getGene(this.gene_name);
+	this.gene_promise = getGene(this.gene_name);
+	var that = this;
+	this.gene_promise.then(function(gene) {
+	  that.scope.gene = gene;
+	});
+	return this.gene_promise;
       };
 
     gsi.prototype.get_features =

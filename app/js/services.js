@@ -293,8 +293,8 @@ angular.module('sprock.services', ['sprock.utilities']).
   factory('each_from_server_test', ['_', 'each_from_server', function(_, each_from_server) {
     return function() {
       var expect = chai.expect;
-      var sum = 0;
 
+      var sum = 0;
       expect(each_from_server('xrange', function(v) {
 	sum += v;
       }, [5,0,-1]).then(function() {
@@ -310,6 +310,36 @@ angular.module('sprock.services', ['sprock.utilities']).
 
       expect(each_from_server('exec', _.identity, ['sys.exit(1)'])).
 	to.be.rejectedWith(403);
+
+      var s2 = 0;
+      expect(each_from_server('sleepy_range', function(v) {
+	s2 += v;
+      }, [5,0,-1]).then(function() {
+	return s2;
+      })).eventually.to.eql(15);
+
+      var s3 = 0
+      expect(each_from_server('sleepy_range', function(v) {
+	s3 += v;
+      }, [100,99,-1]).then(function() {
+	return s3;
+      })).eventually.to.eql(100);
+
+      var s4 = 0
+      expect(each_from_server('sleepy_range', function(v) {
+	s4 += v;
+      }, [7,6,-1]).then(function() {
+	return s4;
+      })).eventually.to.eql(7);
+
+      /*
+      var s5 = 0
+      expect(each_from_server('sleepy_range', function(v) {
+	s5 += v;
+      }, [11,10,-1]).then(function() {
+	return s5;
+      })).to.be.rejectedWith('foo');
+       */
 
     };
   }]).
