@@ -52,11 +52,6 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     iElement.empty();
 		     iElement.append('<h3>format-science</h3>');
 		     if (scope.sequenceObjectsArray) {
-		       //console.log(scope.sequenceInfo);
-		       //iElement.append(scope.sequenceInfo.render_to_html());
-		       //DEBUG scope.sequenceInfo.render_to_html(iElement.append); //inverted control, with iElement.append as the callback
-		       //scope.sequenceInfo.render_to_html(console.log); //DEBUG
-		       //scope.sequenceInfo.render_to_html(function(v) {console.log(v)}); //DEBUG
 		       iElement.append(render_to_html(scope.sequenceObjectsArray));
 		     };
 		   };
@@ -75,7 +70,6 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		       };
 		       var classes = _.difference(_.keys(o), ['b', 'q']).sort();
 		       if (classes.length > 0) {
-			 //console.log(classes); //DEBUG
 			 if (!terminated_quality_span && lastq !== null) {
 			   rv += '</span>';	// change of quality so terminate prior qual span
 			   terminated_quality_span = true;
@@ -101,11 +95,8 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     rv += '</span>';	// close seq class
 		     return rv;
 		   };
-
-
 		 }
+
 	       };
-
 	       return directiveDefinitionObject;
-
 	     }]);

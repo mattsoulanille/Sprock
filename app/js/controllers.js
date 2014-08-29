@@ -121,7 +121,7 @@ angular.module('sprock.controllers', []).
     };
   }]).
 
-  controller('MyCtrl4', ['$scope', '$http', '$q', '_', 'GeneSequenceInfo', function($scope, $http, $q, _, GeneSequenceInfo) {
+  controller('MyCtrl4', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo) {
     $scope.serverError = null;
     $scope.margin = 500;	//FIXME
     $scope.target_span = 2000;
@@ -130,7 +130,94 @@ angular.module('sprock.controllers', []).
     $scope.fuzz = 500;
 
     $scope.getContextInformation = function() {
-      $scope.gsi = new GeneSequenceInfo($scope.gene_name, $scope.margin, $scope);
-      $scope.featureful_sequence_objects = $scope.gsi.get_featureful_sequence_objects();
+      //$scope.gsi = new GeneSequenceInfo($scope.gene_name, $scope.margin, $scope);
+      get_featureful_sequence_objects();
     };
+
+    function get_gene() {
+      if (!$scope.gene_promise) {
+	$scope.gene_promise = getGene($scope.gene_name);
+	$scope.gene_promise.then(function(gene) {
+	  $scope.gene = gene;
+	})};
+      return $scope.gene_promise;
+    };
+
+    function get_features() {
+      if (!$scope.features_promise) {
+	$scope.features_promise = get_gene().
+	  then(function(gene) {
+	    return getFeatures(gene.scaffold,
+			       Math.max(0, gene.start - $scope.margin),
+			       gene.end + $scope.margin);
+	  }).
+	  then(function(v) {
+	    return $scope.features = v;
+	  });
+      };
+      return $scope.features_promise;
+    };
+
+    function get_sequence() {
+      if (!$scope.sequence_promise) {
+	$scope.sequence_promise = get_gene().
+	  then(function(gene) {
+	    return getSequence(gene.scaffold,
+			       Math.max(0, gene.start - $scope.margin),
+			       gene.end + $scope.margin);
+	  }).
+	  then(function(v) {
+	    return $scope.sequence_info = v;
+	  });
+      };
+      return $scope.sequence_promise;
+    };
+
+    function get_sequence_objects() {
+      if (!$scope.sequence_objects_promise) {
+	$scope.sequence_objects_promise = get_sequence().
+	  then(function(si) {
+	    var so = {};
+	    so.scaffold = si.scaffold;
+	    so.span = [si.start, si.end];
+	    so.sequenceObjectsArray =
+	      _.reduce(
+		_.map(
+		  _.zip(si.sequence, si.quality),
+		  function(sq) { return { b: sq[0], q: sq[1] }; }
+		),
+		function(memo, o) { memo.push(o); return memo; },
+		[]);
+	    return $scope.sequence_objects = so;
+	  })};
+      return $scope.sequence_objects_promise;
+    };
+
+    function get_informed() {
+      if (!$scope.informed_promise) {
+	$scope.informed_promise = $q.all({ features: get_features(),
+					   sequence_info_objects: get_sequence_objects()});
+      };
+      return $scope.informed_promise;
+    };
+
+    function get_featureful_sequence_objects() {
+      if (!$scope.featureful_sequence_objects_promise) {
+	$scope.featureful_sequence_objects_promise = get_informed().
+	  then(function(v) {
+	    var features = v.features;
+	    var so = v.sequence_info_objects;
+	    var soa = so.sequenceObjectsArray;
+	    _.each(features.features, function(f) {
+	      // Mark beginning & end of the type represented by this node
+	      var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
+	      soa[Math.max(0, f.span[0]-features.start)][k] = f.type;
+	      soa[Math.min(soa.length-1, f.span[1]-features.start)][k] = null;
+	    });
+	    $scope.soa = soa;
+	    return v; //our work has updated an existing object, not created a new one
+	  })};
+      return $scope.featureful_sequence_objects_promise;
+    };
+
   }]);

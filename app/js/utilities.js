@@ -357,58 +357,5 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	    return v; //our work has updated an existing object, not created a new one
 	  })};
 
-/****************
-    gsi.prototype.render_to_html =
-      function(callback) {
-	var that = this;
-	this.get_featureful_sequence_objects().then(function(v) {
-	  var soa = v.sequence_info_objects.sequenceObjectsArray;
-	  var html = that._render_soa_to_html(soa);
-	  //var html = '<strong><blink><code>gsi.prototype.render_to_html</code> is NOT working code</blink></strong>'
-	  //console.log('GeneSequenceInfo.render_to_html() callback with:' + html);
-	  callback(html);
-	});
-      };
-
-    gsi.prototype._render_soa_to_html =
-      function(soa) {
-	var rv = '<span class="seq">'; // it's all a sequence
-	var lastq = null;
-	var terminated_quality_span;
-	_.each(soa, function(o) {
-	  terminated_quality_span = false;
-	  if (o.q !== lastq && lastq !== null) {
-	    rv += '</span>';	// change of quality so terminate prior qual span
-	    terminated_quality_span = true;
-	  };
-	  var classes = _.difference(_.keys(o), ['b', 'q']).sort();
-	  if (classes.length > 0) {
-	    //console.log(classes); //DEBUG
-	    if (!terminated_quality_span && lastq !== null) {
-	      rv += '</span>';	// change of quality so terminate prior qual span
-	      terminated_quality_span = true;
-	    };
-	    _.each(classes.reverse(), function(k) {
-	      if (o[k] === null) {
-		rv += '</span>'; // close indicated classes in reverse alphabetic order
-	      }});
-	    _.each(classes.reverse(), function(k) { // this second reverse restores original order
-	      if (_.isString(o[k])) {
-		rv += '<span class="' + o[k] + '">'; // open indicated classes
-	      }});
-	  };
-	  if (terminated_quality_span || lastq === null) {
-	    rv += '<span class="q' + o.q + '">'; // open the quality class span
-	    lastq = o.q;
-	  };
-	  rv += o.b;
-	});
-	if (lastq !== null) {
-	  rv += '</span>';	// close quality class
-	}
-	rv += '</span>';	// close seq class
-	return rv;
-      };
-****************/
     return gsi;
   }]);
