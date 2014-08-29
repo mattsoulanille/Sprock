@@ -249,7 +249,6 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
       } else {
 	this.margin = margin;
       }
-      this.scope.foo = 'blurt';	//DEBUG
       return this;
     };
 
@@ -358,6 +357,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	    return v; //our work has updated an existing object, not created a new one
 	  })};
 
+/****************
     gsi.prototype.render_to_html =
       function(callback) {
 	var that = this;
@@ -409,6 +409,6 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	rv += '</span>';	// close seq class
 	return rv;
       };
-
+****************/
     return gsi;
   }]);

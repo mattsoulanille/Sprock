@@ -5,14 +5,6 @@
 describe('directives', function() {
   beforeEach(module('sprock.directives'));
 
-//  beforeEach(inject(function($injector) {
-//    injector = $injector;
-//  }));
-
-//  beforeEach(inject(function($injector) { 
-//    $rootScope  = $injector.get('$rootScope')
-//  }));
-
   describe('app-version', function() {
     it('should print current version', function() {
       module(function($provide) {
@@ -25,32 +17,45 @@ describe('directives', function() {
     });
   });
 
-//  describe('$rootScope', function() {
-//    it('should exist', function($rootScope) {
-//      expect($rootScope).toBeDefined()
-//    });
-//  });
-
-//  describe('$injector', function() {
-//    it('should exist', function($injector) {
-//      expect($injector).toBeDefined()
-//    });
-//  });
-
-/*
   describe('formatSequence', function() {
+    var si;
+    var header = '<h3>format-science</h3>';
 
-    it('should exist', inject(function(formatSequence) {
-      expect(formatSequence).toBeDefined();
-      module(function($provide) {
-        $provide.value('version', 'TEST_VER');
-      });
+    function fs(soa) {
+      var rv;
       inject(function($compile, $rootScope) {
-        var element = $compile('<span app-version></span>')($rootScope);
-        expect(element.text()).toEqual('TEST_VER');
+	$rootScope.soa = soa;
+	//expect($rootScope.soa).toEqual(soa);
+        var element = $compile('<format-science sequence-objects-array="soa"></format-science>')($rootScope);
+	$rootScope.$digest();	// fire the $watch'es
+	rv = element.html();
       });
-    }));
+      return rv;
+    };
+
+    it('should exist', function() {
+      inject(function($compile, $rootScope) {
+	$rootScope.soa = [];
+	expect($rootScope.soa).toBeDefined();
+        var element = $compile('<format-science sequence-objects-array="soa"></format-science>')($rootScope);
+	$rootScope.$digest();	// fire the $watch'es
+        expect(element.html()).toEqual(header + '<span class="seq"></span>');
+      });
+    });
+
+    it('should exist', function() {
+      var soa = [];
+      expect(fs(soa)).
+	toBe(header+'<span class="seq"></span>');
+    });
+
+    it('should handle a teeny case', function() {
+      var soa = [{b: 'A', q: 90}];
+      expect(fs(soa)).
+	toBe(header+'<span class="seq"><span class="q90">A</span></span>');
+    });
+
   });
-*/
+
 
 });

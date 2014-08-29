@@ -283,7 +283,7 @@ describe('service', function() {
 
   });
 
-  describe('GeneSequenceInfo', function() {
+  xdescribe('GeneSequenceInfo', function() {
     var gsi, t1, t2, t3;
 
 

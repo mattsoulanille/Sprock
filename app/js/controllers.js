@@ -129,11 +129,8 @@ angular.module('sprock.controllers', []).
     $scope.min_overlap = 1000;
     $scope.fuzz = 500;
 
-    var foo_d = $q.defer();
-    foo_d.promise.then(function(v) { $scope.foo = v; });
-    foo_d.resolve('bar');
-
     $scope.getContextInformation = function() {
       $scope.gsi = new GeneSequenceInfo($scope.gene_name, $scope.margin, $scope);
+      $scope.featureful_sequence_objects = $scope.gsi.get_featureful_sequence_objects();
     };
   }]);

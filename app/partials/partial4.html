@@ -14,7 +14,8 @@
   <input class="btn-primary" type="submit" value="make primers" style="visibility:show">
 </form>
 
-Foo: {{foo}}, Start: {{gene.start}}
+<span ng-show="gene.start">Start: {{gene.start}}</span>
+
 <p ng-show="scaffold">{{scaffold}} from {{start}} to {{end}}</p>
 <pre>{{serverError}}</pre>
 <p>See it on
