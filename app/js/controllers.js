@@ -137,9 +137,8 @@ angular.module('sprock.controllers', []).
     });
 
 
-    $scope.getContextInformation = function() {
-      //$scope.gsi = new GeneSequenceInfo($scope.gene_name, $scope.margin, $scope);
-      //get_featureful_sequence_objects();
+    $scope.makePrimers = function() {
+      
     };
 
     function get_gene() {
@@ -154,7 +153,7 @@ angular.module('sprock.controllers', []).
     };
     $scope.$watch('gene_name', get_gene);
 
-    $scope.informed_counter = 0;
+    $scope.informed_counter = 0; // a $watch'able to indicate an update
     function get_informed() {
       if ($scope.gene) {
 	return $scope.informed_promise =
