@@ -14,10 +14,10 @@
   <input class="btn-primary" type="submit" value="make primers" style="visibility:show">
 </form>
 
-<span ng-show="gene.start">Start: {{gene.start}}</span>
+<span ng-show="gene">Start: {{gene.start}} End: {{gene.end}}</span>
 
 <p ng-show="scaffold">{{scaffold}} from {{start}} to {{end}}</p>
-<pre>{{serverError}}</pre>
+<pre ng-show="serverError">{{serverError}}</pre>
 <p>See it on
   <a href="http://www.echinobase.org/Echinobase/JBrowse-1.10.9/index.html?data=data_sp&loc={{scaffold}}%3A{{start}}..{{end}}&tracks=DNA%2CGLEAN%2CTranscriptome%2Ccontig%2CeBAC"
      target="_blank">JBrowse</a>

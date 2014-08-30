@@ -129,95 +129,101 @@ angular.module('sprock.controllers', []).
     $scope.min_overlap = 1000;
     $scope.fuzz = 500;
 
+    // DEBUGGING h&w:
+    $scope.watch_count = 0;
+    $scope.$watch(function(scope) {
+      scope.watch_count++;
+      return 0;
+    });
+
+
     $scope.getContextInformation = function() {
       //$scope.gsi = new GeneSequenceInfo($scope.gene_name, $scope.margin, $scope);
-      get_featureful_sequence_objects();
+      //get_featureful_sequence_objects();
     };
 
     function get_gene() {
-      if (!$scope.gene_promise) {
-	$scope.gene_promise = getGene($scope.gene_name);
-	$scope.gene_promise.then(function(gene) {
-	  $scope.gene = gene;
-	})};
-      return $scope.gene_promise;
+      return $scope.gene_promise = getGene($scope.gene_name).
+	then(
+	  function(v) {
+	    $scope.gene = v;
+	  },
+	  function(why) {
+	    $scope.gene = null;
+	  });
     };
+    $scope.$watch('gene_name', get_gene);
+
+    $scope.informed_counter = 0;
+    function get_informed() {
+      if ($scope.gene) {
+	return $scope.informed_promise =
+	  $q.all({ features: get_features(),
+		   sequence_info: get_sequence()}).
+	  then(function(v) {
+	    $scope.informed_counter++;
+	  })
+      } else {
+	var d = $q.defer();
+	d.reject('gene is null');
+	$scope.soa = [];
+	return d.promise;
+      };
+    };
+    $scope.$watch('gene', get_informed);
+    $scope.$watch('margin', get_informed);
 
     function get_features() {
-      if (!$scope.features_promise) {
-	$scope.features_promise = get_gene().
-	  then(function(gene) {
-	    return getFeatures(gene.scaffold,
-			       Math.max(0, gene.start - $scope.margin),
-			       gene.end + $scope.margin);
-	  }).
-	  then(function(v) {
-	    return $scope.features = v;
-	  });
-      };
-      return $scope.features_promise;
+      var gene = $scope.gene;
+      return $scope.features_promise =
+	getFeatures(gene.scaffold,
+		    Math.max(0, gene.start - $scope.margin),
+		    gene.end + $scope.margin).
+	then(function(v) {
+	  return $scope.features = v;
+	});
     };
 
     function get_sequence() {
-      if (!$scope.sequence_promise) {
-	$scope.sequence_promise = get_gene().
-	  then(function(gene) {
-	    return getSequence(gene.scaffold,
-			       Math.max(0, gene.start - $scope.margin),
-			       gene.end + $scope.margin);
-	  }).
-	  then(function(v) {
-	    return $scope.sequence_info = v;
-	  });
-      };
-      return $scope.sequence_promise;
+      var gene = $scope.gene;
+      return $scope.sequence_info_promise =
+	getSequence(gene.scaffold,
+		    Math.max(0, gene.start - $scope.margin),
+		    gene.end + $scope.margin).
+	then(function(v) {
+	  return $scope.sequence_info = v;
+	});
     };
 
     function get_sequence_objects() {
-      if (!$scope.sequence_objects_promise) {
-	$scope.sequence_objects_promise = get_sequence().
-	  then(function(si) {
-	    var so = {};
-	    so.scaffold = si.scaffold;
-	    so.span = [si.start, si.end];
-	    so.sequenceObjectsArray =
-	      _.reduce(
-		_.map(
-		  _.zip(si.sequence, si.quality),
-		  function(sq) { return { b: sq[0], q: sq[1] }; }
-		),
-		function(memo, o) { memo.push(o); return memo; },
-		[]);
-	    return $scope.sequence_objects = so;
-	  })};
-      return $scope.sequence_objects_promise;
+      var si = $scope.sequence_info;
+      var so = {};
+      so.scaffold = si.scaffold;
+      so.span = [si.start, si.end];
+      so.sequenceObjectsArray =
+	_.reduce(
+	  _.map(
+	    _.zip(si.sequence, si.quality),
+	    function(sq) { return { b: sq[0], q: sq[1] }; }
+	  ),
+	  function(memo, o) { memo.push(o); return memo; },
+	  []);
+      $scope.sequence_objects = so;
+      add_features_to_sequence_objects();
+      return $scope.sequence_objects;
     };
+    $scope.$watch('informed_counter', get_sequence_objects);
 
-    function get_informed() {
-      if (!$scope.informed_promise) {
-	$scope.informed_promise = $q.all({ features: get_features(),
-					   sequence_info_objects: get_sequence_objects()});
-      };
-      return $scope.informed_promise;
-    };
-
-    function get_featureful_sequence_objects() {
-      if (!$scope.featureful_sequence_objects_promise) {
-	$scope.featureful_sequence_objects_promise = get_informed().
-	  then(function(v) {
-	    var features = v.features;
-	    var so = v.sequence_info_objects;
-	    var soa = so.sequenceObjectsArray;
-	    _.each(features.features, function(f) {
-	      // Mark beginning & end of the type represented by this node
-	      var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
-	      soa[Math.max(0, f.span[0]-features.start)][k] = f.type;
-	      soa[Math.min(soa.length-1, f.span[1]-features.start)][k] = null;
-	    });
-	    $scope.soa = soa;
-	    return v; //our work has updated an existing object, not created a new one
-	  })};
-      return $scope.featureful_sequence_objects_promise;
+    function add_features_to_sequence_objects() {
+      var features = $scope.features;
+      var soa = $scope.sequence_objects.sequenceObjectsArray;
+      _.each(features.features, function(f) {
+	// Mark beginning & end of the type represented by this node
+	var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
+	soa[Math.max(0, f.span[0]-features.start)][k] = f.type;
+	soa[Math.min(soa.length-1, f.span[1]-features.start)][k] = null;
+      });
+      return $scope.soa = soa;
     };
 
   }]);

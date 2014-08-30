@@ -8,8 +8,8 @@ describe('controllers', function(){
   describe('MyCtrl4', function() {
     var myCtrl4;
 
-    beforeEach(inject(function($controller) {
-      myCtrl4 = $controller('MyCtrl4', { $scope: {} });
+    beforeEach(inject(function($controller, $rootScope) {
+      myCtrl4 = $controller('MyCtrl4', {$scope: $rootScope});
     }));
 
     it('should exist', function() {
