@@ -1,6 +1,6 @@
 from itertools import chain, groupby
 from math import ceil, floor
-from pprint import pprint       # DEUGGING
+from pprint import pprint       # DEBUGGING
 
 import primer3
 
