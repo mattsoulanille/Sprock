@@ -128,6 +128,7 @@ angular.module('sprock.controllers', []).
     $scope.max_span = 4000;
     $scope.min_overlap = 1000;
     $scope.fuzz = 500;
+    $scope.status = {open: false};
 
     // DEBUGGING h&w:
     $scope.watch_count = 0;

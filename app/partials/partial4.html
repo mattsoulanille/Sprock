@@ -1,60 +1,74 @@
-<p>This is the partial for view 4.</p>
+<div class="row">
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-8">
+    <input type="text"
+	   ng-model="gene_name"
+	   size="14"
+	   placeholder="Gene name">
+    <span ng-hide="gene"> e.g. SPU_013015 or SPU_022066</span>
+    <span ng-show="gene">is on {{gene.scaffold}} from {{gene.start}} to {{gene.end}}</span>
+  <br/>
+  Use <input ng-model="margin"
+		   type="number"
+		   min="0"
+		   max="100000"
+		   placeholder="margin">bp of margin around the gene
 
-<!-- <form ng-submit="angular.noop()"> -->
-  <input type="text"
-	 ng-model="gene_name"
-	 size="14"
-	 placeholder="Gene name">
-  <span ng-show="gene">is on {{gene.scaffold}} from {{gene.start}} to {{gene.end}}</span>
+    <input class="btn-primary"
+	   type="submit"
+	   value="do"
+	   style="visibility:hidden">
+    <form ng-show="gene" ng-submit="makePrimers()">
+      target span: <input type="number"
+			  ng-model="target_span"
+			  min="1"
+			  max="10000"
+			  placeholder="span">bp<br/>
+      max span: <input type="number"
+		       ng-model="max_span"
+		       min="1"
+		       max="10000"
+		       placeholder="max span">bp<br/>
+      min overlap: <input type="number"
+			  ng-model="min_overlap"
+			  min="0"
+			  max="10000"
+			  placeholder="min overlap">bp<br/>
+      fuzz: <input type="number"
+		   ng-model="fuzz"
+		   min="0"
+		   max="5000"
+		   placeholder="fuzz">bp<br/>
+      <input class="btn btn-primary"
+	     type="submit"
+	     value="make primers"
+	     ng-click="angular.noop()"
+	     style="visibility:show">
+    </form>
+  </div>
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+    <p ng-show="gene">See it on
+      <a href="http://www.echinobase.org/Echinobase/JBrowse-1.10.9/index.html?data=data_sp&loc={{scaffold}}%3A{{start}}..{{end}}&tracks=DNA%2CGLEAN%2CTranscriptome%2Ccontig%2CeBAC"
+	 target="_blank">JBrowse</a></p>
+    <accordion ng-show="gene">
+      <accordion-group is-open="status.open">
+	  <accordion-heading>
+	    Features from {{features.start}} to {{features.end}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+	  </accordion-heading>
+	  <pre ng-show="features">{{features | json}}</pre>
+      </accordion-group>
+    </accordion>
+  </div>
+</div>
 
-<br/> e.g. SPU_013015 or SPU_022066
-<br/> Use <input ng-model="margin"
-		 type="number"
-		 min="0"
-		 max="100000"
-		 placeholder="margin">bp of margin around the gene
-
-  <input class="btn-primary"
-	 type="submit"
-	 value="do"
-	 style="visibility:hidden">
-<!-- </form> -->
-
-<!-- <pre ng-show="features">{{features | json}}</pre> -->
-
-<form ng-submit="makePrimers()">
-  target span: <input type="number"
-		      ng-model="target_span"
-		      min="1"
-		      max="10000"
-		      placeholder="span">bp,
-  max span: <input type="number"
-		   ng-model="max_span"
-		   min="1"
-		   max="10000"
-		   placeholder="max span">bp,
-  min overlap: <input type="number"
-		      ng-model="min_overlap"
-		      min="0"
-		      max="10000"
-		      placeholder="min overlap">bp,
-  fuzz: <input type="number"
-	       ng-model="fuzz"
-	       min="0"
-	       max="5000"
-	       placeholder="fuzz">bp
-  <input class="btn btn-primary"
-	 type="submit"
-	 value="make primers"
-	 style="visibility:show">
-</form>
-<button type="button" class="btn btn-info" ng-click="addSlide()">Have fun</button>
-
-<p ng-show="gene">See it on
-  <a href="http://www.echinobase.org/Echinobase/JBrowse-1.10.9/index.html?data=data_sp&loc={{scaffold}}%3A{{start}}..{{end}}&tracks=DNA%2CGLEAN%2CTranscriptome%2Ccontig%2CeBAC"
-     target="_blank">JBrowse</a></p>
-<p>Legend: <span class="seq"><span class="gene">GENE</span>&nbsp;<span class="transcript">TRANSCRIPT</span>&nbsp;<span class="exon">EXON</span></span>
-</p>
 <hr/>
-<format-science sequence-objects-array="soa"></format-science>
-<hr/>
+<div class="col-xs-12 col-lg-12" ng-show="gene">
+  <p>Legend:
+    <span class="seq">
+      <span class="gene">GENE</span>
+      <span class="transcript">TRANSCRIPT</span>
+      <span class="exon">EXON</span>
+    </span>
+  </p>
+  <format-science sequence-objects-array="soa"></format-science>
+  <hr/>
+</div>
