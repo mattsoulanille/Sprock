@@ -26,8 +26,9 @@ describe('directives', function() {
       inject(function($compile, $rootScope) {
 	$rootScope.soa = soa;
 	//expect($rootScope.soa).toEqual(soa);
-        var element = $compile('<format-science sequence-objects-array="soa"></format-science>')($rootScope);
-	$rootScope.$digest();	// fire the $watch'es
+	var myScope = $rootScope.$new()
+        var element = $compile('<format-science sequence-objects-array="soa"></format-science>')(myScope);
+	myScope.$digest();	// fire the $watch'es
 	rv = element.html();
       });
       return rv;
