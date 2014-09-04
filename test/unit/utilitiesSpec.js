@@ -286,6 +286,7 @@ describe('service', function() {
   xdescribe('GeneSequenceInfo', function() {
     var gsi, t1, t2, t3;
 
+    // This was for the tree-merge approach, which required too much brainpower to implement
     beforeEach(inject(function(GeneSequenceInfo) {
       gsi = new GeneSequenceInfo('test', 500, {});
 
