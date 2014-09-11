@@ -143,6 +143,7 @@ angular.module('sprock.controllers', []).
     };
 
     function get_gene() {
+      if ($scope.gene_name == undefined) return null;
       return $scope.gene_promise = getGene($scope.gene_name).
 	then(
 	  function(v) {
@@ -155,6 +156,7 @@ angular.module('sprock.controllers', []).
     $scope.$watch('gene_name', get_gene);
 
     function calc_desired_sequence_span() {
+      if ($scope.gene == undefined) return;
       $scope.sequence_span_to_examine = [Math.max(0, $scope.gene.start - $scope.margin),
 					 $scope.gene.end + $scope.margin];
       get_features().
@@ -201,6 +203,10 @@ angular.module('sprock.controllers', []).
     $scope.$watch('margin', calc_desired_sequence_span);
 
     function get_features() {
+      if ($scope.gene == undefined ||
+	  $scope.sequence_span_to_examine == undefined ||
+	  $scope.sequence_span_to_examine[0] == null ||
+	  $scope.sequence_span_to_examine[1] == null) return null;
       var gene = $scope.gene;
       var want_span = $scope.sequence_span_to_examine;
       return $scope.features_promise =
@@ -230,6 +236,7 @@ angular.module('sprock.controllers', []).
     };
 */
     function get_sequence() {
+      if ($scope.gene == undefined) return null;
       var gene = $scope.gene;
       var want_span = $scope.desired_sequence_span;
       return $scope.sequence_info_promise =
@@ -264,6 +271,7 @@ angular.module('sprock.controllers', []).
     };
 
     function get_sequence_objects() {
+      if ($scope.sequence_info == undefined) return;
       var si = $scope.sequence_info;
       var so = {};
       so.scaffold = si.scaffold;
