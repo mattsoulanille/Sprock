@@ -139,7 +139,7 @@ angular.module('sprock.controllers', []).
 
 
     $scope.makePrimers = function() {
-      
+      calc_primer_windows();
     };
 
     function get_gene() {
@@ -154,7 +154,65 @@ angular.module('sprock.controllers', []).
     };
     $scope.$watch('gene_name', get_gene);
 
-    $scope.informed_counter = 0; // a $watch'able to indicate an update
+    function calc_desired_sequence_span() {
+      $scope.sequence_span_to_examine = [Math.max(0, $scope.gene.start - $scope.margin),
+					 $scope.gene.end + $scope.margin];
+      get_features().
+	then(function(features) {
+	  // We start with the full span for which we've gotten features.
+	  var dss = $scope.sequence_span_to_examine.slice(0); // a copy
+	  var gene_span = [$scope.gene.start, $scope.gene.end];
+
+	  // The nearest feature outside of the gene (if any), on each side,
+	  // will require us to move the desired sequence in so that it abuts
+	  // that feature.
+	  // Find all the feature boundaries (edges) in the examined span
+	  var edges = _.chain(features.features).
+		pluck('span').flatten().uniq().sortBy(_.identity).value();
+
+
+	  // Find where the gene boundaries fall relative to the features
+	  // _.sortedIndex(): "... the index at which the value should be
+	  // inserted into the list in order to maintain the list's sorted order."
+	  var ixen = _.map(gene_span,
+			   function(v) {
+			     return _.sortedIndex(edges, v);
+			   });
+
+	  // If the left-hand index is > 0, the edge to it's immediate left
+	  // is the nearest feature boundary on that side:
+	  if (ixen[0] > 0) {
+	    dss[0] = edges[ixen[0]-1];
+	  };
+
+	  // Look rightward along the edge list, starting at the right-hand index,
+	  // until we find an edge greater that the end of the gene, in which
+	  // case we use it as our boundary, or we fall off the feature edges list,
+	  // in which case we can keep the full rightward span.
+	  var i = ixen[1];
+	  while (i < edges.length && edges[i] <= gene_span[1]) i++;
+	  if (i < edges.length) dss[1] = edges[i];
+
+	  // Transmit our result to the $scope
+	  $scope.desired_sequence_span = dss;
+	});
+    };
+    $scope.$watch('gene', calc_desired_sequence_span);
+    $scope.$watch('margin', calc_desired_sequence_span);
+
+    function get_features() {
+      var gene = $scope.gene;
+      var want_span = $scope.sequence_span_to_examine;
+      return $scope.features_promise =
+	getFeatures(gene.scaffold, want_span[0], want_span[1]).
+	then(function(v) {
+	  v.features = _.sortBy(v.features,
+				function(f) { return f.span[0]; });
+	  return $scope.features = v;
+	});
+    };
+
+/*    $scope.informed_counter = 0; // a $watch'able to indicate an update
     function get_informed() {
       if ($scope.gene) {
 	return $scope.informed_promise =
@@ -170,29 +228,39 @@ angular.module('sprock.controllers', []).
 	return d.promise;
       };
     };
-    $scope.$watch('gene', get_informed);
-    $scope.$watch('margin', get_informed);
-
-    function get_features() {
-      var gene = $scope.gene;
-      return $scope.features_promise =
-	getFeatures(gene.scaffold,
-		    Math.max(0, gene.start - $scope.margin),
-		    gene.end + $scope.margin).
-	then(function(v) {
-	  return $scope.features = v;
-	});
-    };
-
+*/
     function get_sequence() {
       var gene = $scope.gene;
+      var want_span = $scope.desired_sequence_span;
       return $scope.sequence_info_promise =
-	getSequence(gene.scaffold,
-		    Math.max(0, gene.start - $scope.margin),
-		    gene.end + $scope.margin).
+	getSequence(gene.scaffold, want_span[0], want_span[1]).
 	then(function(v) {
 	  return $scope.sequence_info = v;
 	});
+    };
+    $scope.$watch('desired_sequence_span', get_sequence);
+
+    function calc_primer_windows() {
+      var gene = $scope.gene;
+      var want_span = $scope.desired_sequence_span;
+      var exon_spans =
+	    _.reduce(gene.exons.exons,
+		     function(memo, v) {
+		       memo.push(v);
+		       return memo;
+		     },
+		     []).
+	    sort();
+      var t = 
+	    _.reduce(exon_spans,
+		     function(memo, v) {
+		       _.last(memo).push(v[0]);
+		       memo.push([v[1]]);
+		       return memo;
+		     },
+		     [[want_span[0]]]);
+      _.last(t).push(want_span[1]);
+      $scope.primer_windows = t;
     };
 
     function get_sequence_objects() {
@@ -212,16 +280,21 @@ angular.module('sprock.controllers', []).
       add_features_to_sequence_objects();
       return $scope.sequence_objects;
     };
-    $scope.$watch('informed_counter', get_sequence_objects);
+    $scope.$watch('sequence_info', get_sequence_objects);
 
     function add_features_to_sequence_objects() {
       var features = $scope.features;
+      var si = $scope.sequence_info;
       var soa = $scope.sequence_objects.sequenceObjectsArray;
       _.each(features.features, function(f) {
 	// Mark beginning & end of the type represented by this node
+
+	// Skip features that are completely outside the sequence
+	if (f.span[1] <= si.start || f.span[0] >= si.end) return;
+
 	var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
-	soa[Math.max(0, f.span[0]-features.start)][k] = f.type;
-	soa[Math.min(soa.length-1, f.span[1]-features.start)][k] = null;
+	soa[Math.max(0, f.span[0]-si.start)][k] = f.type;
+	soa[Math.min(soa.length-1, f.span[1]-si.start)][k] = null;
       });
       return $scope.soa = soa;
     };

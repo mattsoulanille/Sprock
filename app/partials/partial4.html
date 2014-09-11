@@ -47,8 +47,18 @@
   </div>
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
     <p ng-show="gene">See it on
-      <a href="http://www.echinobase.org/Echinobase/JBrowse-1.10.9/index.html?data=data_sp&loc={{gene.scaffold}}%3A{{gene.start}}..{{gene.end}}&tracks=DNA%2CGLEAN%2CTranscriptome%2Ccontig%2CeBAC"
+      <a href="http://www.echinobase.org/Echinobase/JBrowse-1.10.9/index.html?data=data_sp&loc={{gene.scaffold}}%3A{{sequence_span_to_examine[0]}}..{{sequence_span_to_examine[1]}}&tracks=DNA%2CGLEAN%2CTranscriptome%2Ccontig%2CeBAC"
 	 target="_blank">JBrowse</a></p>
+    <accordion close-others="false">
+      <accordion-group>
+	<accordion-heading>
+	  Debugging
+	</accordion-heading>
+	sequence span to examine: {{sequence_span_to_examine | json}}<br/>
+	desired sequence span: {{desired_sequence_span | json}}<br/>
+	primer windows: {{primer_windows | json}}<br/>
+      </accordion-group>
+    </accordion>
     <accordion ng-show="gene" close-others="false">
       <accordion-group>
 	  <accordion-heading>
@@ -57,10 +67,10 @@
 	  <pre ng-show="features">{{gene | json}}</pre>
       </accordion-group>
       <accordion-group is-open="status.open">
-	  <accordion-heading>
-	    Features from {{features.start}} to {{features.end}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-	  </accordion-heading>
-	  <pre ng-show="features">{{features | json}}</pre>
+	<accordion-heading>
+	  Features from {{features.start}} to {{features.end}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+	</accordion-heading>
+	<pre ng-show="features">{{features | json}}</pre>
       </accordion-group>
     </accordion>
   </div>
