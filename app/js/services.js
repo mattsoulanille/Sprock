@@ -332,23 +332,21 @@ angular.module('sprock.services', ['sprock.utilities']).
 	return s4;
       })).eventually.to.eql(7);
 
-      /*
-      var s5 = 0
-      expect(each_from_server('sleepy_range', function(v) {
-	s5 += v;
-      }, [11,10,-1]).then(function() {
+      var s5 = [];
+      expect(each_from_server('echoArgs', function(v) {
+	s5.push(v);
+      }, [2, 'cat', 3.14], {foo:'bar'}).then(function() {
 	return s5;
-      })).to.be.rejectedWith('foo');
-       */
+      })).eventually.to.eql([ '2', 'cat', '3.14', 'foo: bar' ]);
 
     };
   }]).
 
   factory('each_from_server', ['_', '$http', '$q',  function(_, $http, $q) {
-    return function(obj_name, fun, args) {
+    return function(obj_name, fun, args, kwargs) {
       fun = fun || _.identity;
       var deferred = $q.defer()
-      $http.post('/data/iter', {name: obj_name, args: args}).
+      $http.post('/data/iter', {name: obj_name, args: args, kwargs: kwargs}).
 	success(function(data) {
 
 	  function do_next(iter) {

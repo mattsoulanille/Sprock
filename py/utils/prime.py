@@ -5,10 +5,10 @@ from pprint import pprint       # DEBUGGING
 import primer3
 
 class Prime(object):
-    def __init__(self, **args):
-        self.__dict__.update(args)
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
 
-    def set_up_to_prime(self, **args):
+    def set_up_to_prime(self, **kwargs):
         # UI causes this to be called
         # then primer maker gets called with this Prime object
         # it retrieves what data it needs
@@ -19,13 +19,13 @@ class Prime(object):
         self.target_primer_span = int()
         self.primer_windows =  list()
         self.fuzz = int()
-        self.__dict__.update(args)
+        self.__dict__.update(kwargs)
         return self
 
 
 class Primer(object):
-    def __init__(self, **args):
-        self.__dict__.update(args)
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
         try:
             self.start, self.length = map(int, self.pos_len.split(','))
         except AttributeError:
@@ -35,9 +35,9 @@ class Primer(object):
 
 class PrimerPair(object):
     """A pair of primers as produced by primer3"""
-    def __init__(self, d, **args):
+    def __init__(self, d, **kwargs):
         self.d = d
-        self.__dict__.update(args)
+        self.__dict__.update(kwargs)
 
         splits = set((tuple(k.split('_')), k) for k in d.keys())
         splits_having_ppn = set(t for t in splits if len(t[0]) >=3 and t[0][2].isdigit())
@@ -72,8 +72,8 @@ class PrimerPair(object):
 
 class PrimerPairPossibilities(object):
     """From the output of primer3, create a list of PrimerPair objects"""
-    def __init__(self, primer3_design, **args):
-        self.__dict__.update(args)
+    def __init__(self, primer3_design, **kwargs):
+        self.__dict__.update(kwargs)
         self.primer3_design = primer3_design
         self.primer_pair_numbers = sorted(set(v[2] for v in (k.split('_') \
                                                              for k in primer3_design.keys()) \
@@ -168,3 +168,4 @@ class PrimerMaker(object):
             del primers['SEQUENCE_TEMPLATE']
 
             yield PrimerPairPossibilities(primers)
+

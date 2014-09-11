@@ -8,8 +8,6 @@ from utils.get_sequence import FQDB # FIXME: names
 from utils.get_gene import GeneDB
 from utils.prime import Prime, PrimerMaker, Primer, PrimerPair, PrimerPairPossibilities
 from utils.various_utils import time_rand_str
-from utils.various_utils import sleepy_range # for testing of iter
-
 
 
 # An object to hold things
@@ -156,6 +154,24 @@ class DataService(object):
             'results': results
         }
 
+
+    @staticmethod
+    def sleepy_range(*args):
+        for i in xrange(*args):
+            time.sleep(i)
+            yield(i)
+
+    @staticmethod
+    def echoArgs(*args, **kwargs):
+        for a in args:
+            yield str(a)
+        for k,v in kwargs.iteritems():
+            yield "%s: %s" % (k,v)
+
+    @staticmethod
+    def primers(*args, **kwargs):
+        p = Prime(**kwargs)
+
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
@@ -163,10 +179,16 @@ class DataService(object):
         #curl -s -i -X POST -H "Content-Type: application/json" -d '{"name":"xrange", "args":[0,5,2]}' 'http://localhost:8082/data/iter'
         argd = cherrypy.request.json
         name = argd['name']
-        args = argd['args']
-        if name in ('xrange', 'str', 'sleepy_range'):
+        args = 'args' in argd and argd['args'] or []
+        kwargs = 'kwargs' in argd and argd['kwargs'] or {}
+        sleepy_range = self.sleepy_range;
+        constructors = { 'xrange': xrange,
+                         'str' : str,
+                         'echoArgs': self.echoArgs,
+                         'sleepy_range': self.sleepy_range }
+        if name in constructors:
             k = time_rand_str()
-            self.g.iter_things[k] = iter(eval(name)(*args))
+            self.g.iter_things[k] = iter(constructors[name](*args, **kwargs))
             return {'iter': k}
         else:
             raise cherrypy.HTTPError(403, "That iter is not allowed")
