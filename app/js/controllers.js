@@ -5,7 +5,7 @@ angular.module('sprock.controllers', []).
 
   controller('Tester1', ['$scope', '$injector', function($scope, $injector) {
     var expect = chai.expect;
-    var test_names = ['each_from_server_test',
+    var test_names = ['eachFromServer_test',
 		      'data_muks_test',
 		      'mukmuk_test',
 		      'data_getTree_test',
@@ -121,12 +121,12 @@ angular.module('sprock.controllers', []).
     };
   }]).
 
-  controller('MyCtrl4', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo) {
+  controller('MyCtrl4', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer) {
     $scope.serverError = null;
     $scope.margin = 500;	//FIXME
-    $scope.target_span = 2000;
-    $scope.max_span = 4000;
-    $scope.min_overlap = 1000;
+    $scope.target_primer_span = 2000;
+    $scope.maximum_primer_span = 4000;
+    $scope.minimum_overlap = 1000;
     $scope.fuzz = 500;
 //    $scope.status = {open: false}; //FIXME: is this needed?
 
@@ -140,6 +140,17 @@ angular.module('sprock.controllers', []).
 
     $scope.makePrimers = function() {
       calc_primer_windows();
+      $scope.primers = [];
+      return eachFromServer('primers', function(v) {
+	$scope.primers.push(v);	//FIXME: RETURNS PrimerPairPossibilities I think
+      }, [], { scaffold: $scope.gene.scaffold,
+	       target_primer_span: $scope.target_primer_span,
+	       maximum_primer_span: $scope.maximum_primer_span,
+	       minimum_overlap: $scope.minimum_overlap,
+	       primer_windows: $scope.primer_windows,
+	       fuzz: $scope.fuzz }).then(function(v) {
+		 $scope.primers_eventually_was = v; //FIXME
+	       });
     };
 
     function get_gene() {
@@ -271,7 +282,7 @@ angular.module('sprock.controllers', []).
     };
 
     function get_sequence_objects() {
-      if ($scope.sequence_info == undefined) return;
+      if ($scope.sequence_info == undefined) return null;
       var si = $scope.sequence_info;
       var so = {};
       so.scaffold = si.scaffold;

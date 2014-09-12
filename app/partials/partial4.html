@@ -19,17 +19,17 @@
 	   style="visibility:hidden">
     <form ng-show="gene" ng-submit="makePrimers()">
       target span: <input type="number"
-			  ng-model="target_span"
+			  ng-model="target_primer_span"
 			  min="1"
 			  max="10000"
 			  placeholder="span">bp<br/>
       max span: <input type="number"
-		       ng-model="max_span"
+		       ng-model="maximum_primer_span"
 		       min="1"
 		       max="10000"
 		       placeholder="max span">bp<br/>
       min overlap: <input type="number"
-			  ng-model="min_overlap"
+			  ng-model="minimum_overlap"
 			  min="0"
 			  max="10000"
 			  placeholder="min overlap">bp<br/>
