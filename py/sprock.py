@@ -2,6 +2,8 @@ import os
 import os.path
 import time
 
+from traceback import format_exc
+
 import cherrypy
 
 from utils.get_sequence import FQDB # FIXME: names
@@ -168,9 +170,14 @@ class DataService(object):
         for k,v in kwargs.iteritems():
             yield "%s: %s" % (k,v)
 
-    @staticmethod
-    def primers(*args, **kwargs):
+    def primers(self, *args, **kwargs):
         p = Prime(**kwargs)
+        seq_data = self.fqdb.get_sequence_data_entire_scaffold(p.scaffold)
+        p.whole_sequence = seq_data['sequence']
+        p.whole_quality = seq_data['quality']
+        pm = PrimerMaker()
+        pm.config_for(p)
+        return pm
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -185,7 +192,8 @@ class DataService(object):
         constructors = { 'xrange': xrange,
                          'str' : str,
                          'echoArgs': self.echoArgs,
-                         'sleepy_range': self.sleepy_range }
+                         'sleepy_range': self.sleepy_range,
+                         'primers': self.primers }
         if name in constructors:
             k = time_rand_str()
             self.g.iter_things[k] = iter(constructors[name](*args, **kwargs))
@@ -209,8 +217,11 @@ class DataService(object):
             rv['stop'] = True
             del self.g.iter_things[k]
             cherrypy.log("deleted iterable %s, %d remain" % (k, len(self.g.iter_things)))
-        except:
+        except Exception as e:
+            cherrypy.log("Error in next(%s): %s" % (k, e))
+            cherrypy.log(format_exc(5))
             raise cherrypy.HTTPError(500, "Something went wrong with iter")
+            # FIXME: del the iter?
         return rv
 
 

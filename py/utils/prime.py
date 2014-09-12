@@ -8,20 +8,6 @@ class Prime(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
-    def set_up_to_prime(self, **kwargs):
-        # UI causes this to be called
-        # then primer maker gets called with this Prime object
-        # it retrieves what data it needs
-        self.whole_sequence = str()
-        self.whole_quality = str()
-        self.minimum_overlap = int()
-        self.maximum_primer_span = int()
-        self.target_primer_span = int()
-        self.primer_windows =  list()
-        self.fuzz = int()
-        self.__dict__.update(kwargs)
-        return self
-
 
 class Primer(object):
     def __init__(self, **kwargs):
@@ -30,7 +16,6 @@ class Primer(object):
             self.start, self.length = map(int, self.pos_len.split(','))
         except AttributeError:
             pass
-
 
 
 class PrimerPair(object):
@@ -107,7 +92,6 @@ class PrimerMaker(object):
 
     Operates as an iterator. Typical use like:
     >>> prime = Prime()
-    >>> prime.set_up_to_prime('SPU_008174', 30000) # UI does this
     >>> pm = PrimerMaker()
     >>> pm.config_for(prime)
     >>> t0 = time.time()
@@ -120,6 +104,7 @@ class PrimerMaker(object):
     def config_for(self, prime):
         # Do what you need to absorb the particulars
         self.prime = prime
+        return self
 #        self.seq_args['SEQUENCE_TEMPLATE'] = prime_object.whole_sequence
 #        self.seq_args['SEQUENCE_QUALITY'] = ' '.join([str(x) for x in prime_object.whole_quality])
 
