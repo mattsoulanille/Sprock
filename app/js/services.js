@@ -290,59 +290,66 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
-  factory('each_from_server_test', ['_', 'each_from_server', function(_, each_from_server) {
+  factory('eachFromServer_test', ['_', 'eachFromServer', function(_, eachFromServer) {
     return function() {
       var expect = chai.expect;
 
       var sum = 0;
-      expect(each_from_server('xrange', function(v) {
+      expect(eachFromServer('xrange', function(v) {
 	sum += v;
       }, [5,0,-1]).then(function() {
 	return sum;
       })).eventually.to.eql(15);
 
       var s = '';
-      expect(each_from_server('str', function(v) {
+      expect(eachFromServer('str', function(v) {
 	s += v;
       }, ['cat']).then(function() {
 	return s;
       })).eventually.to.eql('cat');
 
-      expect(each_from_server('exec', _.identity, ['sys.exit(1)'])).
+      expect(eachFromServer('exec', _.identity, ['sys.exit(1)'])).
 	to.be.rejectedWith(403);
 
       var s2 = 0;
-      expect(each_from_server('sleepy_range', function(v) {
+      expect(eachFromServer('sleepy_range', function(v) {
 	s2 += v;
       }, [5,0,-1]).then(function() {
 	return s2;
       })).eventually.to.eql(15);
 
       var s3 = 0
-      expect(each_from_server('sleepy_range', function(v) {
+      expect(eachFromServer('sleepy_range', function(v) {
 	s3 += v;
       }, [100,99,-1]).then(function() {
 	return s3;
       })).eventually.to.eql(100);
 
       var s4 = 0
-      expect(each_from_server('sleepy_range', function(v) {
+      expect(eachFromServer('sleepy_range', function(v) {
 	s4 += v;
       }, [7,6,-1]).then(function() {
 	return s4;
       })).eventually.to.eql(7);
 
       var s5 = [];
-      expect(each_from_server('echoArgs', function(v) {
+      expect(eachFromServer('echoArgs', function(v) {
 	s5.push(v);
       }, [2, 'cat', 3.14], {foo:'bar'}).then(function() {
 	return s5;
       })).eventually.to.eql([ '2', 'cat', '3.14', 'foo: bar' ]);
 
+      var s6 = [];
+      expect(eachFromServer('echoArgs', function(v) {
+	s6.push(v);
+      }, [], {'A':'one', 'B':'two'}).then(function() {
+	return s6;
+      })).eventually.to.eql([ 'A: one', 'B: two']);
+
     };
   }]).
 
-  factory('each_from_server', ['_', '$http', '$q',  function(_, $http, $q) {
+  factory('eachFromServer', ['_', '$http', '$q',  function(_, $http, $q) {
     return function(obj_name, fun, args, kwargs) {
       fun = fun || _.identity;
       var deferred = $q.defer()
