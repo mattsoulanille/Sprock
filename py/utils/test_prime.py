@@ -33,8 +33,16 @@ class primeTestCase(unittest.TestCase):
                            target_primer_span=2000,
                            maximum_primer_span=4000,
                            minimum_overlap=1000,
-                           fuzz=500)
-#        self.maker.config_for(prime)
+                           fuzz=500,
+                           primer_windows=[ [ 43520, 44020 ],
+                                            [ 44222, 48383 ],
+                                            [ 48647, 49591 ],
+                                            [ 49731, 53349 ],
+                                            [ 53410, 53845 ],
+                                            [ 53909, 54483 ],
+                                            [ 54653, 57711 ],
+                                            [ 58315, 59919 ] ] )
+        self.maker.config_for(self.prime)
 
     def tearDown(self):
         pass
@@ -65,7 +73,9 @@ class primeTestCase(unittest.TestCase):
                       [ 2000, 4000 ],
                       [ 3000, 5000 ] ]
 
-    def test5_SplitIntervals(self):
+    # Note the leading 'x' in the test name below - that x'es it out of the
+    # set of tests that get run. Easy to delete the x and thereby include it
+    def xtest5_SplitIntervals(self):
         self.prime.primer_windows = [ [ 43520, 44020 ],
                                       [ 44222, 48383 ],
                                       [ 48647, 49591 ],
@@ -78,8 +88,6 @@ class primeTestCase(unittest.TestCase):
         t = list(self.maker.split_interval())
         assert t == "TBD" # The expected result is yet to be determined
 
-    # Note the leading 'x' in the test name below - that x'es it out of the
-    # set of tests that get run. Easy to delete the x and thereby include it
     def xtestMakePrimers(self):
         primers = [x for x in self.maker]
         assert len(primers) == 14
