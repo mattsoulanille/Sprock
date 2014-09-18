@@ -105,7 +105,9 @@ class DataService(object):
         scaffold = argd['scaffold']
         start = int(argd['start'])
         end = int(argd['end'])
-        features = self.gene_db.get_features_data_by_interval(scaffold, start, end)
+        completely_within = argd['completely_within']
+        kwargs = 'kwargs' in argd and argd['kwargs'] or {}
+        features = self.gene_db.get_features_data_by_interval(scaffold, start, end, **kwargs)
         return {
             'request': argd,
             'results': { 'scaffold': scaffold, 'start': start, 'end': end, 'features': features },

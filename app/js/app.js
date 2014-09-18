@@ -39,6 +39,10 @@ angular.module('sprock', [
 	templateUrl: 'partials/partial4.html',
 	controller: 'MyCtrl4'
     })
+    .when('/view5', {
+	templateUrl: 'partials/partial5.html',
+	controller: 'MyCtrl5'
+    })
     .otherwise({redirectTo: '/view1'})
 }]);
 

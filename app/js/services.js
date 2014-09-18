@@ -53,9 +53,12 @@ angular.module('sprock.services', ['sprock.utilities']).
   }]).
 
   factory('getFeatures', ['$http', '$q', function($http, $q) {
-    return function (scaffold, start, end) {
+    return function (scaffold, start, end, completely_within) {
       var deferred = $q.defer();
-      $http.post('/data/getFeatures', {scaffold: scaffold, start: start, end: end}).
+      $http.post('/data/getFeatures', {scaffold: scaffold,
+				       start: start,
+				       end: end,
+				       completely_within: !!completely_within}).
 	success(function (v) {
 	  deferred.resolve(v['results']);
 	}).
