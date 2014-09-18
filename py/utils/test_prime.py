@@ -30,6 +30,7 @@ class primeTestCase(unittest.TestCase):
         self.maker = PrimerMaker()
         self.prime = Prime(whole_sequence=d['sequence'],
                            whole_quality=d['quality'],
+                           minimum_primer_span=800,
                            target_primer_span=2000,
                            maximum_primer_span=4000,
                            minimum_overlap=1000,
@@ -47,35 +48,35 @@ class primeTestCase(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test1_SplitIntervals(self):
+    def test1_IntervalsToPrime(self):
         self.prime.primer_windows = [ [ 1, 100 ] ]
         self.maker.config_for(self.prime)
-        t = list(self.maker.split_interval())
-        assert t == [ [ 1, 100 ] ]
-        
-    def test2_SplitIntervals(self):
+        t = list(self.maker.intervals_to_prime())
+        assert t == [ ]
+
+    def test2_IntervalsToPrime(self):
         self.prime.primer_windows = [ [ 1000, 3000 ] ]
         self.maker.config_for(self.prime)
-        t = list(self.maker.split_interval())
+        t = list(self.maker.intervals_to_prime())
         assert t == [ [ 1000, 3000 ] ]
 
-    def test3_SplitIntervals(self):
+    def test3_IntervalsToPrime(self):
         self.prime.primer_windows = [ [ 1000, 4000 ] ]
         self.maker.config_for(self.prime)
-        t = list(self.maker.split_interval())
+        t = list(self.maker.intervals_to_prime())
         assert t == [ [ 1000, 4000 ] ]
 
-    def test4_SplitIntervals(self):
+    def test4_IntervalsToPrime(self):
         self.prime.primer_windows = [ [ 1000, 5000 ] ]
         self.maker.config_for(self.prime)
-        t = list(self.maker.split_interval())
+        t = list(self.maker.intervals_to_prime())
         assert t == [ [ 1000, 3000 ],
                       [ 2000, 4000 ],
                       [ 3000, 5000 ] ]
 
     # Note the leading 'x' in the test name below - that x'es it out of the
     # set of tests that get run. Easy to delete the x and thereby include it
-    def xtest5_SplitIntervals(self):
+    def xtest5_IntervalsToPrime(self):
         self.prime.primer_windows = [ [ 43520, 44020 ],
                                       [ 44222, 48383 ],
                                       [ 48647, 49591 ],
@@ -85,12 +86,13 @@ class primeTestCase(unittest.TestCase):
                                       [ 54653, 57711 ],
                                       [ 58315, 59919 ] ]
         self.maker.config_for(self.prime)
-        t = list(self.maker.split_interval())
-        assert t == "TBD" # The expected result is yet to be determined
+        t = list(self.maker.intervals_to_prime())
+        assert t == "TBD"
 
-    def xtestMakePrimers(self):
+    def testMakePrimers(self):
+        self.prime.primer_windows = [ [ 1000, 5000 ] ]
         primers = [x for x in self.maker]
-        assert len(primers) == 14
+        assert len(primers) == 3
         assert all(isinstance(x, PrimerPairPossibilities) for x in primers)
 
         assert all(len(ppp.primer_pairs) == 5 for ppp in primers)

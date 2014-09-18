@@ -118,32 +118,36 @@ class PrimerMaker(object):
         #return self.primer_iterator.next()
         pass
         
-    def split_interval(self):
+    def intervals_to_prime(self):
+        """ Generates the intervals for which we want primer pairs
+        """
         for window in self.prime.primer_windows:
-            window_length = (window[1] - window[0]) - self.prime.fuzz * 2
-            start = window[0] + self.prime.fuzz
-            iterstart = start
-            stop = window[1] - self.prime.fuzz
-            end = self.prime.target_primer_span + start 
-            interval = [[start, end]]
-            while end < stop: # brute force :P If you know a prettier way, feel free to change it
-                iterstart = end - self.prime.minimum_overlap
-                end = iterstart + self.prime.target_primer_span
-                interval += [[iterstart, end]]
-            interval[-1][-1] = (stop)
-            number_of_intervals = len(interval)
-
-            overlap = int(ceil(float(self.prime.target_primer_span * number_of_intervals - window_length) / (float(number_of_intervals) - 1)))
-            progress = (self.prime.target_primer_span - overlap)
-            #assert False
-            for x in range(0, number_of_intervals):
-                yield [x*progress + start, x*progress + self.prime.target_primer_span + start]
+            window_length = window[1] - window[0]
+            if window_length < self.prime.minimum_primer_span: # FIXME: necessary?
+                continue
+            if window_length < self.prime.maximum_primer_span:
+                #FIXME: match target span better if possible
+                yield window
+            else:
+                l_overlap = self.prime.minimum_overlap
+                n = int(ceil((window_length - l_overlap) \
+                                  / (self.prime.target_primer_span - l_overlap)))
+                l_interval = int(ceil((window_length - l_overlap) / n \
+                             + self.prime.minimum_overlap))
+                # FIXME: distribute the fractional part
+                left = window[0]
+                right = min(left + l_interval, window[1])
+                while right < window[1]:
+                    yield [left, right]
+                    left = max(right - l_overlap, window[0])
+                    right = min(left + l_interval, window[1])
+                yield [left, right]
 
     def make_primers(self):
         self.seq_args['SEQUENCE_TEMPLATE'] = self.prime.whole_sequence
         self.seq_args['SEQUENCE_QUALITY'] = ' '.join([str(x) for x in self.prime.whole_quality])
 
-        for target in self.split_interval():
+        for target in self.intervals_to_prime():
             length = target[1] - target[0]
             self.seq_args['PRIMER_PRODUCT_SIZE_RANGE'] = str(length) + '-' + str(length + self.prime.fuzz)
             self.seq_args['SEQUENCE_TARGET'] = str(target[0]) + ',' + str(length)
