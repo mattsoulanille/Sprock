@@ -323,10 +323,13 @@ angular.module('sprock.controllers', []).
   controller('MyCtrl5', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer) {
     $scope.serverError = null;
     $scope.margin = 5000;	//FIXME
-    $scope.target_primer_span = 2000;
-    $scope.maximum_primer_span = 4000;
-    $scope.minimum_overlap = 1000;
-    $scope.fuzz = 500;
+    $scope.prime = {
+      minimum_primer_span: 100,
+      target_primer_span: 2000,
+      maximum_primer_span: 4000,
+      minimum_overlap: 1000,
+      fuzz: 500
+    };
 //    $scope.status = {open: false}; //FIXME: is this needed?
 
     // DEBUGGING h&w:
@@ -383,18 +386,15 @@ angular.module('sprock.controllers', []).
     $scope.$watch('desired_sequence_span', get_sequence);
 
     $scope.makePrimers = function() {
-      calc_primer_windows();
       $scope.primers = [];
+      calc_primer_windows();
+      $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
+	console.log(v);
 	$scope.primers.push(v);	//FIXME: RETURNS PrimerPairPossibilities I think
-      }, [], { scaffold: $scope.gene.scaffold,
-	       target_primer_span: $scope.target_primer_span,
-	       maximum_primer_span: $scope.maximum_primer_span,
-	       minimum_overlap: $scope.minimum_overlap,
-	       primer_windows: $scope.primer_windows,
-	       fuzz: $scope.fuzz }).then(function(v) {
-		 $scope.primers_eventually_was = v; //FIXME
-	       });
+      }, [], $scope.prime).then(function(v) {
+	$scope.primers_eventually_was = v; //FIXME
+      });
     };
 
     function calc_primer_windows() {
@@ -417,7 +417,7 @@ angular.module('sprock.controllers', []).
 		     },
 		     [[want_span[0]]]);
       _.last(t).push(want_span[1]);
-      $scope.primer_windows = t;
+      $scope.prime.primer_windows = t;
     };
 
 /*
