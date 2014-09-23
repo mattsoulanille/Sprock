@@ -1,3 +1,5 @@
+import functools
+import json
 import os
 import os.path
 import time
@@ -17,6 +19,17 @@ class Thing(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
+def liberal_json_handler(*args, **kwargs):
+    # Takes liberties in JSON serialization to make more things serialize
+    def jsonable(v):
+        if hasattr(v, '__dict__'):
+            return v.__dict__
+        if isinstance(v, set):
+            return list(v)
+        return v
+
+    value = cherrypy.serving.request._json_inner_handler(*args, **kwargs)
+    return json.dumps(value, default=jsonable)
 
 class HelloWorld(object):
     def __init__(self, **kwargs):
@@ -49,6 +62,24 @@ class DataService(object):
                 'count': range(cherrypy.request.json['N']),
                 'request data': cherrypy.request.json
                 }
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+#handler=lambda v: json.dumps(v, default=lambda o: o.__dict__))
+#handler=functools.partial(json.dumps, default=lambda o: o.__dict__))
+    def t1(self):
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"a":1}' 'http://localhost:8082/data/t1'
+        thing = {'foo': "bar"}
+        return thing
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def t2(self):
+        #curl -i -X POST -H "Content-Type: application/json" -d '{"a":1}' 'http://localhost:8082/data/t2'
+        thing = Thing(foo="bar", kittens=set(["Sophie", "Thor"]))
+        return thing
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -263,6 +294,7 @@ def serve(g):
                    'tools.auth_basic.on': False,
                    'tools.auth_basic.realm': 'earth',
                    'tools.auth_basic.checkpassword': checkpassword,
+                   'tools.json_out.handler': liberal_json_handler,
                    'tools.staticdir.on': True,
                    'tools.staticdir.root': os.path.abspath(os.getcwd()), # FIXME: cwd is the wrong choice
                    'tools.staticdir.dir': 'app/',
