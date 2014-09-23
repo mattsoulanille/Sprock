@@ -3,9 +3,10 @@
 
 // Declare app level module which depends on filters, and services
 angular.module('sprock', [
+  'btford.markdown',
   'ngRoute',
-  'underscore',
   'ui.bootstrap',
+  'underscore',
   'sprock.filters',
   'sprock.services',
   'sprock.directives',
@@ -42,6 +43,10 @@ angular.module('sprock', [
     .when('/view5', {
 	templateUrl: 'partials/partial5.html',
 	controller: 'MyCtrl5'
+    })
+    .when('/dev', {
+	templateUrl: 'partials/dev.html',
+	controller: 'MyDev'
     })
     .otherwise({redirectTo: '/view1'})
 }]);

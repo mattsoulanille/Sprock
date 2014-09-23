@@ -15,6 +15,7 @@
     "angular-underscore-module": "*",
     "chai": "^1.9.1",
     "angular-ui-bootstrap-bower": "~0.11.0",
-    "chai-as-promised": "~4.1.1"
+    "chai-as-promised": "~4.1.1",
+    "angular-markdown-directive": "~0.3.0"
   }
 }

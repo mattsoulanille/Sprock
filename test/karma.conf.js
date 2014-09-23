@@ -8,8 +8,12 @@ module.exports = function(config){
       'app/bower_components/angular-route/angular-route.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
       'app/bower_components/underscore/underscore.js',
+      'app/bower_components/showdown/src/showdown.js',
+      'app/bower_components/showdown/src/extensions/twitter.js',
       'app/bower_components/angular-underscore-module/angular-underscore-module.js',
       'app/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
+      'app/bower_components/angular-markdown-directive/markdown.js',
+      'app/bower_components/angular-sanitize/angular-sanitize.js',
       'app/js/**/*.js',
       'test/unit/**/*.js'
     ],

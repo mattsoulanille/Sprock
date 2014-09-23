@@ -1,0 +1,22 @@
+<div class="row">
+  <!-- http://daringfireball.net/projects/markdown/syntax -->
+  <btf-markdown>
+# Dev Hints #
+This is dangerously incomplete, but better than nothing...
+
+## Building Primer3 ##
+The `primer3` python interface library comes from
+[primer3-py](https://github.com/benpruitt/primer3-py "primer3-py on GitHub"),
+which as of this writing has some bugfixes not in the `pip` install.
+
+To build:
+ You may have to do a `make clean` in `primer3/src/libprimer3`. Then
+
+    primer3-py $ sudo python setup.py install
+    primer3-py $ python primer3_test.py
+    primer3-py $ sudo chmod a+x /Library/Python/2.7/site-packages/primer3/src/libprimer3/primer3_core
+
+*FIXME:* Build, test, install
+
+  </btf-markdown>
+</div>

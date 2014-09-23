@@ -62,6 +62,10 @@ angular.module('sprock.controllers', []).
       then(function(v) {$scope.done = true});
   }]).
 
+  controller('MyDev', ['$scope', '_', function($scope, _) {
+    $scope.done = false;
+  }]).
+
   controller('MyCtrl1', ['$scope', '$http', function($scope, $http) {
     $scope.serverError = '';
     $scope.calcN = function() {
@@ -511,4 +515,8 @@ angular.module('sprock.controllers', []).
       return $scope.soa = soa;
     };
 
+  }]).
+
+  controller('Dev', ['$scope', function($scope) {
+    $scope.done = false;
   }]);
