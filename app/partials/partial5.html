@@ -1,0 +1,119 @@
+<div class="row" style="text-align: center">
+  <div class="form-group">
+    <input type="text"
+	   ng-model="gene_name"
+	   size="14"
+	   placeholder="Gene name">
+    <span ng-hide="gene"><p> e.g. SPU_013015 or SPU_022066</p></span>
+    <span ng-show="gene"><p>is on {{gene.scaffold}} from {{gene.start}} to {{gene.end}}</p></span>
+    <span ng-show="gene">
+      <p>Start
+	<input
+	   type="number"
+	   min="0"
+	   max="{{gene.end}}"
+	   step="1000"
+	   ng-model="desired_sequence_span[0]" size="8">
+	= {{gene.start - desired_sequence_span[0]}} from {{gene.start}}
+	| {{gene.end}} = {{desired_sequence_span[1] - gene.end}} to
+	<input
+	   type="number"
+	   min="{{gene.start}}"
+	   max="1000000"
+	   step="1000"
+	   ng-model="desired_sequence_span[1]" size="8"> End
+      </p>
+    </span>
+
+    <form ng-show="gene" ng-submit="makePrimers()">
+      target span: <input type="number"
+			  ng-model="prime.target_primer_span"
+			  min="1"
+			  max="10000"
+			  placeholder="span">bp
+      minimum span: <input type="number"
+			   ng-model="prime.minimum_primer_span"
+			   min="1"
+			   max="10000"
+			   placeholder="span">bp
+      max span: <input type="number"
+		       ng-model="prime.maximum_primer_span"
+		       min="1"
+		       max="10000"
+		       placeholder="max span">bp
+      min overlap: <input type="number"
+			  ng-model="prime.minimum_overlap"
+			  min="0"
+			  max="10000"
+			  placeholder="min overlap">bp
+      fuzz: <input type="number"
+		   ng-model="prime.fuzz"
+		   min="0"
+		   max="5000"
+		   placeholder="fuzz">bp<br/>
+      <input class="btn btn-primary"
+	     type="submit"
+	     value="make primers"
+	     ng-click="angular.noop()"
+	     style="visibility:show">
+    </form>
+  </div>
+</row>
+<row>
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+    <p ng-show="gene">See it on
+      <a href="http://www.echinobase.org/Echinobase/JBrowse-1.10.9/index.html?data=data_sp&loc={{gene.scaffold}}%3A{{sequence_span_to_examine[0]}}..{{sequence_span_to_examine[1]}}&tracks=DNA%2CGLEAN%2CTranscriptome%2Ccontig%2CeBAC"
+	 target="_blank">JBrowse</a></p>
+    <accordion close-others="false">
+      <accordion-group>
+	<accordion-heading>
+	  Debugging
+	</accordion-heading>
+	desired sequence span: {{desired_sequence_span | json}}<br/>
+	primer windows: {{prime.primer_windows | json}}<br/>
+	soa.length: {{soa.length}}<br/>
+      </accordion-group>
+    </accordion>
+    <accordion ng-show="gene" close-others="false">
+      <accordion-group>
+	  <accordion-heading>
+	    Gene {{gene.name}}
+	  </accordion-heading>
+	  <pre style="text-align: left" ng-show="gene">{{gene | json}}</pre>
+      </accordion-group>
+      <accordion-group is-open="status.open">
+	<accordion-heading>
+	  Features from {{features.start}} to {{features.end}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+	</accordion-heading>
+	<pre ng-show="features">{{features | json}}</pre>
+      </accordion-group>
+    </accordion>
+  </div>
+</div>
+
+<hr/>
+<div class="col-xs-12 col-lg-12" ng-show="gene">
+  <accordion ng-show="gene">
+    <accordion-group heading="{{$index}}: {{ppp.sequence_target}}: {{ppp.primer_pair_num_returned}}" ng-repeat="ppp in primers">
+      <ul>
+	<li ng-repeat="pp in ppp.primer_pairs">
+	  left: {{pp.left.start}} {{pp.left.sequence}}, right: {{pp.right.start}} {{pp.right.sequence}}
+	</li>
+      </ul>
+    </accordion-group>
+    <accordion-group>
+      <accordion-heading>
+	Sequence from {{sequence_info.start}} to {{sequence_info.end}}
+      </accordion-heading>
+      <p>Legend:
+	<span class="seq">
+	  <span class="gene">GENE</span>
+	  <span class="transcript">TRANSCRIPT</span>
+	  <span class="exon">EXON</span>
+	</span>
+      </p>
+      <format-science sequence-objects-array="soa"></format-science>
+    </accordion-group>
+  </accordion>
+</div>
+<hr/>
