@@ -372,8 +372,9 @@ angular.module('sprock.controllers', []).
     $scope.$watch('gene', get_features);
 
     function init_desired_sequence_boundaries_from_gene() {
-      $scope.desired_sequence_span = [Math.max(0, $scope.gene.start - $scope.margin),
-					 $scope.gene.end + $scope.margin];
+      if ($scope.gene == undefined) return null;
+      return $scope.desired_sequence_span = [Math.max(0, $scope.gene.start - $scope.margin),
+				      $scope.gene.end + $scope.margin];
     };
     $scope.$watch('gene', init_desired_sequence_boundaries_from_gene);
 
