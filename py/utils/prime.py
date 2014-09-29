@@ -100,6 +100,8 @@ class PrimerMaker(object):
     """
     def __init__(self):
         self.seq_args = dict()
+        self.global_args = dict()
+        self.input_log = self.output_log = self.err_log = None
 
     def config_for(self, prime):
         # Do what you need to absorb the particulars
@@ -144,17 +146,21 @@ class PrimerMaker(object):
                 yield [left, right]
 
     def make_primers(self):
+        # See http://primer3.sourceforge.net/primer3_manual.htm
+        # A must-read on the inputs:
+        # http://greengenes.lbl.gov/cgi-bin/primer3/primer3_www_OTU_specific_help.cgi
         self.seq_args['SEQUENCE_TEMPLATE'] = self.prime.whole_sequence
-        self.seq_args['SEQUENCE_QUALITY'] = ' '.join([str(x) for x in self.prime.whole_quality])
+        self.seq_args['SEQUENCE_QUALITY'] =  self.prime.whole_quality
 
         for target in self.intervals_to_prime():
             length = target[1] - target[0]
-            self.seq_args['PRIMER_PRODUCT_SIZE_RANGE'] = str(length) + '-' + str(length + self.prime.fuzz)
-            self.seq_args['SEQUENCE_TARGET'] = str(target[0]) + ',' + str(length)
-            
-            primers = primer3.wrappers.designPrimers(self.seq_args)
-            del primers['SEQUENCE_QUALITY']
-            del primers['SEQUENCE_TEMPLATE']
+            self.seq_args['PRIMER_PRODUCT_SIZE_RANGE'] = [[length, length + self.prime.fuzz]]
+            self.seq_args['SEQUENCE_TARGET'] = [target[0], length]
+
+            primers = primer3.simulatedBindings.designPrimers(
+                self.seq_args, self.global_args,
+                input_log=self.input_log,
+                output_log=self.output_log)
 
             yield PrimerPairPossibilities(primers)
 
