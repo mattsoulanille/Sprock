@@ -13,7 +13,9 @@ class Primer(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
         try:
-            self.start, self.length = map(int, self.pos_len.split(','))
+#            self.start, self.length = map(int, self.pos_len.split(','))
+            self.start, self.length = self.pos_len
+            self.span = (self.start, self.start + self.length)
         except AttributeError:
             pass
 
@@ -164,14 +166,24 @@ class PrimerMaker(object):
         self.global_args['PRIMER_EXPLAIN_FLAG'] = 1
         try:
             self.seq_args['SEQUENCE_EXCLUDED_REGION'] \
-                = [(v[0], v[1]-v[0]) for v in self.prime.excluded_intervals]
+                = [(v[0], v[1]-v[0]) for v in self.prime.excluded_spans]
         except AttributeError:
             pass
 
         for target in self.intervals_to_prime():
-            length = target[1] - target[0]
-            self.seq_args['PRIMER_PRODUCT_SIZE_RANGE'] = [[length, length + self.prime.fuzz]]
-            self.seq_args['SEQUENCE_TARGET'] = [target[0], length]
+            #length = target[1] - target[0]
+            #self.seq_args['PRIMER_PRODUCT_SIZE_RANGE'] = [[length, length + self.prime.fuzz]]
+            #self.seq_args['SEQUENCE_TARGET'] = [target[0], length]
+
+            #The left primer must be in the region specified by <left_start>,<left_length>
+            #and the right primer must be in the region specified by <right_start>,<right_length>.
+            self.seq_args['SEQUENCE_PRIMER_PAIR_OK_REGION_LIST'] \
+                = [target[0], self.prime.fuzz,
+                   target[1] - self.prime.fuzz, self.prime.fuzz]
+
+            self.seq_args['PRIMER_PRODUCT_SIZE_RANGE'] \
+                = (target[1] - target[0] - 2*self.prime.fuzz,
+                   target[1]-target[0])
 
             primers = primer3.simulatedBindings.designPrimers(
                 self.seq_args, self.global_args,

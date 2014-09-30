@@ -69,7 +69,7 @@
 	  Debugging
 	</accordion-heading>
 	desired sequence span: {{desired_sequence_span | json}}<br/>
-	excluded intervals: {{prime.excluded_intervals | json}}<br/>
+	excluded spans: {{prime.excluded_spans | json}}<br/>
 	primer windows: {{prime.primer_windows | json}}<br/>
 	soa.length: {{soa.length}}<br/>
       </accordion-group>
@@ -94,7 +94,7 @@
 <hr/>
 <div class="col-xs-12 col-lg-12" ng-show="gene">
   <accordion ng-show="gene">
-    <accordion-group heading="{{$index}}: {{ppp.sequence_target}}: {{ppp.primer_pair_num_returned}}" ng-repeat="ppp in ppp_list">
+    <accordion-group heading="{{$index}}: {{ppp.sequence_primer_pair_ok_region_list[0]}} - {{ppp.sequence_primer_pair_ok_region_list[3]}}: {{ppp.primer_pair_num_returned}}" ng-repeat="ppp in ppp_list">
       <ul>
 	<li ng-repeat="pp in ppp.primer_pairs">
 	  left: {{pp.left.start}} {{pp.left.sequence}}, right: {{pp.right.start}} {{pp.right.sequence}}

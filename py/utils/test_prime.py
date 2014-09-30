@@ -93,18 +93,16 @@ class primeTestCase(unittest.TestCase):
         self.prime.whole_sequence = d['sequence'][:10000]
         self.prime.whole_quality = d['quality'][:10000]
         self.prime.primer_windows = [ [ 1000, 5000 ] ]
-        #with open('primer3_core_input.log', 'w') as self.maker.input_log:
-	    #with open('primer3_core_output.log', 'w') as self.maker.output_log:
         self.maker.input_log = open('primer3_core_input.log', 'w')
         self.maker.output_log = open('primer3_core_output.log', 'w')
         self.maker.err_log = open('primer3_core_err.log', 'w')
-        primers = [x for x in self.maker]
-        assert len(primers) == 3
-        assert all(isinstance(x, PrimerPairPossibilities) for x in primers)
+        ppp_list = [x for x in self.maker]
+        assert len(ppp_list) == 3
+        assert all(isinstance(x, PrimerPairPossibilities) for x in ppp_list)
 
-        assert all(len(ppp.primer_pairs) == 5 for ppp in primers)
+        assert all(len(ppp.primer_pairs) == 5 for ppp in ppp_list)
         assert all(map(lambda x: isinstance(x, PrimerPair),
-                   chain.from_iterable(ppp.primer_pairs for ppp in primers)))
+                   chain.from_iterable(ppp.primer_pairs for ppp in ppp_list)))
         assert all(map(lambda x: set(['compl_any_th',
                                       'compl_end_th',
                                       'left',
@@ -112,10 +110,10 @@ class primeTestCase(unittest.TestCase):
                                       'penalty',
                                       'product_size',
                                       'right']) - set(dir(x)) == set(),
-                   chain.from_iterable(ppp.primer_pairs for ppp in primers)))
+                   chain.from_iterable(ppp.primer_pairs for ppp in ppp_list)))
         assert all(map(lambda x: isinstance(x, Primer),
                        chain.from_iterable((pp.left, pp.right)
-                                           for ppp in primers
+                                           for ppp in ppp_list
                                            for pp in ppp.primer_pairs)))
         assert all(map(lambda x: set(['end_stability',
                                       #'explain',
@@ -130,7 +128,7 @@ class primeTestCase(unittest.TestCase):
                                       'sequence',
                                       'tm']) - set(dir(x)) == set(),
                        chain.from_iterable((pp.left, pp.right)
-                                           for ppp in primers
+                                           for ppp in ppp_list
                                            for pp in ppp.primer_pairs)))
 
 #        assert False            # to drop into pdb with --pdb switch to noestests
@@ -142,13 +140,13 @@ class primeTestCase(unittest.TestCase):
         self.maker.input_log = open('primer3_core_input.log', 'w')
         self.maker.output_log = open('primer3_core_output.log', 'w')
         self.maker.err_log = open('primer3_core_err.log', 'w')
-        primers = [x for x in self.maker]
-        assert len(primers) == 3
-        assert all(isinstance(x, PrimerPairPossibilities) for x in primers)
+        ppp_list = [x for x in self.maker]
+        assert len(ppp_list) == 3
+        assert all(isinstance(x, PrimerPairPossibilities) for x in ppp_list)
 
-        assert all(len(ppp.primer_pairs) == 5 for ppp in primers)
+        assert all(len(ppp.primer_pairs) == 5 for ppp in ppp_list)
         assert all(map(lambda x: isinstance(x, PrimerPair),
-                   chain.from_iterable(ppp.primer_pairs for ppp in primers)))
+                   chain.from_iterable(ppp.primer_pairs for ppp in ppp_list)))
         assert all(map(lambda x: set(['compl_any_th',
                                       'compl_end_th',
                                       'left',
@@ -156,10 +154,10 @@ class primeTestCase(unittest.TestCase):
                                       'penalty',
                                       'product_size',
                                       'right']) - set(dir(x)) == set(),
-                   chain.from_iterable(ppp.primer_pairs for ppp in primers)))
+                   chain.from_iterable(ppp.primer_pairs for ppp in ppp_list)))
         assert all(map(lambda x: isinstance(x, Primer),
                        chain.from_iterable((pp.left, pp.right)
-                                           for ppp in primers
+                                           for ppp in ppp_list
                                            for pp in ppp.primer_pairs)))
         assert all(map(lambda x: set(['end_stability',
                                       #'explain',
@@ -174,7 +172,7 @@ class primeTestCase(unittest.TestCase):
                                       'sequence',
                                       'tm']) - set(dir(x)) == set(),
                        chain.from_iterable((pp.left, pp.right)
-                                           for ppp in primers
+                                           for ppp in ppp_list
                                            for pp in ppp.primer_pairs)))
 
 #        assert False            # to drop into pdb with --pdb switch to noestests
