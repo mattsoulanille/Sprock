@@ -349,7 +349,7 @@ angular.module('sprock.controllers', []).
 	then(
 	  function(v) {
 	    $scope.gene = v;
-	    calc_excluded_intervals(v);
+	    calc_excluded_spans(v);
 	  },
 	  function(why) {
 	    $scope.gene = null;
@@ -357,8 +357,8 @@ angular.module('sprock.controllers', []).
     };
     $scope.$watch('gene_name', get_gene);
 
-    function calc_excluded_intervals(gene) {
-      $scope.prime.excluded_intervals =
+    function calc_excluded_spans(gene) {
+      $scope.prime.excluded_spans =
 	_.reduce(gene.exons.exons,
 		     function(memo, v) {
 		       memo.push(v);
@@ -366,11 +366,11 @@ angular.module('sprock.controllers', []).
 		     },
 		     []).
 	    sort();
-/*      $scope.prime.excluded_region = _.map($scope.excluded_intervals,
+/*      $scope.prime.excluded_region = _.map($scope.excluded_spans,
 					   function(v) {
 					     return [v[0], v[1]-v[0]]
 					   });
-/*      $scope.excluded_intervals =
+/*      $scope.excluded_spans =
 	_.chain(features.features).where({type:'exon'}).pluck('span').value();*/
     };
 
@@ -415,11 +415,28 @@ angular.module('sprock.controllers', []).
       return eachFromServer('primers', function(v) {
 	console.log(v);
 	$scope.ppp_list.push(v);
+	note_new_ppp(v);
       }, [], $scope.prime).then(function(v) {
 	$scope.ppp_list_eventually_was = v; //FIXME
       });
     };
 
+    function note_new_ppp(ppp) {
+      var si = $scope.sequence_info;
+      var soa = $scope.sequence_objects.sequenceObjectsArray;
+
+      //FIXME: refactor with add_features_to_sequence_objects()
+      var f = {type: 'primer', span: ppp.primer_pairs[0].left.span};
+
+      // Skip features that are completely outside the sequence
+      if (f.span[1] <= si.start || f.span[0] >= si.end) return;
+
+      var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
+      soa[Math.max(0, f.span[0]-si.start)][k] = f.type;
+      soa[Math.min(soa.length-1, f.span[1]-si.start)][k] = null;
+
+    };
+    
     function calc_primer_windows() {
       var gene = $scope.gene;
       var want_span = $scope.desired_sequence_span;
@@ -433,7 +450,7 @@ angular.module('sprock.controllers', []).
 		     []).
 	    sort(); */
       var t =
-	    _.reduce($scope.prime.excluded_intervals,
+	    _.reduce($scope.prime.excluded_spans,
 		     function(memo, v) {
 		       _.last(memo).push(v[0]);
 		       memo.push([v[1]]);
