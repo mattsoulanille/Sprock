@@ -59,9 +59,11 @@ class PrimerPairPossibilities(object):
     """From the output of primer3, create a list of PrimerPair objects"""
     def __init__(self, primer3_design, **kwargs):
         self.__dict__.update(kwargs)
-        self.primer3_design = primer3_design
+        p3d = dict((k,v) for k,v in primer3_design.items() \
+                   if k not in ['SEQUENCE_QUALITY',
+                                'SEQUENCE_TEMPLATE'])
         self.primer_pair_numbers = sorted(set(v[2] for v in (k.split('_') \
-                                                             for k in primer3_design.keys()) \
+                                                             for k in p3d.keys()) \
                                               if len(v) >= 3 and v[2].isdigit()))
         def primer_rank(s):
             """Return the part of a primer3 return value key that
@@ -73,18 +75,26 @@ class PrimerPairPossibilities(object):
                 return -1
 
         grouped_keys = list((k, set(g)) for k,g in \
-                            groupby(sorted(primer3_design.keys(), key=primer_rank), primer_rank))
+                            groupby(sorted(p3d.keys(), key=primer_rank), primer_rank))
         if grouped_keys[0][0] == -1:
             unnumbered_keys = grouped_keys.pop(0)[1]
         else:
             unnumbered_keys = set()
 
-        self.primer_pairs = list(PrimerPair(dict((k, primer3_design[k]) \
+        self.primer_pairs = list(PrimerPair(dict((k, p3d[k]) \
                                                  for k in kst[1].union(unnumbered_keys)))
                                  for kst in grouped_keys)
 
-        self.__dict__.update(dict((k.lower(), primer3_design[k]) \
+        self.__dict__.update(dict((k.lower(), p3d[k]) \
                                   for k in unnumbered_keys))
+        try:
+            self.sequence_quality_length = len(primer3_design['SEQUENCE_QUALITY'])
+        except KeyError:
+            pass
+        try:
+            self.sequence_template_length = len(primer3_design['SEQUENCE_TEMPLATE'])
+        except KeyError:
+            pass
         
 
 class PrimerMaker(object):
@@ -149,8 +159,14 @@ class PrimerMaker(object):
         # See http://primer3.sourceforge.net/primer3_manual.htm
         # A must-read on the inputs:
         # http://greengenes.lbl.gov/cgi-bin/primer3/primer3_www_OTU_specific_help.cgi
-        self.seq_args['SEQUENCE_TEMPLATE'] = self.prime.whole_sequence
-        self.seq_args['SEQUENCE_QUALITY'] =  self.prime.whole_quality
+        self.seq_args['SEQUENCE_TEMPLATE'] = self.prime.whole_sequence[:100000] # DEBUG
+        self.seq_args['SEQUENCE_QUALITY'] = self.prime.whole_quality[:100000] # DEBUG
+        self.global_args['PRIMER_EXPLAIN_FLAG'] = 1
+        try:
+            self.seq_args['SEQUENCE_EXCLUDED_REGION'] \
+                = [(v[0], v[1]-v[0]) for v in self.prime.excluded_intervals]
+        except AttributeError:
+            pass
 
         for target in self.intervals_to_prime():
             length = target[1] - target[0]

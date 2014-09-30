@@ -349,6 +349,7 @@ angular.module('sprock.controllers', []).
 	then(
 	  function(v) {
 	    $scope.gene = v;
+	    calc_excluded_intervals(v);
 	  },
 	  function(why) {
 	    $scope.gene = null;
@@ -356,8 +357,25 @@ angular.module('sprock.controllers', []).
     };
     $scope.$watch('gene_name', get_gene);
 
+    function calc_excluded_intervals(gene) {
+      $scope.prime.excluded_intervals =
+	_.reduce(gene.exons.exons,
+		     function(memo, v) {
+		       memo.push(v);
+		       return memo;
+		     },
+		     []).
+	    sort();
+/*      $scope.prime.excluded_region = _.map($scope.excluded_intervals,
+					   function(v) {
+					     return [v[0], v[1]-v[0]]
+					   });
+/*      $scope.excluded_intervals =
+	_.chain(features.features).where({type:'exon'}).pluck('span').value();*/
+    };
+
     function get_features() {
-      // NOTE: Restricted to just the gene's span
+      // NOTE: Restricted to just the gene's span! 
       if ($scope.gene == undefined) return null;
       var gene = $scope.gene;
       var want_span = [$scope.gene.start, $scope.gene.end];
@@ -391,20 +409,21 @@ angular.module('sprock.controllers', []).
     $scope.$watch('desired_sequence_span', get_sequence);
 
     $scope.makePrimers = function() {
-      $scope.primers = [];
+      $scope.ppp_list = [];
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
 	console.log(v);
-	$scope.primers.push(v);	//FIXME: RETURNS PrimerPairPossibilities I think
+	$scope.ppp_list.push(v);
       }, [], $scope.prime).then(function(v) {
-	$scope.primers_eventually_was = v; //FIXME
+	$scope.ppp_list_eventually_was = v; //FIXME
       });
     };
 
     function calc_primer_windows() {
       var gene = $scope.gene;
       var want_span = $scope.desired_sequence_span;
+/*
       var exon_spans =
 	    _.reduce(gene.exons.exons,
 		     function(memo, v) {
@@ -412,9 +431,9 @@ angular.module('sprock.controllers', []).
 		       return memo;
 		     },
 		     []).
-	    sort();
+	    sort(); */
       var t =
-	    _.reduce(exon_spans,
+	    _.reduce($scope.prime.excluded_intervals,
 		     function(memo, v) {
 		       _.last(memo).push(v[0]);
 		       memo.push([v[1]]);
