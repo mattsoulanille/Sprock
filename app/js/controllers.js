@@ -406,7 +406,7 @@ angular.module('sprock.controllers', []).
 	  return $scope.sequence_info = v;
 	});
     };
-    $scope.$watch('desired_sequence_span', get_sequence);
+    $scope.$watch('desired_sequence_span', get_sequence, true);
 
     $scope.makePrimers = function() {
       $scope.ppp_list = [];
@@ -425,18 +425,19 @@ angular.module('sprock.controllers', []).
       var si = $scope.sequence_info;
       var soa = $scope.sequence_objects.sequenceObjectsArray;
 
-      //FIXME: refactor with add_features_to_sequence_objects()
-      var f = {type: 'primer', span: ppp.primer_pairs[0].left.span};
+      _.each(ppp.primer_pairs, function(pp) {
+	//FIXME: refactor along with add_features_to_sequence_objects()
+	var f = {type: 'primer', span: pp.left.span};
 
-      // Skip features that are completely outside the sequence
-      if (f.span[1] <= si.start || f.span[0] >= si.end) return;
+	// Skip features that are completely outside the sequence
+	if (f.span[1] <= si.start || f.span[0] >= si.end) return;
 
-      var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
-      soa[Math.max(0, f.span[0]-si.start)][k] = f.type;
-      soa[Math.min(soa.length-1, f.span[1]-si.start)][k] = null;
-
+	var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
+	soa[Math.max(0, f.span[0]-si.start)][k] = f.type;
+	soa[Math.min(soa.length-1, f.span[1]-si.start)][k] = null;
+      });
     };
-    
+
     function calc_primer_windows() {
       var gene = $scope.gene;
       var want_span = $scope.desired_sequence_span;
