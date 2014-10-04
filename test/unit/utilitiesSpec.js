@@ -16,14 +16,17 @@ describe('service', function() {
   beforeEach(module('sprock.utilities'));
 
   describe('underscore each()', function() {
+
     it('should exist', inject(function(_) {
       expect(_.each).toBeDefined();
     }));
+
     it('should go through an array in order', inject(function(_) {
       var cat = '';
       _.each([1,2,3,4,5], function(e) { cat += e })
       expect(cat).toEqual('12345');
     }));
+
     it('should go through an array in order when elements added out of order',
        // http://ecma-international.org/ecma-262/5.1/#sec-15.4.4.18
        inject(function(_) {
@@ -34,6 +37,228 @@ describe('service', function() {
 	 expect(cat).toEqual('12345');
        }));
   });
+
+
+  describe('_.walk', function() {
+    var nonTrivialTree;
+
+    beforeEach(function() {
+      nonTrivialTree = {
+        "children": [
+            {
+                "children": [
+                    {
+                        "children": [],
+                        "name": "SPU_022066_3UTR:0\"",
+                        "scaffold": "Scaffold694",
+                        "span": [
+                            10480,
+                            10513
+                        ],
+                        "strand": "-",
+                        "type": "three_prime_UTR"
+                    },
+                    {
+                        "children": [],
+                        "name": "SPU_022066:0\"",
+                        "scaffold": "Scaffold694",
+                        "span": [
+                            10514,
+                            10683
+                        ],
+                        "strand": "-",
+                        "type": "exon"
+                    },
+                    {
+                        "children": [],
+                        "name": "SPU_022066:1\"",
+                        "scaffold": "Scaffold694",
+                        "span": [
+                            11406,
+                            11633
+                        ],
+                        "strand": "-",
+                        "type": "exon"
+                    },
+                    {
+                        "children": [],
+                        "name": "SPU_022066:2\"",
+                        "scaffold": "Scaffold694",
+                        "span": [
+                            11875,
+                            11997
+                        ],
+                        "strand": "-",
+                        "type": "exon"
+                    },
+                    {
+                        "children": [],
+                        "name": "SPU_022066:3\"",
+                        "scaffold": "Scaffold694",
+                        "span": [
+                            12713,
+                            12826
+                        ],
+                        "strand": "-",
+                        "type": "exon"
+                    },
+                    {
+                        "children": [],
+                        "name": "SPU_022066:4\"",
+                        "scaffold": "Scaffold694",
+                        "span": [
+                            13329,
+                            13541
+                        ],
+                        "strand": "-",
+                        "type": "exon"
+                    },
+                    {
+                        "children": [],
+                        "name": "SPU_022066:5\"",
+                        "scaffold": "Scaffold694",
+                        "span": [
+                            14180,
+                            14538
+                        ],
+                        "strand": "-",
+                        "type": "exon"
+                    },
+                    {
+                        "children": [],
+                        "name": "SPU_022066:6\"",
+                        "scaffold": "Scaffold694",
+                        "span": [
+                            17988,
+                            18337
+                        ],
+                        "strand": "-",
+                        "type": "exon"
+                    }
+                ],
+                "name": "Sp-Shmt2_1",
+                "scaffold": "Scaffold694",
+                "span": [
+                    10480,
+                    18337
+                ],
+                "strand": "-",
+                "type": "transcript"
+            }
+        ],
+        "name": "SPU_022066",
+        "scaffold": "Scaffold694",
+        "span": [
+            10480,
+            18337
+        ],
+        "strand": "-",
+        "type": "gene"
+      };
+    });
+
+    it('should be a function', inject(function(_) {
+      expect(_.walk).toBeFunction();
+    }));
+
+    it('should traverse simple nested arrays', inject(function(_) {
+      var result = [];
+      expect(_.walk.preorder).toBeFunction();
+      var t = [1];
+      _.walk.preorder(t, function(v) {
+	result.push(JSON.stringify(v));
+      });
+      expect(result).toEqual([ '[1]', '1' ]);
+      expect(_.walk.preorder).toBeFunction();
+      expect(_.walk.map(t, _.walk.preorder, function(v) {
+	return JSON.stringify(v);
+      })).toEqual([ '[1]', '1' ]);
+    }));
+
+    it('should traverse nested arrays', inject(function(_) {
+      var t = [1, [2, 3], 4, [5], [6, [7, 8], 9]];
+
+      expect(_.walk.map(t, _.walk.preorder, function(v) {
+	return JSON.stringify(v);
+      })).toEqual([ '[1,[2,3],4,[5],[6,[7,8],9]]',
+		    '1',
+		    '[2,3]',
+		    '2',
+		    '3',
+		    '4',
+		    '[5]',
+		    '5',
+		    '[6,[7,8],9]',
+		    '6',
+		    '[7,8]',
+		    '7',
+		    '8',
+		    '9' ]);
+
+      expect(_.walk.map(t, _.walk.postorder, function(v) {
+	return JSON.stringify(v);
+      })).toEqual([ '1',
+		    '2',
+		    '3',
+		    '[2,3]',
+		    '4',
+		    '5',
+		    '[5]',
+		    '6',
+		    '7',
+		    '8',
+		    '[7,8]',
+		    '9',
+		    '[6,[7,8],9]',
+		    '[1,[2,3],4,[5],[6,[7,8],9]]' ]);
+
+      expect(_.walk.reduce(t, function(memo, v) {
+	return memo + '<' + JSON.stringify(v) + '>';
+      }, 'leaf')).
+	toEqual('leaf<1>,leaf<2>,leaf<3><[2,3]>,leaf<4>,leaf<5><[5]>,leaf<6>,leaf<7>,leaf<8><[7,8]>,leaf<9><[6,[7,8],9]><[1,[2,3],4,[5],[6,[7,8],9]]>'); // why the commas?
+
+      var leaf = {};		// to indicate a leaf
+      expect(_.walk.reduce(t, function(memo, v) {
+	if (memo == leaf) {
+	  return v;
+	} else {
+	  return _.reduce(memo, function(m, x) {
+	    return m + x;
+	  }, 0);
+	};
+      }, leaf)).
+	toEqual(45);
+
+      expect(_.walk.reduce(t, function(memo, v) {
+	if (memo == leaf) {
+	  return v;
+	} else {
+	  return '(' + memo.join() + ')';
+	};
+      }, leaf)).
+	toEqual('(1,(2,3),4,(5),(6,(7,8),9))');
+
+      expect(_.walk(function(obj) {
+	return _.has(obj, 'children') || _.isElement(obj) ? obj.children : obj;
+	//return obj.children;	//also works here
+      }).reduce(nonTrivialTree, function(memo, v) {
+	if (memo == leaf) {
+	  return v.type;
+	} else {
+	  return '(' +
+	    v.type + ':' +
+	    _.reduce(memo, function(m, v) {
+	      return m + ',' + v;
+	    }) +
+	    ')';
+	};
+      }, leaf)).
+	toEqual('(gene:(transcript:three_prime_UTR,exon,exon,exon,exon,exon,exon,exon))');
+
+    }));
+
+  });
+
 
   describe('compareSpans', function() {
     var s1, s2;
@@ -329,7 +554,7 @@ describe('service', function() {
 					      {type: 'q5', span: [1,2], data: 'M'}]}
 				   ]}
 		      ]};
-		       
+
     }));
 
   });

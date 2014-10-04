@@ -8,6 +8,7 @@ module.exports = function(config){
       'app/bower_components/angular-route/angular-route.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
       'app/bower_components/underscore/underscore.js',
+      'app/bower_components/underscore-contrib/underscore.collections.walk.js',
       'app/bower_components/showdown/src/showdown.js',
       'app/bower_components/showdown/src/extensions/twitter.js',
       'app/bower_components/angular-underscore-module/angular-underscore-module.js',
