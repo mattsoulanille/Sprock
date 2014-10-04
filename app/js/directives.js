@@ -36,6 +36,57 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 			};
 		      }]).
 
+  directive('formatTree',
+	    ['_',
+	     function factory(_) {
+	       var directiveDefinitionObject = {
+		 //template: '<div></div>', // or // function(tElement, tAttrs) { ... },
+		 restrict: 'E',
+
+		 scope: {
+		   tree: '=',
+		 },
+
+		 link: function postLink(scope, iElement, iAttrs, controller) {
+		   var spins = 0;
+
+		   function updateTreeDisplay() {
+		     iElement.empty();
+		     iElement.append('<h3>format-tree</h3>');
+
+		     // An object used to flag a leaf
+		     var leaf = {};
+
+		     // Walk the tree and create the corresponding DOM tree of spans
+		     var r = _.walk(function(obj) {
+		       //return _.has(obj, 'children') || _.isElement(obj) ? obj.children : obj; // works but unnecessarily complex
+		       return obj.children;
+		     }).reduce(
+		       scope.tree, function(memo, v) {
+			 var e = angular.element('<span class="' +
+						    v.type +
+						    '"></span>');
+			 e.data('span', v.span.slice(0));
+			 if (memo == leaf) {
+			   e.append(v.name);
+			 } else {
+			   //_.each(memo, e.append);
+			   _.each(memo, function(v) {
+			     e.append(v);
+			   });
+			 };
+			 return e;
+		       }, leaf);
+
+		     iElement.append(r);
+		   };
+		   scope.$watch('tree', updateTreeDisplay);
+
+		 }
+	       };
+	       return directiveDefinitionObject;
+	       }]).
+
   directive('formatScience',
 	    ['_', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents',
 	     function factory(_, differentiateSequenceToEvents, integrateSequenceEventsToHTML, convertFeaturesToEvents ) {
@@ -44,19 +95,22 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		 restrict: 'E',
 
 		 scope: {
-		   sequenceObjectsArray: '='
+		   sequenceObjectsArray: '=',
+		   tickleCounter: '='
 		 },
 
 		 link: function postLink(scope, iElement, iAttrs, controller) { 
+		   var spins = 0;
 		   function updateSequenceDisplay() {
 		     iElement.empty();
 		     iElement.append('<h3>format-science</h3>');
 		     if (scope.sequenceObjectsArray) {
 		       iElement.append(render_to_html(scope.sequenceObjectsArray));
+		       //iElement.append('<p>' + ++spins + 'spins</p>');
 		     };
 		   };
-
 		   scope.$watch('sequenceObjectsArray', updateSequenceDisplay);
+		   scope.$watch('tickleCounter', updateSequenceDisplay);
 
 		   function render_to_html(soa) {
 		     var rv = '<span class="seq">'; // it's all a sequence
