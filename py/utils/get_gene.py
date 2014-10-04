@@ -84,7 +84,7 @@ class GeneDB(object):
                  map(self.get_tree_by_name,
                      (v['Name'][0] for v in self.db().children(self.id(name), 1))) }
 
-    def get_tree_data_by_name(self, name):
+    def get_tree_data_by_name(self, name, relative_positions=False):
         """returns a tree of data of features that are descendents of name"""
         tree = self.get_tree_by_name(name)
         def datify(d):
@@ -116,7 +116,8 @@ class GeneDB(object):
 
         rv = datify(tree)
         children_sort(rv)
-        children_relative_span(rv, 0)
+        if relative_positions:
+            children_relative_span(rv, 0)
         return rv
 
 

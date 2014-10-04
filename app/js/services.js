@@ -124,7 +124,8 @@ angular.module('sprock.services', ['sprock.utilities']).
   factory('data_getTree_test', ['$http', function($http) {
     return function() {
       var expect = chai.expect;
-      return expect($http.post('/data/getTree', {name: 'SPU_022066'})).
+      return expect($http.post('/data/getTree', {name: 'SPU_022066',
+						relative_positions: true})).
 	to.be.fulfilled.then(function(v) {
 	  //console.log(v);
 	  expect(v).to.have.property('data').property('results');
@@ -203,9 +204,9 @@ angular.module('sprock.services', ['sprock.utilities']).
 
   factory('getTree', ['$http', '$q', 'SequenceInfo',
 			 function($http, $q, SequenceInfo) {
-    return function (name, margin) {
+    return function (name, relative_positions) {
       var deferred = $q.defer();
-      $http.post('/data/getTree', {name: name}).
+      $http.post('/data/getTree', {name: name, relative_positions: relative_positions}).
 	success(function (v) {
 	  var results = v['results']
 	  deferred.resolve(results);

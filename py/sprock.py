@@ -123,8 +123,10 @@ class DataService(object):
         #curl -i -X POST -H "Content-Type: application/json" -d '{"name":"SPU_022066"}' 'http://localhost:8082/data/getTree'
         argd = cherrypy.request.json
         name = argd['name']
+        relative_positions = 'relative_positions' in argd and argd['relative_positions']
         return ({ 'request': argd,
-                  'results': self.gene_db.get_tree_data_by_name(name) })
+                  'results': self.gene_db.get_tree_data_by_name( \
+                                    name, relative_positions = relative_positions)})
 
 
     @cherrypy.expose
@@ -136,7 +138,7 @@ class DataService(object):
         scaffold = argd['scaffold']
         start = int(argd['start'])
         end = int(argd['end'])
-        completely_within = argd['completely_within']
+        completely_within = 'completely_within' in argd and argd['completely_within']
         kwargs = 'kwargs' in argd and argd['kwargs'] or {}
         features = self.gene_db.get_features_data_by_interval(scaffold, start, end, **kwargs)
         return {
