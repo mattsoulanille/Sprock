@@ -45,6 +45,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 
 		 scope: {
 		   tree: '=',
+		   sequenceInfo: '='
 		 },
 
 		 link: function postLink(scope, iElement, iAttrs, controller) {
@@ -54,13 +55,17 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     iElement.empty();
 		     iElement.append('<h3>format-tree</h3>');
 
+		     if (!scope.tree) return;
+
+		     var r = angular.element('<span class="seq"></span>');
+
 		     // An object used to flag a leaf
 		     var leaf = {};
 
 		     // Walk the tree and create the corresponding DOM tree of spans
-		     var r = _.walk(function(obj) {
-		       //return _.has(obj, 'children') || _.isElement(obj) ? obj.children : obj; // works but unnecessarily complex
-		       return obj.children;
+		     var treeForDOM = _.walk(function(obj) {
+		       return _.has(obj, 'children') || _.isElement(obj) ? obj.children : obj;
+		       //return obj.children;
 		     }).reduce(
 		       scope.tree, function(memo, v) {
 			 var e = angular.element('<span class="' +
@@ -78,6 +83,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 			 return e;
 		       }, leaf);
 
+		     r.append(treeForDOM);
 		     iElement.append(r);
 		   };
 		   scope.$watch('tree', updateTreeDisplay);

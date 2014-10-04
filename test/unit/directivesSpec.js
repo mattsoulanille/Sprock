@@ -184,113 +184,86 @@ describe('directives', function() {
 
     beforeEach(function() {
       a_tree = {
+        "name": "SPU_022066",
+        "scaffold": "Scaffold694",
+        "span": [10480, 18337],
+        "strand": "-",
+        "type": "gene",
         "children": [
           {
+            "name": "Sp-Shmt2_1",
+            "scaffold": "Scaffold694",
+            "span": [10480, 18337],
+            "strand": "-",
+            "type": "transcript",
             "children": [
               {
-                "children": [], 
-                "name": "SPU_022066_3UTR:0\"", 
-                "scaffold": "Scaffold694", 
-                "span": [10480, 10513], 
-                "strand": "-", 
+                "children": [],
+                "name": "SPU_022066_3UTR:0\"",
+                "scaffold": "Scaffold694",
+                "span": [10480, 10513],
+                "strand": "-",
                 "type": "three_prime_UTR"
-              }, 
+              },
               {
-                "children": [], 
-                "name": "SPU_022066:0\"", 
-                "scaffold": "Scaffold694", 
-                "span": [
-                  10514, 
-                  10683
-                ], 
-                "strand": "-", 
+                "children": [],
+                "name": "SPU_022066:0\"",
+                "scaffold": "Scaffold694",
+                "span": [10514, 10683],
+                "strand": "-",
                 "type": "exon"
-              }, 
+              },
               {
-                "children": [], 
-                "name": "SPU_022066:1\"", 
-                "scaffold": "Scaffold694", 
-                "span": [
-                  11406, 
-                  11633
-                ], 
-                "strand": "-", 
+                "children": [],
+                "name": "SPU_022066:1\"",
+                "scaffold": "Scaffold694",
+                "span": [11406, 11633],
+                "strand": "-",
                 "type": "exon"
-              }, 
+              },
               {
-                "children": [], 
-                "name": "SPU_022066:2\"", 
-                "scaffold": "Scaffold694", 
-                "span": [
-                  11875, 
-                  11997
-                ], 
-                "strand": "-", 
+                "children": [],
+                "name": "SPU_022066:2\"",
+                "scaffold": "Scaffold694",
+                "span": [11875, 11997],
+                "strand": "-",
                 "type": "exon"
-              }, 
+              },
               {
-                "children": [], 
-                "name": "SPU_022066:3\"", 
-                "scaffold": "Scaffold694", 
-                "span": [
-                  12713, 
-                  12826
-                ], 
-                "strand": "-", 
+                "children": [],
+                "name": "SPU_022066:3\"",
+                "scaffold": "Scaffold694",
+                "span": [12713, 12826],
+                "strand": "-",
                 "type": "exon"
-              }, 
+              },
               {
-                "children": [], 
-                "name": "SPU_022066:4\"", 
-                "scaffold": "Scaffold694", 
-                "span": [
-                  13329, 
-                  13541
-                ], 
-                "strand": "-", 
+                "children": [],
+                "name": "SPU_022066:4\"",
+                "scaffold": "Scaffold694",
+                "span": [13329, 13541],
+                "strand": "-",
                 "type": "exon"
-              }, 
+              },
               {
-                "children": [], 
-                "name": "SPU_022066:5\"", 
-                "scaffold": "Scaffold694", 
-                "span": [
-                  14180, 
-                  14538
-                ], 
-                "strand": "-", 
+                "children": [],
+                "name": "SPU_022066:5\"",
+                "scaffold": "Scaffold694",
+                "span": [14180, 14538],
+                "strand": "-",
                 "type": "exon"
-              }, 
+              },
               {
-                "children": [], 
-                "name": "SPU_022066:6\"", 
-                "scaffold": "Scaffold694", 
-                "span": [
-                  17988, 
-                  18337
-                ], 
-                "strand": "-", 
+                "children": [],
+                "name": "SPU_022066:6\"",
+                "scaffold": "Scaffold694",
+                "span": [17988, 18337],
+                "strand": "-",
                 "type": "exon"
               }
-            ], 
-            "name": "Sp-Shmt2_1", 
-            "scaffold": "Scaffold694", 
-            "span": [
-              10480, 
-              18337
-            ], 
-            "strand": "-", 
-            "type": "transcript"
+            ]
           }
-        ], 
-        "name": "SPU_022066", 
-        "scaffold": "Scaffold694", 
-        "span": [
-          10480, 
-          18337
-        ], 
-        "strand": "-", 
-        "type": "gene"
+        ]
       };
     });
 
@@ -314,22 +287,30 @@ describe('directives', function() {
 		  children: []
 		 };
       expect(fs(tree)).
-	toBe(header+'<span class="bitty">root</span>');
+	toBe(header+'<span class="seq"><span class="bitty">root</span></span>');
+    });
+
+    it('should deal gracefully with null', function() {
+      var tree = null;
+      expect(fs(tree)).
+	toBe(header);
     });
 
     it('should make a tree in the DOM', function() {
       expect(fs(a_tree)).
 	toBe(header +
-	     '<span class="gene">' +
-	       '<span class="transcript">' +
-	         '<span class="three_prime_UTR">SPU_022066_3UTR:0"</span>' +
-	         '<span class="exon">SPU_022066:0"</span>' +
-		 '<span class="exon">SPU_022066:1"</span>' +
-		 '<span class="exon">SPU_022066:2"</span>' +
-		 '<span class="exon">SPU_022066:3"</span>' +
-		 '<span class="exon">SPU_022066:4"</span>' +
-		 '<span class="exon">SPU_022066:5"</span>' +
-		 '<span class="exon">SPU_022066:6"</span>' +
+	     '<span class="seq">' +
+	       '<span class="gene">' +
+	         '<span class="transcript">' +
+	           '<span class="three_prime_UTR">SPU_022066_3UTR:0"</span>' +
+	           '<span class="exon">SPU_022066:0"</span>' +
+		   '<span class="exon">SPU_022066:1"</span>' +
+		   '<span class="exon">SPU_022066:2"</span>' +
+		   '<span class="exon">SPU_022066:3"</span>' +
+		   '<span class="exon">SPU_022066:4"</span>' +
+		   '<span class="exon">SPU_022066:5"</span>' +
+		   '<span class="exon">SPU_022066:6"</span>' +
+	         '</span>' +
 	       '</span>' +
 	     '</span>');
 
