@@ -28,6 +28,15 @@ describe('service', function() {
     }));
   });
 
+  describe('getTree', function() {
+    it('should be a function', inject(function(getTree) {
+      expect(getTree).toBeFunction();
+    }));
+    it('should return a promise', inject(function(getTree) {
+      expect(getTree()).toBeAPromise();
+    }));
+  });
+
   describe('getSeqInfo', function() {
     it('should be a function', inject(function(getSeqInfo) {
       expect(getSeqInfo).toBeFunction();

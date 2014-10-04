@@ -18,4 +18,17 @@ describe('controllers', function(){
 
   });
 
+  describe('Dev', function() {
+    var myCtrl5;
+
+    beforeEach(inject(function($controller, $rootScope) {
+      myCtrl5 = $controller('Dev', {$scope: $rootScope});
+    }));
+
+    it('should exist', function() {
+      expect(myCtrl5).toBeDefined();
+    });
+
+  });
+
 });

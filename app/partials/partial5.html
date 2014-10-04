@@ -93,7 +93,7 @@
 
 <hr/>
 <div class="col-xs-12 col-lg-12" ng-show="gene">
-  <accordion ng-show="gene">
+  <accordion ng-show="gene" close-others="false">
     <accordion-group heading="{{$index}}: {{ppp.sequence_primer_pair_ok_region_list[0]}} - {{ppp.sequence_primer_pair_ok_region_list[2]}}: {{ppp.primer_pair_num_returned}}" ng-repeat="ppp in ppp_list">
       <ul>
 	<li ng-repeat="pp in ppp.primer_pairs">
@@ -112,7 +112,8 @@
 	  <span class="exon">EXON</span>
 	</span>
       </p>
-      <format-science sequence-objects-array="soa"></format-science>
+      <p>soa_tickle_counter is {{soa_tickle_counter}}</p>
+      <format-science sequence-objects-array="soa" tickle-counter="soa_tickle_counter"></format-science>
     </accordion-group>
   </accordion>
 </div>

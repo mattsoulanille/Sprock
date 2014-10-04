@@ -49,6 +49,18 @@
     font-style: italic;
 }
 
+.left-primer {
+  background: #ffbbbb;
+}
+
+.right-primer {
+  background: #bbffbb;
+}
+
+.primer-product-0 {
+  font-style: bold;
+}
+
 .q0 {
   color: #ececec;
 }

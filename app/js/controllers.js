@@ -3,7 +3,7 @@
 /* Controllers */
 angular.module('sprock.controllers', []).
 
-  controller('Tester1', ['$scope', '$injector', function($scope, $injector) {
+  controller('Tester1', ['_', '$scope', '$injector', function(_, $scope, $injector) {
     var expect = chai.expect;
     var test_names = ['eachFromServer_test',
 		      'data_muks_test',
@@ -334,6 +334,7 @@ angular.module('sprock.controllers', []).
       minimum_overlap: 1000,
       fuzz: 500
     };
+    $scope.soa_tickle_counter = 0;
 //    $scope.status = {open: false}; //FIXME: is this needed?
 
     // DEBUGGING h&w:
@@ -406,7 +407,7 @@ angular.module('sprock.controllers', []).
 	  return $scope.sequence_info = v;
 	});
     };
-    $scope.$watch('desired_sequence_span', get_sequence, true);
+    $scope.$watchCollection('desired_sequence_span', get_sequence);
 
     $scope.makePrimers = function() {
       $scope.ppp_list = [];
@@ -415,19 +416,39 @@ angular.module('sprock.controllers', []).
       return eachFromServer('primers', function(v) {
 	console.log(v);
 	$scope.ppp_list.push(v);
-	note_new_ppp(v);
+	note_new_ppp(v, $scope.ppp_list.length);
       }, [], $scope.prime).then(function(v) {
 	$scope.ppp_list_eventually_was = v; //FIXME
       });
     };
 
-    function note_new_ppp(ppp) {
+    function enter_feature_in_sequence_objects_array(type, span) {
       var si = $scope.sequence_info;
       var soa = $scope.sequence_objects.sequenceObjectsArray;
 
-      _.each(ppp.primer_pairs, function(pp) {
-	//FIXME: refactor along with add_features_to_sequence_objects()
-	var f = {type: 'primer', span: pp.left.span};
+      // Skip features that are completely outside the sequence
+      if (span[1] <= si.start || span[0] >= si.end) return;
+
+      var k = {gene:'g', transcript:'t', exon:'x'}[type] || type;
+      soa[Math.max(0, span[0]-si.start)][k] = type;
+      soa[Math.min(soa.length-1, span[1]-si.start)][k] = null;
+    };
+
+    function note_new_ppp(ppp, which) {
+      var si = $scope.sequence_info;
+      var soa = $scope.sequence_objects.sequenceObjectsArray;
+
+      //_.each(ppp.primer_pairs, function(pp) {
+      if (ppp.primer_pair_num_returned > 0) {
+	var pp = ppp.primer_pairs[0];
+
+	enter_feature_in_sequence_objects_array('left-primer', pp.left.span);
+	enter_feature_in_sequence_objects_array('right-primer', pp.right.span);
+	enter_feature_in_sequence_objects_array('primer-product-' + which,
+						[pp.left.span[0], pp.right.span[1]]);
+/*
+	//FIXME: REFACTOR along with add_features_to_sequence_objects()
+        var f = {type: 'left-primer', span: pp.left.span};
 
 	// Skip features that are completely outside the sequence
 	if (f.span[1] <= si.start || f.span[0] >= si.end) return;
@@ -435,7 +456,19 @@ angular.module('sprock.controllers', []).
 	var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
 	soa[Math.max(0, f.span[0]-si.start)][k] = f.type;
 	soa[Math.min(soa.length-1, f.span[1]-si.start)][k] = null;
-      });
+
+	var f = {type: 'right-primer', span: pp.right.span};
+
+	// Skip features that are completely outside the sequence
+	if (f.span[1] <= si.start || f.span[0] >= si.end) return;
+
+	var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
+	soa[Math.max(0, f.span[0]-si.start)][k] = f.type;
+	soa[Math.min(soa.length-1, f.span[1]-si.start)][k] = null;
+*/
+	// Let the world know we've changed the sequenceObjectsArray
+	$scope.soa_tickle_counter++;
+      };
     };
 
     function calc_primer_windows() {
@@ -555,6 +588,8 @@ angular.module('sprock.controllers', []).
 
   }]).
 
-  controller('Dev', ['$scope', function($scope) {
+  controller('Dev', ['_', '$scope', 'getTree', function(_, $scope, getTree) {
     $scope.done = false;
+
+
   }]);

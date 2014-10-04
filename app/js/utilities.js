@@ -358,4 +358,19 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	  })};
 
     return gsi;
+  }]).
+
+  factory('MessAround', ['_', function(_) {
+
+    function fooey(a, b) {
+      this.a = a;
+      return this;
+    };
+
+    fooey.prototype.getSmart =
+      function() {
+	return this.a;
+      };
+
+    return fooey;
   }]);
