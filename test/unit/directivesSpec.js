@@ -158,27 +158,14 @@ describe('directives', function() {
 		 {b: 'A', q: 90, foo: null},
 		 {b: 'T', q: 90, bar: null},
 		];
-      expect(fs(soa)).
-	toBe(header +
-	     '<span class="seq">' +
-	       '<span class="foo">' +
-	         '<span class="q90">A</span>' +
-		 '<span class="q45">T</span>' +
-	       '</span>' +
-	       '<span class="foo bar">' +
-	         '<span class="q90">CG</span>' +
-	       '</span>' +
-	       '<span class="bar">' +
-	         '<span class="q90">A</span>' +
-	       '</span>' +
-	       '<span class="q90">T</span>' +
-	     '</span>');
+      expect(fs(soa)).toBe('something that works');
     });
 
   });
 
   describe('formatTree', function() {
-    var header = '<h3>format-tree</h3>';
+    //var header = '<h3>format-tree</h3>';
+    var header = '';
     var si;
     var a_tree;
 
@@ -346,30 +333,40 @@ describe('directives', function() {
 
       expect(fs(tree, seqInfo)).
 	toBe(header +
-
-             '<span class="seq">' +
-               '<span class="gene">' +
-                 '<span class="seqFrag">' +
-                   '<span class="q7">GH</span>' +
-                 '</span>' +
-                 '<span class="exon" data-name="foo">' +
-                   '<span class="seqFrag">' +
-             	'<span class="q9">IJ</span>' +
-             	'<span class="q11">K</span>' +
-                   '</span>' +
-                 '</span>' +
-                 '<span class="seqFrag">' +
-                   '<span class="q11">L</span>' +
-                   '<span class="q13">MN</span>' +
-                 '</span>' +
-                 '<span class="exon" data-name="bar">' +
-                   '<span class="seqFrag">' +
-             	'<span class="q15">OP</span>' +
-             	'<span class="q17">QR</span>' +
-                   '</span>' +
-                 '</span>' +
-               '</span>' +
-             '</span>');
+	     '<span class="seq">' +
+	       '<span class="seqFrag">' +
+	         '<span class="q1">AB</span>' +
+	         '<span class="q3">CD</span>' +
+	         '<span class="q5">EF</span>' +
+	       '</span>' +
+	       '<span class="gene">' +
+	         '<span class="seqFrag">' +
+	           '<span class="q7">GH</span>' +
+	         '</span>' +
+	         '<span class="exon" data-name="foo">' +
+	           '<span class="seqFrag">' +
+	     	'<span class="q9">IJ</span>' +
+	     	'<span class="q11">K</span>' +
+	           '</span>' +
+	         '</span>' +
+	         '<span class="seqFrag">' +
+	           '<span class="q11">L</span>' +
+	           '<span class="q13">MN</span>' +
+	         '</span>' +
+	         '<span class="exon" data-name="bar">' +
+	           '<span class="seqFrag">' +
+	     	'<span class="q15">OP</span>' +
+	     	'<span class="q17">QR</span>' +
+	           '</span>' +
+	         '</span>' +
+	       '</span>' +
+	       '<span class="seqFrag">' +
+	         '<span class="q19">ST</span>' +
+	         '<span class="q21">UV</span>' +
+	         '<span class="q23">WX</span>' +
+	         '<span class="q25">YZ</span>' +
+	       '</span>' +
+	     '</span>');
     });
 
     xit('should handle a teeny case', function() {

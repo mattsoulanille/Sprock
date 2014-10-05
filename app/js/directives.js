@@ -55,7 +55,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 
 		   function updateTreeDisplay() {
 		     iElement.empty();
-		     iElement.append('<h3>format-tree</h3>');
+		     //iElement.append('<h3>format-tree</h3>');
 
 		     if (!scope.tree) return;
 
@@ -90,7 +90,6 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		   function putSequenceInTree() {
 
 		     function sequenceFragment(left, right) {
-		       var si = scope.sequenceInfo;
 		       var seq_start = si.span[0];
 		       var seq = si.sequence.slice(left-seq_start, right-seq_start);
 		       var qual = si.quality.slice(left-seq_start, right-seq_start);
@@ -113,6 +112,8 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		       return rv;
 		     };
 
+		     var si = scope.sequenceInfo;
+		     iElement.children().eq(0).data('span', si.span.slice(0));
 		     _.walk(function(elem) {
 		       return _.map(elem.children(), angular.element);
 		     }).postorder(iElement, function(node) {
