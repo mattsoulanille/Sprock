@@ -599,7 +599,6 @@ angular.module('sprock.controllers', []).
       fuzz: 500
     };
     $scope.soa_tickle_counter = 0;
-//    $scope.status = {open: false}; //FIXME: is this needed?
 
     // DEBUGGING h&w:
     $scope.watch_count = 0;
@@ -639,21 +638,6 @@ angular.module('sprock.controllers', []).
 	_.chain(features.features).where({type:'exon'}).pluck('span').value();*/
     };
 
-    function get_features() {
-      // NOTE: Restricted to just the gene's span!
-      if ($scope.gene == undefined) return null;
-      var gene = $scope.gene;
-      var want_span = [$scope.gene.start, $scope.gene.end];
-      return $scope.features_promise =
-	getFeatures(gene.scaffold, want_span[0], want_span[1], true).
-	then(function(v) {
-	  v.features = _.sortBy(v.features,
-				function(f) { return f.span[0]; });
-	  return $scope.features = v;
-	});
-    };
-//    $scope.$watch('gene', get_features);
-
     function init_desired_sequence_boundaries_from_gene() {
       if ($scope.gene == undefined) return null;
       return $scope.desired_sequence_span = [Math.max(0, $scope.gene.span[0] - $scope.margin),
@@ -684,55 +668,6 @@ angular.module('sprock.controllers', []).
       }, [], $scope.prime).then(function(v) {
 	$scope.ppp_list_eventually_was = v; //FIXME
       });
-    };
-
-    function enter_feature_in_sequence_objects_array(type, span) {
-      var si = $scope.sequence_info;
-      var soa = $scope.sequence_objects.sequenceObjectsArray;
-
-      // Skip features that are completely outside the sequence
-      if (span[1] <= si.start || span[0] >= si.end) return;
-
-      var k = {gene:'g', transcript:'t', exon:'x'}[type] || type;
-      soa[Math.max(0, span[0]-si.start)][k] = type;
-      soa[Math.min(soa.length-1, span[1]-si.start)][k] = null;
-    };
-
-    function note_new_ppp(ppp, which) {
-      var si = $scope.sequence_info;
-      var soa = $scope.sequence_objects.sequenceObjectsArray;
-
-      //_.each(ppp.primer_pairs, function(pp) {
-      if (ppp.primer_pair_num_returned > 0) {
-	var pp = ppp.primer_pairs[0];
-
-	enter_feature_in_sequence_objects_array('left-primer', pp.left.span);
-	enter_feature_in_sequence_objects_array('right-primer', pp.right.span);
-	enter_feature_in_sequence_objects_array('primer-product-' + which,
-						[pp.left.span[0], pp.right.span[1]]);
-/*
-	//FIXME: REFACTOR along with add_features_to_sequence_objects()
-        var f = {type: 'left-primer', span: pp.left.span};
-
-	// Skip features that are completely outside the sequence
-	if (f.span[1] <= si.start || f.span[0] >= si.end) return;
-
-	var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
-	soa[Math.max(0, f.span[0]-si.start)][k] = f.type;
-	soa[Math.min(soa.length-1, f.span[1]-si.start)][k] = null;
-
-	var f = {type: 'right-primer', span: pp.right.span};
-
-	// Skip features that are completely outside the sequence
-	if (f.span[1] <= si.start || f.span[0] >= si.end) return;
-
-	var k = {gene:'g', transcript:'t', exon:'x'}[f.type] || f.type;
-	soa[Math.max(0, f.span[0]-si.start)][k] = f.type;
-	soa[Math.min(soa.length-1, f.span[1]-si.start)][k] = null;
-*/
-	// Let the world know we've changed the sequenceObjectsArray
-	$scope.soa_tickle_counter++;
-      };
     };
 
     function calc_primer_windows() {

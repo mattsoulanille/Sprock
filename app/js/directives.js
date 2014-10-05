@@ -113,6 +113,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     };
 
 		     var si = scope.sequenceInfo;
+		     if (si === undefined) return; // bail if no sequence to install
 		     // set the "seq" wrapper to have the span of the sequence:
 		     iElement.children().eq(0).data('span', si.span.slice(0));
 		     _.walk(function(elem) {
