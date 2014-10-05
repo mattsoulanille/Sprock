@@ -339,25 +339,37 @@ describe('directives', function() {
 
       var seqInfo = {
 	sequence: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-	quality: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-		  14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
+	quality: [1, 1, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 13, 13,
+		  15, 15, 17, 17, 19, 19, 21, 21, 23, 23, 25, 25],
 	scaffold: "some scaffold",
 	span: [7, 7 + 26]};
 
       expect(fs(tree, seqInfo)).
 	toBe(header +
-	     '<span class="seq">' +
-	       '<span class="gene">' +
-	         '<span class="seqFrag">GH</span>' +
-	         '<span class="exon" data-name="foo">' +
-	           '<span class="seqFrag">IJK</span>' +
-	         '</span>' +
-	         '<span class="seqFrag">LMN</span>' +
-	         '<span class="exon" data-name="bar">' +
-	           '<span class="seqFrag">OPQR</span>' +
-	         '</span>' +
-	       '</span>' +
-	     '</span>');
+
+             '<span class="seq">' +
+               '<span class="gene">' +
+                 '<span class="seqFrag">' +
+                   '<span class="q7">GH</span>' +
+                 '</span>' +
+                 '<span class="exon" data-name="foo">' +
+                   '<span class="seqFrag">' +
+             	'<span class="q9">IJ</span>' +
+             	'<span class="q11">K</span>' +
+                   '</span>' +
+                 '</span>' +
+                 '<span class="seqFrag">' +
+                   '<span class="q11">L</span>' +
+                   '<span class="q13">MN</span>' +
+                 '</span>' +
+                 '<span class="exon" data-name="bar">' +
+                   '<span class="seqFrag">' +
+             	'<span class="q15">OP</span>' +
+             	'<span class="q17">QR</span>' +
+                   '</span>' +
+                 '</span>' +
+               '</span>' +
+             '</span>');
     });
 
     xit('should handle a teeny case', function() {

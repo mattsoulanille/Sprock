@@ -94,8 +94,22 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		       var seq_start = si.span[0];
 		       var seq = si.sequence.slice(left-seq_start, right-seq_start);
 		       var qual = si.quality.slice(left-seq_start, right-seq_start);
+		       var html = '<span class="q' + si.quality[left-seq_start] + '">' +
+			     _.map(_.zip(si.sequence.slice(left-seq_start, right-seq_start),
+					 si.quality.slice(left-seq_start, right-seq_start),
+					 si.quality.slice(left-seq_start + 1, right-seq_start)),
+				   function(triple) {
+				     var rv = triple[0];
+				     if (triple[1] !== triple[2]) {
+				       rv += '</span>';
+				       if (triple[2] !== undefined) {
+					 rv += '<span class="q' + triple[2] + '">';
+				       };
+				     };
+				     return rv;
+				   }).join('');
 		       var rv = angular.element('<span class="seqFrag"></span>');
-		       rv.append(seq); //FIXME
+		       rv.append(html); //FIXME
 		       return rv;
 		     };
 
