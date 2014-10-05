@@ -307,7 +307,7 @@ describe('directives', function() {
 
     });
 
-    it('should place sequence with quality into tree', function() {
+    xit('should place sequence with quality into tree', function() {
       var tree = {name: 'root',
 		  type: 'gene',
 		  span: [13, 25],
@@ -368,6 +368,126 @@ describe('directives', function() {
 	       '</span>' +
 	     '</span>');
     });
+
+    it('should allow the sequence span to change', function() {
+      var tree = {name: 'root',
+		  type: 'gene',
+		  span: [13, 25],
+		  children: [{
+		    name: 'foo',
+		    type: 'exon',
+		    span: [15, 18],
+		    children: []
+		  },{
+		    name: 'bar',
+		    type: 'exon',
+		    span: [21, 25],
+		    children: []
+		  }]
+		 };
+
+      var first_seqInfo = {
+	sequence: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+	quality: [1, 1, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 13, 13,
+		  15, 15, 17, 17, 19, 19, 21, 21, 23, 23, 25, 25],
+	scaffold: "some scaffold",
+	span: [7, 7 + 26]};
+
+      var second_seqInfo = {
+	sequence: "DEFGHIJKLMNOPQRSTUVWXYZabc",
+	quality: [3, 5, 5, 7, 7, 9, 9, 11, 11, 13, 13,
+		  15, 15, 17, 17, 19, 19, 21, 21, 23, 23, 25, 25, 27, 27, 29],
+	scaffold: "some scaffold",
+	span: [10, 10 + 26]};
+
+      var first_expect = header +
+	     '<span class="seq">' +
+	       '<span class="seqFrag">' +
+	         '<span class="q1">AB</span>' +
+	         '<span class="q3">CD</span>' +
+	         '<span class="q5">EF</span>' +
+	       '</span>' +
+	       '<span class="gene">' +
+	         '<span class="seqFrag">' +
+	           '<span class="q7">GH</span>' +
+	         '</span>' +
+	         '<span class="exon" data-name="foo">' +
+	           '<span class="seqFrag">' +
+	     	'<span class="q9">IJ</span>' +
+	     	'<span class="q11">K</span>' +
+	           '</span>' +
+	         '</span>' +
+	         '<span class="seqFrag">' +
+	           '<span class="q11">L</span>' +
+	           '<span class="q13">MN</span>' +
+	         '</span>' +
+	         '<span class="exon" data-name="bar">' +
+	           '<span class="seqFrag">' +
+	     	'<span class="q15">OP</span>' +
+	     	'<span class="q17">QR</span>' +
+	           '</span>' +
+	         '</span>' +
+	       '</span>' +
+	       '<span class="seqFrag">' +
+	         '<span class="q19">ST</span>' +
+	         '<span class="q21">UV</span>' +
+	         '<span class="q23">WX</span>' +
+	         '<span class="q25">YZ</span>' +
+	       '</span>' +
+	     '</span>';
+
+      var second_expect = header +
+	    '<span class="seq">' +
+	      '<span class="seqFrag">' +
+	        '<span class="q3">D</span>' +
+	        '<span class="q5">EF</span>' +
+	      '</span>' +
+	      '<span class="gene">' +
+	        '<span class="seqFrag">' +
+	          '<span class="q7">GH</span>' +
+	        '</span>' +
+	        '<span class="exon" data-name="foo">' +
+	          '<span class="seqFrag">' +
+	    	'<span class="q9">IJ</span>' +
+	    	'<span class="q11">K</span>' +
+	          '</span>' +
+	        '</span>' +
+	        '<span class="seqFrag">' +
+	          '<span class="q11">L</span>' +
+	          '<span class="q13">MN</span>' +
+	        '</span>' +
+	        '<span class="exon" data-name="bar">' +
+	          '<span class="seqFrag">' +
+	    	'<span class="q15">OP</span>' +
+	    	'<span class="q17">QR</span>' +
+	          '</span>' +
+	        '</span>' +
+	      '</span>' +
+	      '<span class="seqFrag">' +
+	        '<span class="q19">ST</span>' +
+	        '<span class="q21">UV</span>' +
+	        '<span class="q23">WX</span>' +
+	        '<span class="q25">YZ</span>' +
+	        '<span class="q27">ab</span>' +
+	        '<span class="q29">c</span>' +
+	      '</span>' +
+	    '</span>';
+
+
+
+      inject(function($compile, $rootScope) {
+	$rootScope.tree = tree;
+	$rootScope.sequenceInfo = first_seqInfo;
+	var myScope = $rootScope.$new()
+        var element = $compile('<format-tree tree="tree" sequence-info="sequenceInfo"></format-tree>')(myScope);
+	myScope.$digest();	// fire the $watch'es
+	expect(element.html()).toBe(first_expect);
+	$rootScope.sequenceInfo = second_seqInfo;
+	myScope.$digest();	// fire the $watch'es
+	expect(element.html()).toBe(second_expect);
+      });
+    });
+
 
     xit('should handle a teeny case', function() {
       var soa = [{b: 'A', q: 90}];

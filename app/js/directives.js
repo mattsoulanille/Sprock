@@ -113,34 +113,40 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     };
 
 		     var si = scope.sequenceInfo;
+		     // set the "seq" wrapper to have the span of the sequence:
 		     iElement.children().eq(0).data('span', si.span.slice(0));
 		     _.walk(function(elem) {
 		       return _.map(elem.children(), angular.element);
 		     }).postorder(iElement, function(node) {
-		       var span = node.data().span;
-		       if (!span) return;
-		       var children = _.map(node.children(), angular.element);
-		       // angular's jqLite doesn't have element.before(), only .after()
-		       // so we scan from "right to left"
-		       var gap_right = span[1];
-		       var gap_left;
-		       try {
-			 if (!!children[0].data().span) {
-			   for (var i=children.length-1; i>=0; i--) {
-			     var child = children[i];
-			     var child_span = child.data().span;
-			     gap_left = child_span[1];
-			     if (gap_left < gap_right) {
-			       child.after(sequenceFragment(gap_left, gap_right));
+		       if (node.hasClass("seqFrag")) {
+			 node.remove(); // dump the old sequence fragments
+		       } else {
+			 var span = node.data().span;
+			 if (!span) return;
+			 var children = _.map(node.children(), angular.element);
+			 // angular's jqLite doesn't have element.before(), only .after()
+			 // so we scan from "right to left"
+			 var gap_right = span[1];
+			 var gap_left;
+			 try {
+			   if (!!children[0].data().span) {
+			     for (var i=children.length-1; i>=0; i--) {
+			       var child = children[i];
+			       var child_span = child.data().span;
+			       gap_left = child_span[1];
+			       if (gap_left < gap_right) {
+				 child.after(sequenceFragment(gap_left, gap_right));
+			       };
+			       gap_right = child_span[0];
 			     };
-			     gap_right = child_span[0];
 			   };
+			 } catch (e) {
+			   // no span, so nothing to install
+			 }
+			 gap_left = span[0];
+			 if (gap_left < gap_right) {
+			   node.prepend(sequenceFragment(gap_left, gap_right));
 			 };
-		       } catch (e) {
-		       }
-		       gap_left = span[0];
-		       if (gap_left < gap_right) {
-			 node.prepend(sequenceFragment(gap_left, gap_right));
 		       };
 		     });
 
