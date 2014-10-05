@@ -199,7 +199,7 @@ describe('directives', function() {
             "children": [
               {
                 "children": [],
-                "name": "SPU_022066_3UTR:0\"",
+                "name": "SPU_022066_3UTR:0",
                 "scaffold": "Scaffold694",
                 "span": [10480, 10513],
                 "strand": "-",
@@ -207,7 +207,7 @@ describe('directives', function() {
               },
               {
                 "children": [],
-                "name": "SPU_022066:0\"",
+                "name": "SPU_022066:0",
                 "scaffold": "Scaffold694",
                 "span": [10514, 10683],
                 "strand": "-",
@@ -215,7 +215,7 @@ describe('directives', function() {
               },
               {
                 "children": [],
-                "name": "SPU_022066:1\"",
+                "name": "SPU_022066:1",
                 "scaffold": "Scaffold694",
                 "span": [11406, 11633],
                 "strand": "-",
@@ -223,7 +223,7 @@ describe('directives', function() {
               },
               {
                 "children": [],
-                "name": "SPU_022066:2\"",
+                "name": "SPU_022066:2",
                 "scaffold": "Scaffold694",
                 "span": [11875, 11997],
                 "strand": "-",
@@ -231,7 +231,7 @@ describe('directives', function() {
               },
               {
                 "children": [],
-                "name": "SPU_022066:3\"",
+                "name": "SPU_022066:3",
                 "scaffold": "Scaffold694",
                 "span": [12713, 12826],
                 "strand": "-",
@@ -239,7 +239,7 @@ describe('directives', function() {
               },
               {
                 "children": [],
-                "name": "SPU_022066:4\"",
+                "name": "SPU_022066:4",
                 "scaffold": "Scaffold694",
                 "span": [13329, 13541],
                 "strand": "-",
@@ -247,7 +247,7 @@ describe('directives', function() {
               },
               {
                 "children": [],
-                "name": "SPU_022066:5\"",
+                "name": "SPU_022066:5",
                 "scaffold": "Scaffold694",
                 "span": [14180, 14538],
                 "strand": "-",
@@ -255,7 +255,7 @@ describe('directives', function() {
               },
               {
                 "children": [],
-                "name": "SPU_022066:6\"",
+                "name": "SPU_022066:6",
                 "scaffold": "Scaffold694",
                 "span": [17988, 18337],
                 "strand": "-",
@@ -268,54 +268,97 @@ describe('directives', function() {
     });
 
 
-    function fs(tree) {
+    function fs(tree, seqInfo) {
       var rv;
       inject(function($compile, $rootScope) {
 	$rootScope.tree = tree;
+	$rootScope.sequenceInfo = seqInfo;
 	var myScope = $rootScope.$new()
-        var element = $compile('<format-tree tree="tree"></format-tree>')(myScope);
+        var element = $compile('<format-tree tree="tree" sequence-info="sequenceInfo"></format-tree>')(myScope);
 	myScope.$digest();	// fire the $watch'es
 	rv = element.html();
       });
       return rv;
     };
 
-    it('should exist', function() {
+    xit('should exist', function() {
       var tree = {name: 'root',
 		  type: 'bitty',
 		  span: [12, 34],
 		  children: []
 		 };
       expect(fs(tree)).
-	toBe(header+'<span class="seq"><span class="bitty">root</span></span>');
+	toBe(header +
+	     '<span class="seq">' +
+	       '<span class="bitty" data-name="root"></span>' +
+	     '</span>');
     });
 
-    it('should deal gracefully with null', function() {
+    xit('should deal gracefully with null', function() {
       var tree = null;
       expect(fs(tree)).
 	toBe(header);
     });
 
-    it('should make a tree in the DOM', function() {
+    xit('should make a tree in the DOM', function() {
       expect(fs(a_tree)).
 	toBe(header +
 	     '<span class="seq">' +
 	       '<span class="gene">' +
 	         '<span class="transcript">' +
-	           '<span class="three_prime_UTR">SPU_022066_3UTR:0"</span>' +
-	           '<span class="exon">SPU_022066:0"</span>' +
-		   '<span class="exon">SPU_022066:1"</span>' +
-		   '<span class="exon">SPU_022066:2"</span>' +
-		   '<span class="exon">SPU_022066:3"</span>' +
-		   '<span class="exon">SPU_022066:4"</span>' +
-		   '<span class="exon">SPU_022066:5"</span>' +
-		   '<span class="exon">SPU_022066:6"</span>' +
+	           '<span class="three_prime_UTR" data-name="SPU_022066_3UTR:0"></span>' +
+	           '<span class="exon" data-name="SPU_022066:0"></span>' +
+		   '<span class="exon" data-name="SPU_022066:1"></span>' +
+		   '<span class="exon" data-name="SPU_022066:2"></span>' +
+		   '<span class="exon" data-name="SPU_022066:3"></span>' +
+		   '<span class="exon" data-name="SPU_022066:4"></span>' +
+		   '<span class="exon" data-name="SPU_022066:5"></span>' +
+		   '<span class="exon" data-name="SPU_022066:6"></span>' +
 	         '</span>' +
 	       '</span>' +
 	     '</span>');
 
     });
 
+    it('should place sequence with quality into tree', function() {
+      var tree = {name: 'root',
+		  type: 'gene',
+		  span: [13, 25],
+		  children: [{
+		    name: 'foo',
+		    type: 'exon',
+		    span: [15, 18],
+		    children: []
+		  },{
+		    name: 'bar',
+		    type: 'exon',
+		    span: [21, 25],
+		    children: []
+		  }]
+		 };
+
+      var seqInfo = {
+	sequence: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+	quality: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+		  14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
+	scaffold: "some scaffold",
+	span: [7, 7 + 26]};
+
+      expect(fs(tree, seqInfo)).
+	toBe(header +
+	     '<span class="seq">' +
+	       '<span class="gene">' +
+	         '<span class="seqFrag">GH</span>' +
+	         '<span class="exon" data-name="foo">' +
+	           '<span class="seqFrag">IJK</span>' +
+	         '</span>' +
+	         '<span class="seqFrag">LMN</span>' +
+	         '<span class="exon" data-name="bar">' +
+	           '<span class="seqFrag">OPQR</span>' +
+	         '</span>' +
+	       '</span>' +
+	     '</span>');
+    });
 
     xit('should handle a teeny case', function() {
       var soa = [{b: 'A', q: 90}];

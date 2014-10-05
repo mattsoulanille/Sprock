@@ -50,6 +50,8 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 
 		 link: function postLink(scope, iElement, iAttrs, controller) {
 		   var spins = 0;
+		   // An object used to flag a leaf
+		   var leaf = {};
 
 		   function updateTreeDisplay() {
 		     iElement.empty();
@@ -58,9 +60,6 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     if (!scope.tree) return;
 
 		     var r = angular.element('<span class="seq"></span>');
-
-		     // An object used to flag a leaf
-		     var leaf = {};
 
 		     // Walk the tree and create the corresponding DOM tree of spans
 		     var treeForDOM = _.walk(function(obj) {
@@ -73,7 +72,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 						    '"></span>');
 			 e.data('span', v.span.slice(0));
 			 if (memo == leaf) {
-			   e.append(v.name);
+			   e.attr('data-name', v.name);
 			 } else {
 			   //_.each(memo, e.append);
 			   _.each(memo, function(v) {
@@ -88,10 +87,56 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		   };
 		   scope.$watch('tree', updateTreeDisplay);
 
-		 }
+		   function putSequenceInTree() {
+
+		     function sequenceFragment(left, right) {
+		       var si = scope.sequenceInfo;
+		       var seq_start = si.span[0];
+		       var seq = si.sequence.slice(left-seq_start, right-seq_start);
+		       var qual = si.quality.slice(left-seq_start, right-seq_start);
+		       var rv = angular.element('<span class="seqFrag"></span>');
+		       rv.append(seq); //FIXME
+		       return rv;
+		     };
+
+		     _.walk(function(elem) {
+		       return _.map(elem.children(), angular.element);
+		     }).postorder(iElement, function(node) {
+		       var span = node.data().span;
+		       if (!span) return;
+		       var children = _.map(node.children(), angular.element);
+		       // angular's jqLite doesn't have element.before(), only .after()
+		       // so we scan from "right to left"
+		       var gap_right = span[1];
+		       var gap_left;
+		       try {
+			 if (!!children[0].data().span) {
+			   for (var i=children.length-1; i>=0; i--) {
+			     var child = children[i];
+			     var child_span = child.data().span;
+			     gap_left = child_span[1];
+			     if (gap_left < gap_right) {
+			       child.after(sequenceFragment(gap_left, gap_right));
+			     };
+			     gap_right = child_span[0];
+			   };
+			 };
+		       } catch (e) {
+		       }
+		       gap_left = span[0];
+		       if (gap_left < gap_right) {
+			 node.prepend(sequenceFragment(gap_left, gap_right));
+		       };
+		     });
+
+		   };
+		   scope.$watch('sequenceInfo', putSequenceInTree);
+
+		 } //link
 	       };
+
 	       return directiveDefinitionObject;
-	       }]).
+	     }]).
 
   directive('formatScience',
 	    ['_', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents',
