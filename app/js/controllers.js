@@ -613,7 +613,7 @@ angular.module('sprock.controllers', []).
 	then(
 	  function(v) {
 	    $scope.gene = v;
-//	    calc_excluded_spans(v);
+	    calc_excluded_spans(v);
 	  },
 	  function(why) {
 	    $scope.gene = null;
@@ -622,14 +622,28 @@ angular.module('sprock.controllers', []).
     $scope.$watch('gene_name', get_gene);
 
     function calc_excluded_spans(gene) {
+      var w = _.walk(function(node) {
+	return node.children;
+      });
       $scope.prime.excluded_spans =
-	_.reduce(gene.exons.exons,
+	_.sortBy(
+	  _.compact(
+	    w.map(gene, w.postorder, function(node) {
+	      if (node.type === "exon") {
+		return node.span;
+	      } else {
+		return null;
+	      };
+	    })));
+
+/*	_.reduce(gene.exons.exons,
 		     function(memo, v) {
 		       memo.push(v);
 		       return memo;
 		     },
 		     []).
 	    sort();
+*/
 /*      $scope.prime.excluded_region = _.map($scope.excluded_spans,
 					   function(v) {
 					     return [v[0], v[1]-v[0]]
@@ -692,6 +706,10 @@ angular.module('sprock.controllers', []).
 		     [[want_span[0]]]);
       _.last(t).push(want_span[1]);
       $scope.prime.primer_windows = t;
+    };
+
+    function note_new_ppp(ppp, which) {
+      console.log("FIXME");
     };
 
 /*
