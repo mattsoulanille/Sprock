@@ -11,6 +11,7 @@ module.exports = function(config){
       'app/bower_components/underscore-contrib/underscore.collections.walk.js',
       'app/bower_components/showdown/src/showdown.js',
       'app/bower_components/showdown/src/extensions/twitter.js',
+      'app/bower_components/chai/chai.js',
       'app/bower_components/angular-underscore-module/angular-underscore-module.js',
       'app/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
       'app/bower_components/angular-markdown-directive/markdown.js',

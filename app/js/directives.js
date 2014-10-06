@@ -37,32 +37,31 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		      }]).
 
   directive('formatTree',
-	    ['_',
-	     function factory(_) {
+	    ['_', 'compareSpans',
+	     function factory(_, compareSpans) {
 	       var directiveDefinitionObject = {
 		 //template: '<div></div>', // or // function(tElement, tAttrs) { ... },
 		 restrict: 'E',
 
 		 scope: {
 		   tree: '=',
-		   sequenceInfo: '='
+		   sequenceInfo: '=',
+		   primerPairs: '='
 		 },
 
 		 link: function postLink(scope, iElement, iAttrs, controller) {
 		   var spins = 0;
-		   // An object used to flag a leaf
-		   var leaf = {};
+
+		   var leaf = {}; // An object used to flag a leaf
 
 		   function updateTreeDisplay() {
-		     iElement.empty();
-		     //iElement.append('<h3>format-tree</h3>');
-
 		     if (!scope.tree) return;
-
+		     iElement.empty();
 		     var r = angular.element('<span class="seq"></span>');
 
 		     // Walk the tree and create the corresponding DOM tree of spans
 		     var treeForDOM = _.walk(function(obj) {
+		       // FIXME: why this complexity?
 		       return _.has(obj, 'children') || _.isElement(obj) ? obj.children : obj;
 		       //return obj.children;
 		     }).reduce(
@@ -70,6 +69,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 			 var e = angular.element('<span class="' +
 						    v.type +
 						    '"></span>');
+			 // Record span in the DOM element itself, for later traversal:
 			 e.data('span', v.span.slice(0));
 			 if (memo == leaf) {
 			   e.attr('data-name', v.name);
@@ -87,9 +87,21 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		   };
 		   scope.$watch('tree', updateTreeDisplay);
 
+
 		   function putSequenceInTree() {
+		     var si = scope.sequenceInfo;
+		     if (si === undefined) return; // bail if no sequence to install
+		     // set the "seq" wrapper to have the span of the sequence:
+		     iElement.children().eq(0).data('span', si.span.slice(0));
+		     putSequenceInSubtree(iElement, si);
+		   };
+		   scope.$watch('sequenceInfo', putSequenceInTree);
+
+		   function putSequenceInSubtree(rootElem, si) {
 
 		     function sequenceFragment(left, right) {
+		       // Provides an element displaying the sequence in the span [left, right]
+		       var rv = angular.element('<span class="seqFrag"></span>');
 		       var seq_start = si.span[0];
 		       var seq = si.sequence.slice(left-seq_start, right-seq_start);
 		       var qual = si.quality.slice(left-seq_start, right-seq_start);
@@ -107,18 +119,14 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 				     };
 				     return rv;
 				   }).join('');
-		       var rv = angular.element('<span class="seqFrag"></span>');
-		       rv.append(html); //FIXME
+		       rv.append(html);
+		       rv.data("span", [left, right]); // Record the span for DOM traversal
 		       return rv;
 		     };
 
-		     var si = scope.sequenceInfo;
-		     if (si === undefined) return; // bail if no sequence to install
-		     // set the "seq" wrapper to have the span of the sequence:
-		     iElement.children().eq(0).data('span', si.span.slice(0));
 		     _.walk(function(elem) {
 		       return _.map(elem.children(), angular.element);
-		     }).postorder(iElement, function(node) {
+		     }).postorder(rootElem, function(node) {
 		       if (node.hasClass("seqFrag")) {
 			 node.remove(); // dump the old sequence fragments
 		       } else {
@@ -152,7 +160,146 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     });
 
 		   };
-		   scope.$watch('sequenceInfo', putSequenceInTree);
+
+
+		   function putPrimersInTree() {
+		     if (!scope.primerPairs) return;
+		     var seq_elem = iElement.children().eq(0);
+		     chai.assert(seq_elem.hasClass("seq"),
+				 'putPrimersInTree() expected a "seq" element');
+		     _.each(scope.primerPairs, function(pp) {
+		       _.each([pp.left, pp.right], function(primer) {
+			 var elem = findLeastElemContainingSpan(seq_elem, primer.span);
+			 if (elem) {
+			   putPrimerIn(elem, primer);
+			 } else {
+			   console.log("no place for primer:");
+			   console.log(primer);
+			 };
+		       })});
+		   };
+		   scope.$watch('primerPairs', putPrimersInTree);
+
+
+		   function putPrimerIn(elem, primer) {
+		     chai.assert(elem.hasClass("seqFrag"),
+				 'putPrimerIn(elem, primer) expected a "seqFrag" element');
+		     var elem_span = elem.data().span;
+		     _.each(primer.span, function(v) {
+		       chai.expect(v).to.be.within(elem_span[0], elem_span[1]);
+		     });
+		     var primer_start = primer.span[0];
+		     var primer_end = primer.span[1];
+
+		     // Find leftmost child whose end > primer_start
+		     // If its start < primer_start, then split it
+		     var child = elem.children().eq(0);
+		     var prev_child = null;
+		     chai.expect(child).to.have.length(1);
+		     chai.assert(angular.isElement(child), "expected angular element");
+		     var child_start = elem_span[0];
+		     var child_end;
+		     var child_text;
+		     var new_child;
+
+		     while (child.length) {
+		       child_text = child.text();
+		       child_end = child_start + child_text.length;
+		       if (child_end > primer_start) break;
+		       prev_child = child;
+		       child = child.next();
+		       child_start = child_end;
+		     };
+		     chai.expect(child).to.have.length(1);
+		     if (child_start < primer_start) {
+		       // split it
+		       var how_far_into_child_to_cut = primer_start - child_start;
+		       new_child = child.clone();
+		       child.text(child_text.slice(0, how_far_into_child_to_cut));
+		       new_child.text(child_text.slice(how_far_into_child_to_cut));
+		       child.after(new_child);
+		       prev_child = child;
+		       child = new_child;
+		       child.start = primer_start;
+		       child_text = child.text(); // unnecessary
+		     };
+		     chai.expect(child).to.have.length(1);
+		     chai.assert(angular.isElement(child),
+				 "putPrimerIn() ran out of children looking for end");
+
+		     // Here child's start aligns with primer start
+		     // prev_child is the immediately-leftward child
+		     // We place the primer element between them
+		     var primer_elem = angular.element('<span class="primer primer-left"></span>');
+		     if (prev_child === null) { // It has no child before it
+		       elem.prepend(primer_elem); // so it goes first
+		     } else {
+		       prev_child.after(primer_elem);
+		     };
+
+		     // Transfer children into primer_elem, until
+		     // the first child whose end >= primer_end
+		     // If its end is > primer_end, then split it
+		     // Include it in primer_elem
+		     while (child.length) {
+		       child_text = child.text();
+		       child_end = child_start + child_text.length;
+		       //console.log("child_start=" + child_start + ", child_end=" + child_end);
+		       if (child_end > primer_end) {
+			 var how_far_into_child_to_cut = primer_end - child_start;
+			 new_child = child.clone();
+			 child.text(child_text.slice(0, how_far_into_child_to_cut));
+			 new_child.text(child_text.slice(how_far_into_child_to_cut));
+			 child.after(new_child);
+			 child_text = child.text();
+			 child_end = child_start + child_text.length;
+			 chai.expect(child_end).to.equal(primer_end);
+		       };
+		       var child_venir = child.next();
+		       primer_elem.append(child);
+		       if (child_end === primer_end) break;
+		       child = child_venir;
+		       child_start = child_end;
+		       //console.log(elem);
+		     };
+		     chai.expect(child).to.have.length(1);
+		   };
+
+		   function findLeastElemContainingSpan(elem, span) {
+		     // Find the leafward-most element, along the first path found,
+		     // whose "span" contains the given span
+		     var elem_span;
+/*
+		     try {
+		       elem_span = elem.data().span;
+		       if (elem_span === undefined ||
+			   elem_span[0] > span[0] ||
+			   elem_span[1] < span[1]) {
+			 return null;
+		       };
+		     } catch (e) {
+		       return null; //FIXME: when??
+		     }; */
+		     elem_span = elem.data().span;
+		     if (elem_span === undefined ||
+			 elem_span[0] > span[0] ||
+			 elem_span[1] < span[1]) {
+		       return null;
+		     };
+
+		     var elem_children = _.map(elem.children(), angular.element);
+		     // Look for it sequentially rather than functionally, to avoid extra work:
+		     for (var i=0; i<elem_children.length; i++) {
+		       var candidate = findLeastElemContainingSpan(elem_children[i], span);
+		       if (candidate !== null) {
+			 return candidate;
+		       };
+		     };
+		     chai.expect(elem.data()).to.have.property("span").instanceof(Array);
+		     return elem;
+		   };
+
+
 
 		 } //link
 	       };
