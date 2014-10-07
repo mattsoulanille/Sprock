@@ -503,6 +503,74 @@ describe('directives', function() {
       var seqInfo = {
 	span: [7, 7 + 20],
 	sequence: "ABCDEFGHIJKLMNOPQRST",
+	quality: [90, 90, 90, 90, 90, 90, 90, 90, 90, 90,
+		  90, 90, 90, 90, 90, 90, 90, 90, 90, 90],
+	scaffold: "some scaffold"};
+
+      var primerPair = {
+	left: {
+	  span: [8, 11],
+	  sequence: "LLL" },
+	 right: {
+	  span: [13, 15],
+	  sequence: "RR" }
+      };
+
+
+      inject(function($compile, $rootScope) {
+	$rootScope.tree = tree;
+	$rootScope.sequenceInfo = seqInfo;
+	$rootScope.primerPairs = [primerPair];
+	var myScope = $rootScope.$new()
+        var element = $compile(
+	  '<format-tree tree="tree"' +
+	    ' sequence-info="sequenceInfo"' +
+	    ' primer-pairs="primerPairs"' +
+	    '></format-tree>')(myScope);
+	myScope.$digest();	// fire the $watch'es
+	expect(element.html()).toBe(
+	  '<span class="seq">' +
+	    '<span class="seqFrag">' +
+	      '<span class="q90">A</span>' +
+	      '<span class="primer primer-left">' +
+	        '<span class="q90">BCD</span>' +
+	      '</span>' +
+	      '<span class="q90">EF</span>' +
+	      '<span class="primer primer-right">' +
+	        '<span class="q90">GH</span>' +
+	      '</span>' +
+	    '</span>' +
+	    '<span class="gene">' +
+	      '<span class="exon" data-name="foo">' +
+	        '<span class="seqFrag">' +
+	  	'<span class="q90">IJKLM</span>' +
+	        '</span>' +
+	      '</span>' +
+	    '</span>' +
+	    '<span class="seqFrag">' +
+	      '<span class="q90">NOPQRST</span>' +
+	    '</span>' +
+	  '</span>'
+	);
+      });
+    });
+
+
+    it('should display primer pairs in simple case', function() {
+      var tree = {name: 'root',
+		  type: 'gene',
+		  span: [15, 20],
+		  children: [{
+		    name: 'foo',
+		    type: 'exon',
+		    span: [15, 20],
+		    children: []
+		  }]
+		 };
+
+      var seqInfo = {
+	span: [7, 7 + 20],
+	sequence: "ABCDEFGHIJKLMNOPQRST",
 	quality: [20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26,
 		  27, 27, 28, 28, 29, 29],
 	scaffold: "some scaffold"};
@@ -531,28 +599,30 @@ describe('directives', function() {
 	expect(element.html()).toBe(
 	    '<span class="seq">' +
 	      '<span class="seqFrag">' +
-	        '<span class="q20">A</span>' +
-	        '<span class="primer primer-left">' +
-	          '<span class="q20">B</span>' +
-	          '<span class="q21">CD</span>' +
+		'<span class="q20">A</span>' +
+		'<span class="primer primer-left">' +
+		  '<span class="q20">B</span>' +
+		  '<span class="q21">CD</span>' +
+		'</span>' +
+		'<span class="q22">EF</span>' +
+	        '<span class="primer primer-right">' +
+	          '<span class="q23">GH</span>' +
 	        '</span>' +
-	        '<span class="q22">EF</span>' +
-	        '<span class="q23">GH</span>' +
 	      '</span>' +
 	      '<span class="gene">' +
-	        '<span class="exon" data-name="foo">' +
-	          '<span class="seqFrag">' +
-	    	    '<span class="q24">IJ</span>' +
-	    	    '<span class="q25">KL</span>' +
-	    	    '<span class="q26">M</span>' +
-	          '</span>' +
-	        '</span>' +
+		'<span class="exon" data-name="foo">' +
+		  '<span class="seqFrag">' +
+		    '<span class="q24">IJ</span>' +
+		    '<span class="q25">KL</span>' +
+		    '<span class="q26">M</span>' +
+		  '</span>' +
+		'</span>' +
 	      '</span>' +
 	      '<span class="seqFrag">' +
-	        '<span class="q26">N</span>' +
-	        '<span class="q27">OP</span>' +
-	        '<span class="q28">QR</span>' +
-	        '<span class="q29">ST</span>' +
+		'<span class="q26">N</span>' +
+		'<span class="q27">OP</span>' +
+		'<span class="q28">QR</span>' +
+		'<span class="q29">ST</span>' +
 	      '</span>' +
 	    '</span>'
 	);

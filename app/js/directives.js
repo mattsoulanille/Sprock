@@ -168,15 +168,20 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     chai.assert(seq_elem.hasClass("seq"),
 				 'putPrimersInTree() expected a "seq" element');
 		     _.each(scope.primerPairs, function(pp) {
-		       _.each([pp.left, pp.right], function(primer) {
-			 var elem = findLeastElemContainingSpan(seq_elem, primer.span);
-			 if (elem) {
-			   putPrimerIn(elem, primer);
-			 } else {
-			   console.log("no place for primer:");
-			   console.log(primer);
-			 };
-		       })});
+		       _.each([
+			 [pp.left, "primer-left"],
+			 [pp.right, "primer-right"]], function(t) {
+			   var primer = t[0];
+			   var primer_class = t[1];
+			   var elem = findLeastElemContainingSpan(seq_elem, primer.span);
+			   if (elem) {
+			     var e = putPrimerIn(elem, primer);
+			     e.toggleClass(primer_class, true);
+			   } else {
+			     console.log("no place for primer:");
+			     console.log(primer);
+			   };
+			 })});
 		   };
 		   scope.$watch('primerPairs', putPrimersInTree);
 
@@ -195,7 +200,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     // If its start < primer_start, then split it
 		     var child = elem.children().eq(0);
 		     var prev_child = null;
-		     chai.expect(child).to.have.length(1);
+		     chai.expect(child).to.have.length(1); // meaning it isn't []
 		     chai.assert(angular.isElement(child), "expected angular element");
 		     var child_start = elem_span[0];
 		     var child_end;
@@ -211,6 +216,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		       child_start = child_end;
 		     };
 		     chai.expect(child).to.have.length(1);
+		     chai.expect(child_start).to.be.at.most(primer_start);
 		     if (child_start < primer_start) {
 		       // split it
 		       var how_far_into_child_to_cut = primer_start - child_start;
@@ -220,17 +226,18 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		       child.after(new_child);
 		       prev_child = child;
 		       child = new_child;
-		       child.start = primer_start;
+		       child_start = primer_start;
 		       child_text = child.text(); // unnecessary
 		     };
 		     chai.expect(child).to.have.length(1);
 		     chai.assert(angular.isElement(child),
 				 "putPrimerIn() ran out of children looking for end");
 
+		     chai.expect(child_start).to.equal(primer_start);
 		     // Here child's start aligns with primer start
 		     // prev_child is the immediately-leftward child
 		     // We place the primer element between them
-		     var primer_elem = angular.element('<span class="primer primer-left"></span>');
+		     var primer_elem = angular.element('<span class="primer"></span>');
 		     if (prev_child === null) { // It has no child before it
 		       elem.prepend(primer_elem); // so it goes first
 		     } else {
@@ -263,6 +270,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		       //console.log(elem);
 		     };
 		     chai.expect(child).to.have.length(1);
+		     return primer_elem;
 		   };
 
 		   function findLeastElemContainingSpan(elem, span) {
