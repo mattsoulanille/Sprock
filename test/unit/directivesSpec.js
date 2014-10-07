@@ -535,19 +535,16 @@ describe('directives', function() {
 	        '<span class="primer primer-left">' +
 	          '<span class="q20">B</span>' +
 	          '<span class="q21">CD</span>' +
-	          '<span class="q22">E</span>' +
 	        '</span>' +
-	        '<span class="q22">F</span>' +
-	        '<span class="primer primer-left">' +
-	          '<span class="q23">GH</span>' +
-	        '</span>' +
+	        '<span class="q22">EF</span>' +
+	        '<span class="q23">GH</span>' +
 	      '</span>' +
 	      '<span class="gene">' +
 	        '<span class="exon" data-name="foo">' +
 	          '<span class="seqFrag">' +
-	    	'<span class="q24">IJ</span>' +
-	    	'<span class="q25">KL</span>' +
-	    	'<span class="q26">M</span>' +
+	    	    '<span class="q24">IJ</span>' +
+	    	    '<span class="q25">KL</span>' +
+	    	    '<span class="q26">M</span>' +
 	          '</span>' +
 	        '</span>' +
 	      '</span>' +
