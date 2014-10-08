@@ -558,4 +558,117 @@ describe('service', function() {
     }));
 
   });
+
+  describe('findLeastElemContainingSpan', function() {
+
+    /*
+    beforeEach(inject(function(_) {
+      var leaf = {};
+      function makeTree(root) {
+	return _.walk.reduce(root, function(memo, node) {
+	  if (memo === leaf) return node;
+	  _.reduce(
+	    _.map(memo, function(v) {
+	      if (v.length === 2 &&
+		  typeof(v[0] === "number")) {
+		var elem = angular.element('<span></span>');
+		elem.data("span", v);
+		return elem;
+	      } else return v;
+	    }), function(memo, v) {
+	      
+	    }, angular.element('<span></span>')
+	    
+
+
+
+	  if (typeof(memo[0]) === "number") {
+
+
+	  }
+	}, leaf);
+      };
+    }));
+     */
+
+    it('should exist',
+       inject(function(findLeastElemContainingSpan) {
+	 expect(findLeastElemContainingSpan).toBeDefined();
+       }));
+
+    it('should return null for an element with no span',
+       inject(function(findLeastElemContainingSpan) {
+	 var elem = angular.element('<span></span>');
+	 expect(findLeastElemContainingSpan(elem, [7, 11])).toBe(null);
+       }));
+
+    it('should return null when span is outside element span',
+       inject(function(findLeastElemContainingSpan) {
+	 var elem = angular.element('<span></span>');
+	 elem.data("span", [7, 11]);
+	 expect(findLeastElemContainingSpan(elem, [3, 5])).toBe(null);
+	 expect(findLeastElemContainingSpan(elem, [13, 17])).toBe(null);
+       }));
+
+    it('should return null when span has some part outside element span',
+       inject(function(findLeastElemContainingSpan) {
+	 var elem = angular.element('<span></span>');
+	 elem.data("span", [7, 11]);
+	 expect(findLeastElemContainingSpan(elem, [7, 12])).toBe(null);
+	 expect(findLeastElemContainingSpan(elem, [6, 11])).toBe(null);
+       }));
+
+    it('should return element when span is same as element span',
+       inject(function(findLeastElemContainingSpan) {
+	 var elem = angular.element('<span></span>');
+	 elem.data("span", [7, 11]);
+	 expect(findLeastElemContainingSpan(elem, [7, 11])).toBe(elem);
+       }));
+
+    it('should return element when span is within element span',
+       inject(function(findLeastElemContainingSpan) {
+	 var elem = angular.element('<span></span>');
+	 elem.data("span", [7, 11]);
+	 expect(findLeastElemContainingSpan(elem, [8, 11])).toBe(elem);
+	 expect(findLeastElemContainingSpan(elem, [8, 10])).toBe(elem);
+	 expect(findLeastElemContainingSpan(elem, [7, 10])).toBe(elem);
+       }));
+
+    it("should return outer element when it's the only one fully containing span",
+       inject(function(findLeastElemContainingSpan) {
+	 var elem = angular.element('<span></span>');
+	 elem.data("span", [7, 17]);
+	 var child = angular.element('<span></span>');
+	 child.data("span", [11, 13]);
+	 elem.append(child);
+	 expect(findLeastElemContainingSpan(elem, [7, 11])).toBe(elem);
+	 expect(findLeastElemContainingSpan(elem, [10, 12])).toBe(elem);
+	 expect(findLeastElemContainingSpan(elem, [12, 14])).toBe(elem);
+	 expect(findLeastElemContainingSpan(elem, [14, 17])).toBe(elem);
+       }));
+
+    it("should return inner element when it has the span we seek",
+       inject(function(findLeastElemContainingSpan) {
+	 var elem = angular.element('<span></span>');
+	 elem.data("span", [7, 17]);
+	 var child = angular.element('<span></span>');
+	 child.data("span", [11, 13]);
+	 elem.append(child);
+	 expect(findLeastElemContainingSpan(elem, [11, 13])).toBeAngularEqual(child);
+       }));
+
+    it("should not return an element without a span",
+       inject(function(findLeastElemContainingSpan) {
+	 var elem = angular.element('<span>parent</span>');
+	 elem.data("span", [7, 17]);
+	 var child = angular.element('<span>child</span>');
+	 child.data("span", [11, 13]);
+	 elem.append(child);
+	 var grandchild = angular.element('<span>grandchild</span>');
+	 expect(findLeastElemContainingSpan(elem, [11, 13])).toBeAngularEqual(child);
+       }));
+
+  });// findLeastElemContainingSpan
+
+
 });

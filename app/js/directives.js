@@ -37,8 +37,8 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		      }]).
 
   directive('formatTree',
-	    ['_', 'compareSpans',
-	     function factory(_, compareSpans) {
+	    ['_', 'compareSpans', 'findLeastElemContainingSpan',
+	     function factory(_, compareSpans, findLeastElemContainingSpan) {
 	       var directiveDefinitionObject = {
 		 //template: '<div></div>', // or // function(tElement, tAttrs) { ... },
 		 restrict: 'E',
@@ -168,9 +168,9 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     chai.assert(seq_elem.hasClass("seq"),
 				 'putPrimersInTree() expected a "seq" element');
 		     _.each(scope.primerPairs, function(pp) {
-		       _.each([
-			 [pp.left, "primer-left"],
-			 [pp.right, "primer-right"]], function(t) {
+		       if (!(_.has(pp, 'left') && _.has(pp, 'right'))) return;
+		       _.each(
+			 [[pp.left, "primer-left"], [pp.right, "primer-right"]], function(t) {
 			   var primer = t[0];
 			   var primer_class = t[1];
 			   var elem = findLeastElemContainingSpan(seq_elem, primer.span);
@@ -188,7 +188,8 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 
 		   function putPrimerIn(elem, primer) {
 		     chai.assert(elem.hasClass("seqFrag"),
-				 'putPrimerIn(elem, primer) expected a "seqFrag" element');
+				 'putPrimerIn(elem, primer) expected a "seqFrag" element' +
+				 ', got a ' + '"' + elem.attr("class") + '" element');
 		     var elem_span = elem.data().span;
 		     _.each(primer.span, function(v) {
 		       chai.expect(v).to.be.within(elem_span[0], elem_span[1]);
@@ -272,41 +273,6 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     chai.expect(child).to.have.length(1);
 		     return primer_elem;
 		   };
-
-		   function findLeastElemContainingSpan(elem, span) {
-		     // Find the leafward-most element, along the first path found,
-		     // whose "span" contains the given span
-		     var elem_span;
-/*
-		     try {
-		       elem_span = elem.data().span;
-		       if (elem_span === undefined ||
-			   elem_span[0] > span[0] ||
-			   elem_span[1] < span[1]) {
-			 return null;
-		       };
-		     } catch (e) {
-		       return null; //FIXME: when??
-		     }; */
-		     elem_span = elem.data().span;
-		     if (elem_span === undefined ||
-			 elem_span[0] > span[0] ||
-			 elem_span[1] < span[1]) {
-		       return null;
-		     };
-
-		     var elem_children = _.map(elem.children(), angular.element);
-		     // Look for it sequentially rather than functionally, to avoid extra work:
-		     for (var i=0; i<elem_children.length; i++) {
-		       var candidate = findLeastElemContainingSpan(elem_children[i], span);
-		       if (candidate !== null) {
-			 return candidate;
-		       };
-		     };
-		     chai.expect(elem.data()).to.have.property("span").instanceof(Array);
-		     return elem;
-		   };
-
 
 
 		 } //link

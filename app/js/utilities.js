@@ -360,6 +360,42 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
     return gsi;
   }]).
 
+  factory('findLeastElemContainingSpan', ['_', function(_) {
+    return function flecs(elem, span) {
+      // Find the leafward-most element, along the first path found,
+      // whose "span" contains the given span
+      var elem_span;
+/*
+                     try {
+		       elem_span = elem.data().span;
+		       if (elem_span === undefined ||
+			   elem_span[0] > span[0] ||
+			   elem_span[1] < span[1]) {
+			 return null;
+		       };
+		     } catch (e) {
+		       return null; //FIXME: when??
+		     }; */
+      elem_span = elem.data().span;
+      if (elem_span === undefined ||
+	  elem_span[0] > span[0] ||
+	  elem_span[1] < span[1]) {
+	return null;
+      };
+
+      var elem_children = _.map(elem.children(), angular.element);
+      // Look for it sequentially rather than functionally, to avoid extra work:
+      for (var i=0; i<elem_children.length; i++) {
+	var candidate = flecs(elem_children[i], span);
+	if (candidate !== null) {
+	  return candidate;
+	};
+      };
+      chai.expect(elem.data()).to.have.property("span").instanceof(Array);
+      return elem;
+    };
+  }]).
+
   factory('MessAround', ['_', function(_) {
 
     function fooey(a, b) {
