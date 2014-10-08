@@ -588,7 +588,7 @@ angular.module('sprock.controllers', []).
 
   }]).
 
-  controller('MyCtrl6', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer) {
+  controller('MyCtrl6', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', 'compareSpans', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer, compareSpans) {
     $scope.serverError = null;
     $scope.margin = 5000;	//FIXME
     $scope.prime = {
@@ -673,10 +673,11 @@ angular.module('sprock.controllers', []).
 
     $scope.makePrimers = function() {
       $scope.ppp_list = [];
+      $scope.primer_pairs = [];
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
-	console.log(v);
+	//console.log(v);
 	$scope.ppp_list.push(v);
 	note_new_ppp(v, $scope.ppp_list.length);
       }, [], $scope.prime).then(function(v) {
@@ -709,7 +710,53 @@ angular.module('sprock.controllers', []).
     };
 
     function note_new_ppp(ppp, which) {
-      console.log("FIXME");
+      console.log("FIXME: note_new_ppp() is a hack");
+      if (!ppp || !_.has(ppp, 'primer_pairs')) return;
+      var pp = ppp.primer_pairs[0];
+
+      _.each([pp.left, pp.right], function(primer) {
+	_.each($scope.prime.excluded_spans, function(ex_span) {
+	  var cc = compareSpans(primer.span, ex_span);
+	  chai.assert(
+	    _.contains(['<<<<','>>>>'], cc),
+	    "primer " + primer.sequence +
+	      " span " + primer.span +
+	      " intersects excluded span " + ex_span);
+	})});
+
+
+      /*
+      chai.expect(pp).to.satisfy(function(pair) {
+	_.every([pair.left, pair.right], function(primer) {
+	  return _.every(
+	    _.map($scope.prime.excluded_spans, _.partial(compareSpans, primer.span)),
+	    function(s) {
+	      return _.contains(['<<<<','>>>>'], s)
+	    });
+	})});
+       */
+      /*
+      _.every([pp.left, pp.right], function(primer) {
+	return _.every($scope.prime.excluded_spans, function(ex_span) {
+	  return chai.assert(
+	    _.contains(['<<<<','>>>>'], compareSpans(primer.span, ex_span)),
+	    "primer " + primer + " span " + primer.span);
+	})});
+       */
+
+      /*
+      chai.expect(pp).to.satisfy(function(pair) {
+	_.every([pair.left, pair.right], function(primer) {
+	  return _.every(
+	    _.map($scope.prime.excluded_spans, _.partial(compareSpans, primer.span)),
+	    function(s) {
+	      return _.contains(['<<<<','>>>>'], s)
+	    });
+	})});
+       */
+
+      $scope.primer_pairs = [pp];
+      //***
     };
 
 /*

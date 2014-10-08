@@ -556,6 +556,79 @@ describe('directives', function() {
     });
 
 
+    it("should display primer pairs in very simple case, with primers after feature", function() {
+      var tree = {name: 'root',
+		  type: 'gene',
+		  span: [8, 20],
+		  children: [{
+		    name: 'foo',
+		    type: 'exon',
+		    span: [8, 12],
+		    children: []
+		  }]
+		 };
+
+      var seqInfo = {
+	span: [7, 7 + 20],
+	sequence: "ABCDEFGHIJKLMNOPQRST",
+	quality: [90, 90, 90, 90, 90, 90, 90, 90, 90, 90,
+		  90, 90, 90, 90, 90, 90, 90, 90, 90, 90],
+	scaffold: "some scaffold"};
+
+      var primerPair = {
+	left: {
+	  span: [13, 15],
+	  sequence: "LL" },
+	 right: {
+	  span: [17, 19],
+	  sequence: "RR" }
+      };
+
+
+      inject(function($compile, $rootScope) {
+	$rootScope.tree = tree;
+	$rootScope.sequenceInfo = seqInfo;
+	$rootScope.primerPairs = [primerPair];
+	var myScope = $rootScope.$new()
+        var element = $compile(
+	  '<format-tree tree="tree"' +
+	    ' sequence-info="sequenceInfo"' +
+	    ' primer-pairs="primerPairs"' +
+	    '></format-tree>')(myScope);
+	myScope.$digest();	// fire the $watch'es
+	expect(element.html()).toBe(
+
+	  '<span class="seq">' +
+	    '<span class="seqFrag">' +
+	      '<span class="q90">A</span>' +
+	    '</span>' +
+	    '<span class="gene">' +
+	      '<span class="exon" data-name="foo">' +
+	        '<span class="seqFrag">' +
+	  	'<span class="q90">BCDE</span>' +
+	        '</span>' +
+	      '</span>' +
+	      '<span class="seqFrag">' +
+	        '<span class="q90">F</span>' +
+	        '<span class="primer primer-left">' +
+	  	'<span class="q90">GH</span>' +
+	        '</span>' +
+	        '<span class="q90">IJ</span>' +
+	        '<span class="primer primer-right">' +
+	  	'<span class="q90">KL</span>' +
+	        '</span>' +
+	        '<span class="q90">M</span>' +
+	      '</span>' +
+	    '</span>' +
+	    '<span class="seqFrag">' +
+	      '<span class="q90">NOPQRST</span>' +
+	    '</span>' +
+	  '</span>'
+	);
+      });
+    });
+
+
     it('should display primer pairs in simple case', function() {
       var tree = {name: 'root',
 		  type: 'gene',
