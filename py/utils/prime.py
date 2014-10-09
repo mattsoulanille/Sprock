@@ -187,7 +187,7 @@ class PrimerMaker(object):
                 = (target[1] - target[0] - 2*self.prime.fuzz,
                    target[1]-target[0])
 
-            primers = primer3.simulatedBindings.designPrimers(
+            primers = primer3.simulatedbindings.designPrimers(
                 self.seq_args, self.global_args,
                 input_log=self.input_log,
                 output_log=self.output_log)
