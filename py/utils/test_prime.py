@@ -1,5 +1,5 @@
 import unittest
-from itertools import chain
+from itertools import chain, product
 
 from get_sequence import FQDB
 from prime import Prime, PrimerMaker, Primer, PrimerPair, PrimerPairPossibilities
@@ -16,6 +16,10 @@ prime.maximum_primer_span = 4000
 prime.target_primer_span = 2000
 prime.fuzz = 500
 
+
+def compare_spans(a, b):
+    return ''.join('<' if t[0] < t[1] else '>' if t[0] > t[1] else '='
+                   for t in product(a,b))
 
 class primeTestCase(unittest.TestCase):
 
@@ -42,11 +46,98 @@ class primeTestCase(unittest.TestCase):
                                             [ 53410, 53845 ],
                                             [ 53909, 54483 ],
                                             [ 54653, 57711 ],
-                                            [ 58315, 59919 ] ] )
+                                            [ 58315, 59919 ] ],
+
+                           excluded_spans=[ [ 44020, 44222 ],
+                                            [ 48383, 48647 ],
+                                            [ 49591, 49731 ],
+                                            [ 53349, 53410 ],
+                                            [ 53845, 53909 ],
+                                            [ 54483, 54653 ],
+                                            [ 57711, 58315 ] ])
         self.maker.config_for(self.prime)
 
     def tearDown(self):
         pass
+
+    def test0_hot_MakePrimers(self):
+        # The "hot" test is the one currently the focus of development.
+        # Once settled it is moved down the numbered list
+        # blowup at GGTGGTGGTAGTCGAGAGGA:
+        # SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=46328,500,47881,500
+        def just():
+            yield [ 46328, 47881+500 ]
+
+        self.prime.primer_windows = [ [ 44222, 48383 ] ]
+        self.maker.config_for(self.prime)
+        # Monkey-patch:
+        self.maker.intervals_to_prime = just
+        self.maker.input_log = open('primer3_core_input.log', 'w')
+        self.maker.output_log = open('primer3_core_output.log', 'w')
+        self.maker.err_log = open('primer3_core_err.log', 'w')
+        for ppp in self.maker:
+            self.assert_ppp_basics(ppp)
+
+    def assert_ppp_list_basics(self, ppp_list):
+        return all(self.assert_ppp_basics(ppp) for ppp in ppp_list)
+
+    def assert_ppp_basics(self, ppp):
+        try:
+            assert isinstance(ppp, PrimerPairPossibilities), "expected PrimerPairPossibilities"
+            assert not hasattr(ppp, 'primer_error')
+            assert len(ppp.primer_pairs) == ppp.primer_pair_num_returned 
+            assert all(isinstance(pp, PrimerPair) for pp in ppp.primer_pairs)
+            assert all(set(['compl_any_th',
+                            'compl_end_th',
+                            'left',
+                            'num_returned',
+                            'penalty',
+                            'product_size',
+                            'right']) - set(dir(pp)) == set()
+                       for pp in ppp.primer_pairs)
+
+            assert all(isinstance(x, Primer)
+                       for pp in ppp.primer_pairs
+                       for x in (pp.left, pp.right))
+
+            assert all(set(['end_stability',
+                            #'explain',
+                            'gc_percent',
+                            'min_seq_quality',
+                            'num_returned',
+                            'penalty',
+                            'pos_len',
+                            #'self_any_th',
+                            #'self_end_th',
+                            #'self_hairpin_th',
+                            'sequence',
+                            'tm']) - set(dir(x)) == set()
+                       for pp in ppp.primer_pairs
+                       for x in (pp.left, pp.right))
+
+
+            # DEBUG
+            t = list((primer.span, excluded_span, compare_spans(primer.span, excluded_span))
+                     for pp in ppp.primer_pairs
+                     for primer in (pp.left, pp.right)
+                     for excluded_span in self.prime.excluded_spans)
+
+            for pp in ppp.primer_pairs:
+                for primer in (pp.left, pp.right):
+                    for excluded_span in self.prime.excluded_spans:
+                        assert compare_spans(primer.span, excluded_span) in ['<<<<', '>>>>'], \
+                            "primer %s span %r intersects excluded span %r" % \
+                            (primer.sequence, primer.span, excluded_span)
+
+            assert all(compare_spans(primer.span, excluded_span) in ['<<<<', '>>>>']
+                       for pp in ppp.primer_pairs
+                       for primer in (pp.left, pp.right)
+                       for excluded_span in self.prime.excluded_spans), \
+                           "primer span in excluded span"
+        except AssertionError:
+            raise
+        else:
+            return True
 
     def test1_IntervalsToPrime(self):
         self.prime.primer_windows = [ [ 1, 100 ] ]
@@ -89,93 +180,14 @@ class primeTestCase(unittest.TestCase):
         t = list(self.maker.intervals_to_prime())
         assert t == "TBD"
 
-    def test1_MakePrimers(self):
-        self.prime.whole_sequence = d['sequence'][:10000]
-        self.prime.whole_quality = d['quality'][:10000]
-        self.prime.primer_windows = [ [ 1000, 5000 ] ]
+    def xtest6_MakePrimers(self):
+        # The "hot" test is the one currently the focus of development.
+        # Once settled it is moved down the numbered list
         self.maker.input_log = open('primer3_core_input.log', 'w')
         self.maker.output_log = open('primer3_core_output.log', 'w')
         self.maker.err_log = open('primer3_core_err.log', 'w')
-        ppp_list = [x for x in self.maker]
-        assert len(ppp_list) == 3
-        assert all(isinstance(x, PrimerPairPossibilities) for x in ppp_list)
-
-        assert all(len(ppp.primer_pairs) == 5 for ppp in ppp_list)
-        assert all(map(lambda x: isinstance(x, PrimerPair),
-                   chain.from_iterable(ppp.primer_pairs for ppp in ppp_list)))
-        assert all(map(lambda x: set(['compl_any_th',
-                                      'compl_end_th',
-                                      'left',
-                                      'num_returned',
-                                      'penalty',
-                                      'product_size',
-                                      'right']) - set(dir(x)) == set(),
-                   chain.from_iterable(ppp.primer_pairs for ppp in ppp_list)))
-        assert all(map(lambda x: isinstance(x, Primer),
-                       chain.from_iterable((pp.left, pp.right)
-                                           for ppp in ppp_list
-                                           for pp in ppp.primer_pairs)))
-        assert all(map(lambda x: set(['end_stability',
-                                      #'explain',
-                                      'gc_percent',
-                                      'min_seq_quality',
-                                      'num_returned',
-                                      'penalty',
-                                      'pos_len',
-                                      #'self_any_th',
-                                      #'self_end_th',
-                                      #'self_hairpin_th',
-                                      'sequence',
-                                      'tm']) - set(dir(x)) == set(),
-                       chain.from_iterable((pp.left, pp.right)
-                                           for ppp in ppp_list
-                                           for pp in ppp.primer_pairs)))
-
-#        assert False            # to drop into pdb with --pdb switch to noestests
-
-    def test2_MakePrimers(self):
-        self.prime.primer_windows = [ [ 1000, 5000 ] ]
-        #with open('primer3_core_input.log', 'w') as self.maker.input_log:
-	    #with open('primer3_core_output.log', 'w') as self.maker.output_log:
-        self.maker.input_log = open('primer3_core_input.log', 'w')
-        self.maker.output_log = open('primer3_core_output.log', 'w')
-        self.maker.err_log = open('primer3_core_err.log', 'w')
-        ppp_list = [x for x in self.maker]
-        assert len(ppp_list) == 3
-        assert all(isinstance(x, PrimerPairPossibilities) for x in ppp_list)
-
-        assert all(len(ppp.primer_pairs) == 5 for ppp in ppp_list)
-        assert all(map(lambda x: isinstance(x, PrimerPair),
-                   chain.from_iterable(ppp.primer_pairs for ppp in ppp_list)))
-        assert all(map(lambda x: set(['compl_any_th',
-                                      'compl_end_th',
-                                      'left',
-                                      'num_returned',
-                                      'penalty',
-                                      'product_size',
-                                      'right']) - set(dir(x)) == set(),
-                   chain.from_iterable(ppp.primer_pairs for ppp in ppp_list)))
-        assert all(map(lambda x: isinstance(x, Primer),
-                       chain.from_iterable((pp.left, pp.right)
-                                           for ppp in ppp_list
-                                           for pp in ppp.primer_pairs)))
-        assert all(map(lambda x: set(['end_stability',
-                                      #'explain',
-                                      'gc_percent',
-                                      'min_seq_quality',
-                                      'num_returned',
-                                      'penalty',
-                                      'pos_len',
-                                      #'self_any_th',
-                                      #'self_end_th',
-                                      #'self_hairpin_th',
-                                      'sequence',
-                                      'tm']) - set(dir(x)) == set(),
-                       chain.from_iterable((pp.left, pp.right)
-                                           for ppp in ppp_list
-                                           for pp in ppp.primer_pairs)))
-
-#        assert False            # to drop into pdb with --pdb switch to noestests
+        for ppp in self.maker:
+            self.assert_ppp_basics(ppp)
 
 
 def main():

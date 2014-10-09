@@ -212,6 +212,9 @@ class DataService(object):
         p.whole_sequence = seq_data['sequence']
         p.whole_quality = seq_data['quality']
         pm = PrimerMaker()
+        pm.input_log = open('sprock_primer_input.log', 'a')
+        pm.output_log = open('sprock_primer_output.log', 'a')
+        pm.err_log = open('sprock_primer_err.log', 'a')
         pm.config_for(p)
         return pm
 
