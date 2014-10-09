@@ -65,13 +65,15 @@ class primeTestCase(unittest.TestCase):
         # Once settled it is moved down the numbered list
         # blowup at GGTGGTGGTAGTCGAGAGGA:
         # SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=46328,500,47881,500
-        def just():
-            yield [ 46328, 47881+500 ]
+        def just_this_interval():
+            yield [ 6328, 7881+500 ]
 
-        self.prime.primer_windows = [ [ 44222, 48383 ] ]
+        self.prime.whole_sequence = d['sequence'][40000:60000]
+        self.prime.whole_quality = d['quality'][40000:60000]
+        self.prime.primer_windows = [ [ 4222, 8383 ] ]
+        self.prime.excluded_spans=[ [ 8383, 8647 ] ]
         self.maker.config_for(self.prime)
-        # Monkey-patch:
-        self.maker.intervals_to_prime = just
+        self.maker.intervals_to_prime = just_this_interval # Monkey-patch
         self.maker.input_log = open('primer3_core_input.log', 'w')
         self.maker.output_log = open('primer3_core_output.log', 'w')
         self.maker.err_log = open('primer3_core_err.log', 'w')
@@ -84,7 +86,7 @@ class primeTestCase(unittest.TestCase):
     def assert_ppp_basics(self, ppp):
         try:
             assert isinstance(ppp, PrimerPairPossibilities), "expected PrimerPairPossibilities"
-            assert not hasattr(ppp, 'primer_error')
+            assert not hasattr(ppp, 'primer_error'), ppp.primer_error
             assert len(ppp.primer_pairs) == ppp.primer_pair_num_returned 
             assert all(isinstance(pp, PrimerPair) for pp in ppp.primer_pairs)
             assert all(set(['compl_any_th',
@@ -126,14 +128,13 @@ class primeTestCase(unittest.TestCase):
                 for primer in (pp.left, pp.right):
                     for excluded_span in self.prime.excluded_spans:
                         assert compare_spans(primer.span, excluded_span) in ['<<<<', '>>>>'], \
-                            "primer %s span %r intersects excluded span %r" % \
-                            (primer.sequence, primer.span, excluded_span)
+"primer %s span %r intersects excluded span %r; ok regions %r excluded region %r" % \
+                            (primer.sequence,
+                             primer.span,
+                             excluded_span,
+                             ppp.sequence_primer_pair_ok_region_list,
+                             ppp.sequence_excluded_region)
 
-            assert all(compare_spans(primer.span, excluded_span) in ['<<<<', '>>>>']
-                       for pp in ppp.primer_pairs
-                       for primer in (pp.left, pp.right)
-                       for excluded_span in self.prime.excluded_spans), \
-                           "primer span in excluded span"
         except AssertionError:
             raise
         else:
@@ -181,8 +182,38 @@ class primeTestCase(unittest.TestCase):
         assert t == "TBD"
 
     def xtest6_MakePrimers(self):
-        # The "hot" test is the one currently the focus of development.
-        # Once settled it is moved down the numbered list
+        self.maker.input_log = open('primer3_core_input.log', 'w')
+        self.maker.output_log = open('primer3_core_output.log', 'w')
+        self.maker.err_log = open('primer3_core_err.log', 'w')
+        for ppp in self.maker:
+            self.assert_ppp_basics(ppp)
+
+    def xtest7_MakePrimers(self):
+        # blowup at GGTGGTGGTAGTCGAGAGGA:
+        # SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=46328,500,47881,500
+        def just():
+            yield [ 46328, 47881+500 ]
+
+        self.prime.primer_windows = [ [ 44222, 48383 ] ]
+        self.maker.config_for(self.prime)
+        self.maker.intervals_to_prime = just # Monkey-patch
+        self.maker.input_log = open('primer3_core_input.log', 'w')
+        self.maker.output_log = open('primer3_core_output.log', 'w')
+        self.maker.err_log = open('primer3_core_err.log', 'w')
+        for ppp in self.maker:
+            self.assert_ppp_basics(ppp)
+
+    def xtest8_hot_MakePrimers(self):
+        # blowup at GGTGGTGGTAGTCGAGAGGA:
+        # SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=46328,500,47881,500
+        def just_this_interval():
+            yield [ 46328, 47881+500 ]
+
+        self.prime.whole_sequence = d['sequence'][:60000]
+        self.prime.whole_quality = d['quality'][:60000]
+        self.prime.primer_windows = [ [ 44222, 48383 ] ]
+        self.maker.config_for(self.prime)
+        self.maker.intervals_to_prime = just_this_interval # Monkey-patch
         self.maker.input_log = open('primer3_core_input.log', 'w')
         self.maker.output_log = open('primer3_core_output.log', 'w')
         self.maker.err_log = open('primer3_core_err.log', 'w')
