@@ -12,7 +12,7 @@ def main():
     scale = float(lightest - 0) / (20 - 90)
     for q in xrange(20,91):
         c = int((q - 20) * scale + lightest)
-        color_string = '#%x%x%x' % (c, c, c)
+        color_string = '#%.2x%.2x%.2x' % (c, c, c)
         print(s % (q, color_string))
 
 if __name__ == '__main__':
