@@ -396,6 +396,14 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
     };
   }]).
 
+  factory('reverseComplement', ['_', function(_) {
+    return function(seq) {
+      return _.map(seq, function(bp) {
+	return {A:'T', T:'A', C:'G', G:'C', N:'N'}[bp]
+      }).reverse().join('');
+    };
+  }]).
+
   factory('MessAround', ['_', function(_) {
 
     function fooey(a, b) {

@@ -670,5 +670,18 @@ describe('service', function() {
 
   });// findLeastElemContainingSpan
 
+  describe('reverseComplement', function() {
+    it('should exist',
+       inject(function(reverseComplement) {
+	 expect(reverseComplement).toBeDefined();
+       }));
+
+    it('should invert a sequence',
+       inject(function(reverseComplement) {
+	 expect(reverseComplement('ATCG')).toBe('CGAT');
+       }));
+
+  });
+
 
 });
