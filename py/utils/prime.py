@@ -15,7 +15,6 @@ class Primer(object):
         try:
 #            self.start, self.length = map(int, self.pos_len.split(','))
             self.start, self.length = self.pos_len
-            self.span = (self.start, self.start + self.length)
         except AttributeError:
             pass
 
@@ -51,8 +50,11 @@ class PrimerPair(object):
 
         self.left = Primer(**dict((child_key, d[k]) \
                                          for child_key, k in left_primer_key_map))
+        self.left.span = (self.left.start, self.left.start + self.left.length)
+
         self.right = Primer(**dict((child_key, d[k]) \
                                          for child_key, k in right_primer_key_map))
+        self.right.span = (self.right.start - self.right.length + 1, self.right.start + 1)
         self.__dict__.update(**dict((child_key, d[k]) \
                                          for child_key, k in pair_primer_key_map))
         

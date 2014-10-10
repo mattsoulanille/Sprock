@@ -65,13 +65,14 @@ class primeTestCase(unittest.TestCase):
         # Once settled it is moved down the numbered list
         # blowup at GGTGGTGGTAGTCGAGAGGA:
         # SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=46328,500,47881,500
+        bot = 44000
         def just_this_interval():
-            yield [ 6328, 7881+500 ]
+            yield [ 46328-bot, 47881+500-bot ]
 
-        self.prime.whole_sequence = d['sequence'][40000:60000]
-        self.prime.whole_quality = d['quality'][40000:60000]
-        self.prime.primer_windows = [ [ 4222, 8383 ] ]
-        self.prime.excluded_spans=[ [ 8383, 8647 ] ]
+        self.prime.whole_sequence = d['sequence'][bot:49000]
+        self.prime.whole_quality = d['quality'][bot:49000]
+        self.prime.primer_windows = [ [ 44222-bot, 48383-bot ] ]
+        self.prime.excluded_spans=[ [ 48383-bot, 48647-bot ] ]
         self.maker.config_for(self.prime)
         self.maker.intervals_to_prime = just_this_interval # Monkey-patch
         self.maker.input_log = open('primer3_core_input.log', 'w')
@@ -203,15 +204,17 @@ class primeTestCase(unittest.TestCase):
         for ppp in self.maker:
             self.assert_ppp_basics(ppp)
 
-    def xtest8_hot_MakePrimers(self):
+    def test8_hot_MakePrimers(self):
         # blowup at GGTGGTGGTAGTCGAGAGGA:
         # SEQUENCE_PRIMER_PAIR_OK_REGION_LIST=46328,500,47881,500
+        bot = 44000
         def just_this_interval():
-            yield [ 46328, 47881+500 ]
+            yield [ 46328-bot, 47881+500-bot ]
 
-        self.prime.whole_sequence = d['sequence'][:60000]
-        self.prime.whole_quality = d['quality'][:60000]
-        self.prime.primer_windows = [ [ 44222, 48383 ] ]
+        self.prime.whole_sequence = d['sequence'][bot:49000]
+        self.prime.whole_quality = d['quality'][bot:49000]
+        self.prime.primer_windows = [ [ 44222-bot, 48383-bot ] ]
+        self.prime.excluded_spans=[ [ 48383-bot, 48647-bot ] ]
         self.maker.config_for(self.prime)
         self.maker.intervals_to_prime = just_this_interval # Monkey-patch
         self.maker.input_log = open('primer3_core_input.log', 'w')
