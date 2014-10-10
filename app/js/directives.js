@@ -164,26 +164,34 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 
 		   function putPrimersInTree() {
 		     if (!scope.primerPairs) return;
+		     _.each(scope.primerPairs, function(pp) {
+		       if (!(_.has(pp, 'left') && _.has(pp, 'right'))) {
+			 console.log("where's my primers?:");
+			 console.log(pp);
+		       } else {
+			 putPrimerPairInTree(pp);
+		       }});
+		   };
+		   scope.$watch('primerPairs', putPrimersInTree);
+
+		   function putPrimerPairInTree(pp) {
 		     var seq_elem = iElement.children().eq(0);
 		     chai.assert(seq_elem.hasClass("seq"),
 				 'putPrimersInTree() expected a "seq" element');
-		     _.each(scope.primerPairs, function(pp) {
-		       if (!(_.has(pp, 'left') && _.has(pp, 'right'))) return;
-		       _.each(
-			 [[pp.left, "primer-left"], [pp.right, "primer-right"]], function(t) {
-			   var primer = t[0];
-			   var primer_class = t[1];
-			   var elem = findLeastElemContainingSpan(seq_elem, primer.span);
-			   if (elem) {
-			     var e = putPrimerIn(elem, primer);
-			     e.toggleClass(primer_class, true);
-			   } else {
-			     console.log("no place for primer:");
-			     console.log(primer);
-			   };
-			 })});
+		     _.each(
+		       [[pp.left, "primer-left"], [pp.right, "primer-right"]], function(t) {
+			 var primer = t[0];
+			 var primer_class = t[1];
+			 var elem = findLeastElemContainingSpan(seq_elem, primer.span);
+			 if (elem) {
+			   var e = putPrimerIn(elem, primer);
+			   e.toggleClass(primer_class, true);
+			 } else {
+			   console.log("no place for primer:");
+			   console.log(primer);
+			 };
+		       });
 		   };
-		   scope.$watch('primerPairs', putPrimersInTree);
 
 
 		   function putPrimerIn(elem, primer) {

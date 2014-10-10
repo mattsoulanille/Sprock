@@ -713,7 +713,10 @@ angular.module('sprock.controllers', []).
       console.log("FIXME: note_new_ppp() is a hack");
       if (!ppp || !_.has(ppp, 'primer_pairs')) return;
       var pp = ppp.primer_pairs[0];
-
+      if (!pp) {
+	console.log("note_new_ppp() got no primer_pairs");
+	return;
+      };
       _.each([pp.left, pp.right], function(primer) {
 	_.each($scope.prime.excluded_spans, function(ex_span) {
 	  var cc = compareSpans(primer.span, ex_span);
@@ -724,39 +727,7 @@ angular.module('sprock.controllers', []).
 	      " intersects excluded span " + ex_span);
 	})});
 
-
-      /*
-      chai.expect(pp).to.satisfy(function(pair) {
-	_.every([pair.left, pair.right], function(primer) {
-	  return _.every(
-	    _.map($scope.prime.excluded_spans, _.partial(compareSpans, primer.span)),
-	    function(s) {
-	      return _.contains(['<<<<','>>>>'], s)
-	    });
-	})});
-       */
-      /*
-      _.every([pp.left, pp.right], function(primer) {
-	return _.every($scope.prime.excluded_spans, function(ex_span) {
-	  return chai.assert(
-	    _.contains(['<<<<','>>>>'], compareSpans(primer.span, ex_span)),
-	    "primer " + primer + " span " + primer.span);
-	})});
-       */
-
-      /*
-      chai.expect(pp).to.satisfy(function(pair) {
-	_.every([pair.left, pair.right], function(primer) {
-	  return _.every(
-	    _.map($scope.prime.excluded_spans, _.partial(compareSpans, primer.span)),
-	    function(s) {
-	      return _.contains(['<<<<','>>>>'], s)
-	    });
-	})});
-       */
-
       $scope.primer_pairs = [pp];
-      //***
     };
 
 /*

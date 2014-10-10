@@ -7,7 +7,7 @@ angular.module('sprock.services', ['sprock.utilities']).
 
 // Demonstrate how to register services
 // In this case it is a simple value service.
-  value('version', '0.0.3').
+  value('version', '0.0.5').
 
 // FIXME: DRY
 
