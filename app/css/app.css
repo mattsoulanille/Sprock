@@ -57,12 +57,16 @@
   background: #ffbbbb;
 }
 
-primer-lit {
-  background: #ff8888;
+.primer-left.lit {
+  background: #ff7777;
 }
 
 .primer-right {
   background: #bbffbb;
+}
+
+.primer-right.lit {
+  background: #66ff66;
 }
 
 .primer-product-0 {

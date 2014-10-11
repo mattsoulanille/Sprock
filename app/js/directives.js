@@ -189,7 +189,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 			 if (elem) {
 			   var e = putPrimerIn(elem, primer);
 			   e.addClass("primer-" + side_name);
-			   e.attr('ng-class', '{primerLit: ' + switchName + '}');
+			   e.attr('ng-class', '{lit: ' + switchName + '}');
 			   e.attr('ng-mouseenter', switchName + '=true');
 			   e.attr('ng-mouseleave', switchName + '=false');
 /*
