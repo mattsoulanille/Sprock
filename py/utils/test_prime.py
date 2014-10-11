@@ -157,7 +157,7 @@ class primeTestCase(unittest.TestCase):
         self.prime.primer_windows = [ [ 1000, 4000 ] ]
         self.maker.config_for(self.prime)
         t = list(self.maker.intervals_to_prime())
-        assert t == [ [ 1000, 4000 ] ]
+        assert t == [ [ 1000, 3000], [ 2000, 4000 ] ]
 
     def test4_IntervalsToPrime(self):
         self.prime.primer_windows = [ [ 1000, 5000 ] ]

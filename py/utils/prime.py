@@ -133,8 +133,8 @@ class PrimerMaker(object):
         # return the next primer pair (if you're the iterator)
         #return self.primer_iterator.next()
         pass
-        
-    def intervals_to_prime(self):
+    
+    def was_intervals_to_prime(self):
         """ Generates the intervals for which we want primer pairs
         """
         for window in self.prime.primer_windows:
@@ -158,6 +158,30 @@ class PrimerMaker(object):
                     left = max(right - l_overlap, window[0])
                     right = min(left + l_interval, window[1])
                 yield [left, right]
+
+
+    def intervals_to_prime(self):
+        from math import floor
+        for window in self.prime.primer_windows:
+            smin = self.prime.minimum_primer_span
+            srec = self.prime.target_primer_span
+            if window[1] - window[0] >= smin:
+                if window[1] - window[0] <= srec:
+                    yield [window[0], window[1]]
+                    
+                else:
+                    over = self.prime.minimum_overlap
+                    final_term = int(floor((window[1] - (window[0] + srec)) / (srec - over))) # The number of the final term
+                    terms = final_term + 1 # the number of intervals that will be returned
+                    s = int((window[1] - window[0] + (float(over))*final_term) / (final_term + 1)) # see notes here "https://drive.google.com/a/soulanille.net/folderview?id=0BxQJBFe9xq7hNlVNaFIwTFpJREU&usp=drive_web"
+                    interval_to_prime = [[window[0] + n*s - (over) * n, \
+                                          window[0] + (n+1)*s - (over) * n] \
+                                         for n in range(terms)]
+                    interval_to_prime[-1][-1] = window[1]
+                    for x in interval_to_prime:
+                        yield x
+
+
 
     def make_primers(self):
         # See http://primer3.sourceforge.net/primer3_manual.htm
