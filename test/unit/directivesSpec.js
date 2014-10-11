@@ -532,11 +532,11 @@ describe('directives', function() {
 	  '<span class="seq">' +
 	    '<span class="seqFrag">' +
 	      '<span class="q90">A</span>' +
-	      '<span class="primer primer-left">' +
+	      '<span class="primer primer-left ng-scope">' +
 	        '<span class="q90">BCD</span>' +
 	      '</span>' +
 	      '<span class="q90">EF</span>' +
-	      '<span class="primer primer-right">' +
+	      '<span class="primer primer-right ng-scope">' +
 	        '<span class="q90">GH</span>' +
 	      '</span>' +
 	    '</span>' +
@@ -610,11 +610,11 @@ describe('directives', function() {
 	      '</span>' +
 	      '<span class="seqFrag">' +
 	        '<span class="q90">F</span>' +
-	        '<span class="primer primer-left">' +
+	        '<span class="primer primer-left ng-scope">' +
 	  	'<span class="q90">GH</span>' +
 	        '</span>' +
 	        '<span class="q90">IJ</span>' +
-	        '<span class="primer primer-right">' +
+	        '<span class="primer primer-right ng-scope">' +
 	  	'<span class="q90">KL</span>' +
 	        '</span>' +
 	        '<span class="q90">M</span>' +
@@ -673,12 +673,12 @@ describe('directives', function() {
 	    '<span class="seq">' +
 	      '<span class="seqFrag">' +
 		'<span class="q20">A</span>' +
-		'<span class="primer primer-left">' +
+		'<span class="primer primer-left ng-scope">' +
 		  '<span class="q20">B</span>' +
 		  '<span class="q21">CD</span>' +
 		'</span>' +
 		'<span class="q22">EF</span>' +
-	        '<span class="primer primer-right">' +
+	        '<span class="primer primer-right ng-scope">' +
 	          '<span class="q23">GH</span>' +
 	        '</span>' +
 	      '</span>' +

@@ -53,6 +53,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		 link: function postLink(scope, iElement, iAttrs, controller) {
 		   var spins = 0;
 		   var leaf = {}; // An object used to flag a leaf
+		   scope.lightSwitches = {}; // used to control hightlighting of specific primer pairs
 
 		   function updateTreeDisplay() {
 		     if (!scope.tree) return;
@@ -178,6 +179,8 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     var seq_elem = iElement.children().eq(0);
 		     chai.assert(seq_elem.hasClass("seq"),
 				 'putPrimersInTree() expected a "seq" element');
+		     var switchName = 'lightSwitches.' +
+			   pp.left.sequence + pp.right.sequence;
 		     _.each(
 		       [[pp.left, "left"], [pp.right, "right"]], function(t) {
 			 var primer = t[0];
@@ -186,8 +189,27 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 			 if (elem) {
 			   var e = putPrimerIn(elem, primer);
 			   e.addClass("primer-" + side_name);
-			   e.attr("tooltip", "so good");
-			   e.attr("tooltip-placement", side_name);
+			   e.attr('ng-class', '{primerLit: ' + switchName + '}');
+			   e.attr('ng-mouseenter', switchName + '=true');
+			   e.attr('ng-mouseleave', switchName + '=false');
+/*
+		     _.each(
+		       [[pp.left, "left"], [pp.right, "right"]], function(t) {
+			 var primer = t[0];
+			 var side_name = t[1];
+			 var elem = findLeastElemContainingSpan(seq_elem, primer.span);
+			 if (elem) {
+			   var e = putPrimerIn(elem, primer);
+			   e.addClass("primer-" + side_name);
+			   e.attr('ng-class',
+				  '{primerLit: ' +
+				  'lightSwitches.' + primer.sequence + '}');
+			   e.attr('ng-mouseover',
+				  'lightSwitches.' + primer.sequence +
+				  ' = 1');
+//			   e.attr("tooltip", "so good");
+//			   e.attr("tooltip-placement", side_name);
+*/
 			   $compile(e)(scope);
 			 } else {
 			   console.log("no place for primer:");
