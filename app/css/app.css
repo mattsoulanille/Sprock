@@ -66,287 +66,363 @@
 }
 
 .q0 {
-  color: #ececec;
-}
-
-.q20 {
   color: #eaeaea;
 }
 
-.q21 {
-  color: #e6e6e6;
+.q1 {
+  color: #e7e7e7;
 }
 
-.q22 {
-  color: #e3e3e3;
+.q2 {
+  color: #e4e4e4;
 }
 
-.q23 {
+.q3 {
+  color: #e2e2e2;
+}
+
+.q4 {
   color: #dfdfdf;
 }
 
-.q24 {
-  color: #dcdcdc;
+.q5 {
+  color: #dddddd;
 }
 
-.q25 {
-  color: #d9d9d9;
+.q6 {
+  color: #dadada;
 }
 
-.q26 {
+.q7 {
+  color: #d7d7d7;
+}
+
+.q8 {
   color: #d5d5d5;
 }
 
-.q27 {
+.q9 {
   color: #d2d2d2;
 }
 
-.q28 {
-  color: #cfcfcf;
+.q10 {
+  color: #d0d0d0;
 }
 
-.q29 {
-  color: #cbcbcb;
+.q11 {
+  color: #cdcdcd;
 }
 
-.q30 {
+.q12 {
+  color: #cacaca;
+}
+
+.q13 {
   color: #c8c8c8;
 }
 
-.q31 {
+.q14 {
   color: #c5c5c5;
 }
 
-.q32 {
-  color: #c1c1c1;
+.q15 {
+  color: #c3c3c3;
 }
 
-.q33 {
-  color: #bebebe;
+.q16 {
+  color: #c0c0c0;
 }
 
-.q34 {
+.q17 {
+  color: #bdbdbd;
+}
+
+.q18 {
   color: #bbbbbb;
 }
 
-.q35 {
-  color: #b7b7b7;
+.q19 {
+  color: #b8b8b8;
 }
 
-.q36 {
-  color: #b4b4b4;
+.q20 {
+  color: #b6b6b6;
 }
 
-.q37 {
-  color: #b1b1b1;
+.q21 {
+  color: #b3b3b3;
 }
 
-.q38 {
-  color: #adadad;
+.q22 {
+  color: #b0b0b0;
 }
 
-.q39 {
-  color: #aaaaaa;
+.q23 {
+  color: #aeaeae;
 }
 
-.q40 {
-  color: #a7a7a7;
+.q24 {
+  color: #ababab;
 }
 
-.q41 {
+.q25 {
+  color: #a9a9a9;
+}
+
+.q26 {
+  color: #a6a6a6;
+}
+
+.q27 {
   color: #a3a3a3;
 }
 
-.q42 {
-  color: #a0a0a0;
+.q28 {
+  color: #a1a1a1;
 }
 
-.q43 {
-  color: #9d9d9d;
+.q29 {
+  color: #9e9e9e;
 }
 
-.q44 {
+.q30 {
+  color: #9c9c9c;
+}
+
+.q31 {
   color: #999999;
 }
 
-.q45 {
+.q32 {
   color: #969696;
 }
 
-.q46 {
-  color: #939393;
+.q33 {
+  color: #949494;
 }
 
-.q47 {
+.q34 {
+  color: #919191;
+}
+
+.q35 {
   color: #8f8f8f;
 }
 
-.q48 {
+.q36 {
   color: #8c8c8c;
 }
 
-.q49 {
+.q37 {
   color: #898989;
 }
 
-.q50 {
-  color: #858585;
+.q38 {
+  color: #878787;
 }
 
-.q51 {
+.q39 {
+  color: #848484;
+}
+
+.q40 {
   color: #828282;
 }
 
-.q52 {
+.q41 {
   color: #7f7f7f;
 }
 
-.q53 {
-  color: #7b7b7b;
+.q42 {
+  color: #7c7c7c;
 }
 
-.q54 {
-  color: #787878;
+.q43 {
+  color: #7a7a7a;
 }
 
-.q55 {
+.q44 {
+  color: #777777;
+}
+
+.q45 {
   color: #757575;
 }
 
-.q56 {
-  color: #717171;
+.q46 {
+  color: #727272;
 }
 
-.q57 {
-  color: #6e6e6e;
+.q47 {
+  color: #6f6f6f;
 }
 
-.q58 {
+.q48 {
+  color: #6d6d6d;
+}
+
+.q49 {
   color: #6a6a6a;
 }
 
-.q59 {
-  color: #676767;
+.q50 {
+  color: #686868;
 }
 
-.q60 {
-  color: #646464;
+.q51 {
+  color: #656565;
 }
 
-.q61 {
+.q52 {
+  color: #626262;
+}
+
+.q53 {
   color: #606060;
 }
 
-.q62 {
+.q54 {
   color: #5d5d5d;
 }
 
-.q63 {
-  color: #5a5a5a;
+.q55 {
+  color: #5b5b5b;
 }
 
-.q64 {
-  color: #565656;
+.q56 {
+  color: #585858;
 }
 
-.q65 {
+.q57 {
+  color: #555555;
+}
+
+.q58 {
   color: #535353;
 }
 
-.q66 {
+.q59 {
   color: #505050;
 }
 
-.q67 {
-  color: #4c4c4c;
+.q60 {
+  color: #4e4e4e;
 }
 
-.q68 {
-  color: #494949;
+.q61 {
+  color: #4b4b4b;
 }
 
-.q69 {
+.q62 {
+  color: #484848;
+}
+
+.q63 {
   color: #464646;
 }
 
+.q64 {
+  color: #434343;
+}
+
+.q65 {
+  color: #414141;
+}
+
+.q66 {
+  color: #3e3e3e;
+}
+
+.q67 {
+  color: #3b3b3b;
+}
+
+.q68 {
+  color: #393939;
+}
+
+.q69 {
+  color: #363636;
+}
+
 .q70 {
-  color: #424242;
+  color: #343434;
 }
 
 .q71 {
-  color: #3f3f3f;
+  color: #313131;
 }
 
 .q72 {
-  color: #3c3c3c;
-}
-
-.q73 {
-  color: #383838;
-}
-
-.q74 {
-  color: #353535;
-}
-
-.q75 {
-  color: #323232;
-}
-
-.q76 {
   color: #2e2e2e;
 }
 
-.q77 {
-  color: #2b2b2b;
+.q73 {
+  color: #2c2c2c;
 }
 
-.q78 {
-  color: #282828;
+.q74 {
+  color: #292929;
 }
 
-.q79 {
+.q75 {
+  color: #272727;
+}
+
+.q76 {
   color: #242424;
 }
 
-.q80 {
+.q77 {
   color: #212121;
 }
 
-.q81 {
-  color: #1e1e1e;
+.q78 {
+  color: #1f1f1f;
 }
 
-.q82 {
+.q79 {
+  color: #1c1c1c;
+}
+
+.q80 {
   color: #1a1a1a;
 }
 
-.q83 {
+.q81 {
   color: #171717;
 }
 
-.q84 {
+.q82 {
   color: #141414;
 }
 
-.q85 {
-  color: #101010;
+.q83 {
+  color: #121212;
 }
 
-.q86 {
+.q84 {
+  color: #0f0f0f;
+}
+
+.q85 {
   color: #0d0d0d;
 }
 
-.q87 {
+.q86 {
   color: #0a0a0a;
 }
 
+.q87 {
+  color: #070707;
+}
+
 .q88 {
-  color: #060606;
+  color: #050505;
 }
 
 .q89 {
-  color: #030303;
+  color: #020202;
 }
 
 .q90 {
