@@ -37,10 +37,11 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		      }]).
 
   directive('formatTree',
-	    ['_', 'compareSpans', 'findLeastElemContainingSpan',
-	     function factory(_, compareSpans, findLeastElemContainingSpan) {
+	    ['_', '$compile', 'compareSpans', 'findLeastElemContainingSpan',
+	     function factory(_, $compile, compareSpans, findLeastElemContainingSpan) {
 	       var directiveDefinitionObject = {
 		 //template: '<div></div>', // or // function(tElement, tAttrs) { ... },
+		 //transclude: true,
 		 restrict: 'E',
 
 		 scope: {
@@ -51,7 +52,6 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 
 		 link: function postLink(scope, iElement, iAttrs, controller) {
 		   var spins = 0;
-
 		   var leaf = {}; // An object used to flag a leaf
 
 		   function updateTreeDisplay() {
@@ -179,13 +179,16 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     chai.assert(seq_elem.hasClass("seq"),
 				 'putPrimersInTree() expected a "seq" element');
 		     _.each(
-		       [[pp.left, "primer-left"], [pp.right, "primer-right"]], function(t) {
+		       [[pp.left, "left"], [pp.right, "right"]], function(t) {
 			 var primer = t[0];
-			 var primer_class = t[1];
+			 var side_name = t[1];
 			 var elem = findLeastElemContainingSpan(seq_elem, primer.span);
 			 if (elem) {
 			   var e = putPrimerIn(elem, primer);
-			   e.toggleClass(primer_class, true);
+			   e.addClass("primer-" + side_name);
+			   e.attr("tooltip", "so good");
+			   e.attr("tooltip-placement", side_name);
+			   $compile(e)(scope);
 			 } else {
 			   console.log("no place for primer:");
 			   console.log(primer);
@@ -247,6 +250,8 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     // prev_child is the immediately-leftward child
 		     // We place the primer element between them
 		     var primer_elem = angular.element('<span class="primer"></span>');
+//		     primer_elem.attr("tooltip", "so nice");
+//		     var primer_elem = angular.element('<span class="primer" tooltip="lovely"></span>');
 		     if (prev_child === null) { // It has no child before it
 		       elem.prepend(primer_elem); // so it goes first
 		     } else {
@@ -281,7 +286,6 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     chai.expect(child).to.have.length(1);
 		     return primer_elem;
 		   };
-
 
 		 } //link
 	       };
