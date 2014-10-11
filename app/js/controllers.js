@@ -721,7 +721,7 @@ angular.module('sprock.controllers', []).
 	_.each($scope.prime.excluded_spans, function(ex_span) {
 	  var cc = compareSpans(primer.span, ex_span);
 	  chai.assert(
-	    _.contains(['<<<<','>>>>'], cc),
+	    _.contains(['<<<<','>>>>', '<<=<'], cc),
 	    "primer " + primer.sequence +
 	      " span " + primer.span +
 	      " intersects excluded span " + ex_span);
