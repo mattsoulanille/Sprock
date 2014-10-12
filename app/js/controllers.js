@@ -823,6 +823,22 @@ angular.module('sprock.controllers', []).
 
   }]).
 
+  controller('primerModalCtrl', function ($scope, $modalInstance, primerPairs) {
+
+    $scope.primerPairs = primerPairs;
+    $scope.selected = {
+      item: $scope.primerPairs[0]
+    };
+
+    $scope.ok = function () {
+      $modalInstance.close($scope.selected.item);
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+  }).
+
   controller('Dev', ['_', '$scope', 'getTree', function(_, $scope, getTree) {
     $scope.done = false;
 

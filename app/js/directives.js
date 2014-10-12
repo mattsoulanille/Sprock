@@ -37,8 +37,8 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		      }]).
 
   directive('formatTree',
-	    ['_', '$compile', 'compareSpans', 'findLeastElemContainingSpan',
-	     function factory(_, $compile, compareSpans, findLeastElemContainingSpan) {
+	    ['_', '$compile', '$modal', '$log', 'compareSpans', 'findLeastElemContainingSpan',
+	     function factory(_, $compile, $modal, $log, compareSpans, findLeastElemContainingSpan) {
 	       var directiveDefinitionObject = {
 		 //template: '<div></div>', // or // function(tElement, tAttrs) { ... },
 		 //transclude: true,
@@ -178,7 +178,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		   function putPrimerPairInTree(pp) {
 		     var seq_elem = iElement.children().eq(0);
 		     chai.assert(seq_elem.hasClass("seq"),
-				 'putPrimersInTree() expected a "seq" element');
+				 'putPrimerPairInTree() expected a "seq" element');
 		     var switchName = 'lightSwitches.' +
 			   pp.left.sequence + pp.right.sequence;
 		     var pair_span = pp.right.span[1] - pp.left.span[0];
@@ -196,6 +196,10 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 			   e.attr('ng-mouseleave', switchName + '=false');
 			   e.attr('tooltip', pair_span + ' ' + pair_tm +
 				 ' ' + primer.sequence);
+			   e.attr('ng-click',
+				  "primerModal('" +
+				  pp.left.sequence + "', '" +
+				  pp.right.sequence + "')");
 			   $compile(e)(scope);
 			 } else {
 			   console.log("no place for primer:");
@@ -293,6 +297,28 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		     };
 		     chai.expect(child).to.have.length(1);
 		     return primer_elem;
+		   };
+
+
+		   scope.primerModal = function(left_seq, right_seq) {
+
+		     var modalInstance = $modal.open({
+		       templateUrl: 'partials/primerModalContent.html',
+		       controller: 'primerModalCtrl',
+		       //size: size,
+		       resolve: {
+			 primerPairs: function () {
+			   return scope.primerPairs;
+			 }
+		       }
+		     });
+
+		     modalInstance.result.then(function (selectedItem) {
+		       scope.selected = selectedItem;
+		     }, function (why) {
+		       $log.info('Modal dismissed at: ' + new Date() +
+				 ' because of ' + why);
+		     });
 		   };
 
 		 } //link
