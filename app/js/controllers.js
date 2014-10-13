@@ -410,15 +410,15 @@ angular.module('sprock.controllers', []).
     $scope.$watchCollection('desired_sequence_span', get_sequence);
 
     $scope.makePrimers = function() {
-      $scope.ppp_list = [];
+      $scope.pppList = [];
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
 	console.log(v);
-	$scope.ppp_list.push(v);
-	note_new_ppp(v, $scope.ppp_list.length);
+	$scope.pppList.push(v);
+	note_new_ppp(v, $scope.pppList.length);
       }, [], $scope.prime).then(function(v) {
-	$scope.ppp_list_eventually_was = v; //FIXME
+	$scope.pppList_eventually_was = v; //FIXME
       });
     };
 
@@ -672,16 +672,16 @@ angular.module('sprock.controllers', []).
     $scope.$watchCollection('desired_sequence_span', get_sequence);
 
     $scope.makePrimers = function() {
-      $scope.ppp_list = [];
-      $scope.primer_pairs = [];
+      $scope.pppList = [];
+//      $scope.primer_pairs = [];
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
 	//console.log(v);
-	$scope.ppp_list.push(v);
-	note_new_ppp(v, $scope.ppp_list.length);
+	$scope.pppList.push(v);
+	note_new_ppp(v, $scope.pppList.length);
       }, [], $scope.prime).then(function(v) {
-	$scope.ppp_list_eventually_was = v; //FIXME
+	$scope.pppList_eventually_was = v; //FIXME
       });
     };
 
@@ -711,7 +711,9 @@ angular.module('sprock.controllers', []).
 
     function note_new_ppp(ppp, which) {
       console.log("FIXME: note_new_ppp() is a hack");
-      if (!ppp || !_.has(ppp, 'primer_pairs')) return;
+      if (!ppp || !_.has(ppp, 'primer_pairs')) {
+	return;
+      };
       var pp = ppp.primer_pairs[0];
       if (!pp) {
 	console.log("note_new_ppp() got no primer_pairs");

@@ -47,7 +47,8 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		 scope: {
 		   tree: '=',
 		   sequenceInfo: '=',
-		   primerPairs: '='
+		   primerPairs: '=',
+		   pppList: '='
 		 },
 
 		 link: function postLink(scope, iElement, iAttrs, controller) {
@@ -163,22 +164,94 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		   };
 
 
-		   function putPrimersInTree() {
-		     if (!scope.primerPairs) return;
-		     _.each(scope.primerPairs, function(pp) {
-		       if (!(_.has(pp, 'left') && _.has(pp, 'right'))) {
-			 console.log("where's my primers?:");
-			 console.log(pp);
-		       } else {
-			 putPrimerPairInTree(pp);
-		       }});
+		   scope.unPrime = function(elem) {
+		     chai.expect(elem.hasClass('primer')).to.be.true;
+		     var children = _.map(elem.children(), angular.element);
+		     while (children.length) {
+		       elem.after(children.pop());
+		     };
 		   };
-		   scope.$watch('primerPairs', putPrimersInTree);
 
-		   function putPrimerPairInTree(pp) {
-		     var seq_elem = iElement.children().eq(0);
+/*
+ * We are passed the pppList in our (isolate) scope as an attribute. We maintain
+ * an object in which we record where we put each primer pair.
+ * 
+ * 
+ */
+
+		   var obj_for_data_obj_for_ppp = {};
+
+		   function data_obj_for_ppp(ppp) {
+		     var key = key_for_ppp(ppp);
+		     return data_obj_for_ppp_from_key(key);
+		   };
+
+		   function key_for_ppp(ppp) {
+		     if (!ppp ||
+			 !_.has(ppp, 'primer_pair_num_returned') ||
+			 !ppp.primer_pair_num_returned) {
+		       return null;
+		     };
+		     var pp = ppp.primer_pairs[0];
+		     return pp.left.sequence + pp.right.sequence;
+		   };
+
+		   function data_obj_for_ppp_from_key(key) {
+		     if (key) {
+		       if (!_.has(obj_for_data_obj_for_ppp, key)) {
+			 obj_for_data_obj_for_ppp[key] = {};
+		       };
+		       return obj_for_data_obj_for_ppp[key];
+		     };
+		     return null;
+		   };
+
+		   function makeDOMMatchPrimerPairPossibilitiesList() {
+		     if (!scope.pppList || !scope.pppList.length) return;
+
+		     // First clear away primers that are not in the current pppList
+		     var keysInPPPList =
+			   _.filter(_.map(scope.pppList, key_for_ppp),
+				    _.identity);
+		     var keysNotInPPPList =
+			   _.difference(_.keys(obj_for_data_obj_for_ppp),
+					keysInPPPList);
+		     _.each(keysNotInPPPList, function(key) {
+		       var d = data_obj_for_ppp_from_key(key);
+		       chai.expect(d).to.include.keys('elements');
+		       _.each(d.elements, scope.unPrime);
+		     });
+		     obj_for_data_obj_for_ppp =
+		       _.omit(obj_for_data_obj_for_ppp, keysNotInPPPList);
+
+		     // Ensure each ppp in pppList is or gets put in the DOM
+		     _.each(scope.pppList, function(ppp) {
+		       if (!ppp.primer_pair_num_returned) {
+			 //console.log("where's my primers?:");
+			 //console.log(ppp);
+		       } else {
+			 ensurePrimerPairPossibilitiesInTree(ppp);
+		       }});
+
+		   };
+		   scope.$watchCollection('pppList', makeDOMMatchPrimerPairPossibilitiesList);
+
+
+		   function ensurePrimerPairPossibilitiesInTree(ppp) {
+		     var ppp_data = data_obj_for_ppp(ppp);
+		     if (!ppp_data.elements) {
+		       ppp_data.elements = putPrimerPairPossibilitiesInTree(ppp);
+		     };
+		   };
+
+
+		   function putPrimerPairPossibilitiesInTree(ppp) {
+		     var rv = {};
+		     var seq_elem = iElement.children().eq(0); // get our root sequence element
 		     chai.assert(seq_elem.hasClass("seq"),
 				 'putPrimerPairInTree() expected a "seq" element');
+
+		     var pp = ppp.primer_pairs[0]; //FIXME
 		     var switchName = 'lightSwitches.' +
 			   pp.left.sequence + pp.right.sequence;
 		     var pair_span = pp.right.span[1] - pp.left.span[0];
@@ -196,16 +269,18 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 			   e.attr('ng-mouseleave', switchName + '=false');
 			   e.attr('tooltip', pair_span + ' ' + pair_tm +
 				 ' ' + primer.sequence);
-			   e.attr('ng-click',
-				  "primerModal('" +
-				  pp.left.sequence + "', '" +
-				  pp.right.sequence + "')");
+//			   e.attr('ng-click',
+//				  "primerModal('" +
+//				  pp.left.sequence + "', '" +
+//				  pp.right.sequence + "')");
 			   $compile(e)(scope);
+			   rv[side_name] = e;
 			 } else {
 			   console.log("no place for primer:");
 			   console.log(primer);
 			 };
 		       });
+		     return rv;
 		   };
 
 
