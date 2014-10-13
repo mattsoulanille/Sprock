@@ -825,16 +825,18 @@ angular.module('sprock.controllers', []).
 
   }]).
 
-  controller('primerModalCtrl', function ($scope, $modalInstance, me, primerPairs) {
+  controller('primerModalCtrl', function ($scope, $modalInstance, me) {
 
-    $scope.primerPairs = primerPairs;
     $scope.ppp = me.data('ppp');
+    $scope.ppIndex = me.data('ppIndex');
+
     $scope.selected = {
-      item: $scope.primerPairs[0]
+      original_index: $scope.ppIndex,
+      index: $scope.ppIndex
     };
 
     $scope.ok = function () {
-      $modalInstance.close($scope.selected.item);
+      $modalInstance.close($scope.selected);
     };
 
     $scope.cancel = function () {

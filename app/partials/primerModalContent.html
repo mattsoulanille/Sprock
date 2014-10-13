@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <h3 class="modal-title">Primer Pairs Proffered:</h3>
+</div>
+<div class="modal-body">
+  <ul class="list-unstyled">
+    <li ng-repeat="pp in ppp.primer_pairs">
+      <span ng-click="selected.index = $index">
+	{{pp.left.start}}
+	<span class="seq primer primer-left" ng-class="{lit: $index == selected.index}">{{pp.left.sequence}}</span>
+	{{pp.left.tm}} {{pp.right.tm}}
+	<span class="seq primer primer-right" ng-class="{lit: $index == selected.index}">{{pp.right.sequence}}</span>
+	{{pp.right.start}}
+      </span>
+    </li>
+  </ul>
+  Selected: <b>{{ selected.index }}</b>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" ng-click="ok()">OK</button>
+  <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

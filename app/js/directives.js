@@ -51,7 +51,6 @@ angular.module('sprock.directives',
 		 scope: {
 		   tree: '=',
 		   sequenceInfo: '=',
-		   primerPairs: '=',
 		   pppList: '='
 		 },
 
@@ -168,21 +167,27 @@ angular.module('sprock.directives',
 		   };
 
 
-		   scope.unPrime = function(elem) {
+		   function unPrime(elem) {
 		     chai.expect(elem.hasClass('primer')).to.be.true;
 		     var children = _.map(elem.children(), angular.element);
 		     while (children.length) {
 		       elem.after(children.pop());
 		     };
+		     elem.remove();
 		   };
+
+		   function removePPP(ppp) {
+		     var d = data_obj_for_ppp(ppp);
+		     chai.expect(d).to.include.keys('elements');
+		     _.each(d.elements, unPrime);
+		     remove_data_obj_for_ppp_from_ofdofp(ppp);
+		   };
+
 
 /*
  * We are passed the pppList in our (isolate) scope as an attribute. We maintain
  * an object in which we record where we put each primer pair.
- * 
- * 
  */
-
 		   var obj_for_data_obj_for_ppp = {};
 
 		   function data_obj_for_ppp(ppp) {
@@ -202,13 +207,20 @@ angular.module('sprock.directives',
 
 		   function data_obj_for_ppp_from_key(key) {
 		     if (key) {
-		       if (!_.has(obj_for_data_obj_for_ppp, key)) {
+		       if (!_.has(obj_for_data_obj_for_ppp, key) ||
+			   !obj_for_data_obj_for_ppp[key]) {
 			 obj_for_data_obj_for_ppp[key] = {};
 		       };
 		       return obj_for_data_obj_for_ppp[key];
 		     };
 		     return null;
 		   };
+
+		   function remove_data_obj_for_ppp_from_ofdofp(ppp) {
+		     var key = key_for_ppp(ppp);
+		     if (key) {
+		       obj_for_data_obj_for_ppp[key] = null;
+		     }};
 
 		   function makeDOMMatchPrimerPairPossibilitiesList() {
 		     if (!scope.pppList || !scope.pppList.length) return;
@@ -223,7 +235,7 @@ angular.module('sprock.directives',
 		     _.each(keysNotInPPPList, function(key) {
 		       var d = data_obj_for_ppp_from_key(key);
 		       chai.expect(d).to.include.keys('elements');
-		       _.each(d.elements, scope.unPrime);
+		       _.each(d.elements, unPrime);
 		     });
 		     obj_for_data_obj_for_ppp =
 		       _.omit(obj_for_data_obj_for_ppp, keysNotInPPPList);
@@ -241,21 +253,21 @@ angular.module('sprock.directives',
 		   scope.$watchCollection('pppList', makeDOMMatchPrimerPairPossibilitiesList);
 
 
-		   function ensurePrimerPairPossibilitiesInTree(ppp) {
+		   function ensurePrimerPairPossibilitiesInTree(ppp, ppIndex) {
 		     var ppp_data = data_obj_for_ppp(ppp);
 		     if (!ppp_data.elements) {
-		       ppp_data.elements = putPrimerPairPossibilitiesInTree(ppp);
+		       // ppp is not installed in the DOM.
+		       ppp_data.elements = putPrimerPairPossibilitiesInTree(ppp, ppIndex || 0);
 		     };
 		   };
 
 
-		   function putPrimerPairPossibilitiesInTree(ppp) {
+		   function putPrimerPairPossibilitiesInTree(ppp, ppIndex) {
 		     var rv = {};
 		     var seq_elem = iElement.children().eq(0); // get our root sequence element
 		     chai.assert(seq_elem.hasClass("seq"),
 				 'putPrimerPairInTree() expected a "seq" element');
-
-		     var pp = ppp.primer_pairs[0]; //FIXME
+		     var pp = ppp.primer_pairs[ppIndex];
 		     var switchName = 'lightSwitches.' +
 			   pp.left.sequence + pp.right.sequence;
 		     var pair_span = pp.right.span[1] - pp.left.span[0];
@@ -274,6 +286,7 @@ angular.module('sprock.directives',
 			   e.attr('tooltip', pair_span + ' ' + pair_tm +
 				 ' ' + primer.sequence);
 			   e.data('ppp', ppp);
+			   e.data('ppIndex', ppIndex);
 			   e.attr('ng-click',
 				  "primerModal($event, '" +
 				  pp.left.sequence + "', '" +
@@ -382,22 +395,32 @@ angular.module('sprock.directives',
 
 		   scope.primerModal = function(clickEvent, left_seq, right_seq) {
 
+		     var targetElement = angular.element(clickEvent.currentTarget);
+
 		     var modalInstance = $modal.open({
 		       templateUrl: 'partials/primerModalContent.html',
 		       controller: 'primerModalCtrl',
 		       //size: size,
 		       resolve: {
-			 primerPairs: function () {
-			   return scope.primerPairs;
-			 },
 			 me: function () {
-			   return angular.element(clickEvent.currentTarget);
-			 }
+			   return targetElement;
+			 }/*,
+			 putPrimerPairPossibilitiesInTree: function () {
+			   return putPrimerPairPossibilitiesInTree;
+			 },
+			 unPrime: function () {
+			   return unPrime;
+			 }*/
 		       }
 		     });
 
-		     modalInstance.result.then(function (selectedItem) {
-		       scope.selected = selectedItem;
+		     modalInstance.result.then(function (selected) {
+		       $log.info('Modal gives ' + JSON.stringify(selected));
+		       if (selected.index !== selected.original_index) {
+			 var ppp = targetElement.data('ppp');
+			 removePPP(ppp);
+			 ensurePrimerPairPossibilitiesInTree(ppp, selected.index);
+		       };
 		     }, function (why) {
 		       $log.info('Modal dismissed at: ' + new Date() +
 				 ' because of ' + why);
