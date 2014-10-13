@@ -3,7 +3,11 @@
 /* Directives */
 // see https://docs.angularjs.org/api/ng/service/$compile
 
-angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
+angular.module('sprock.directives',
+	       ['underscore',
+		'sprock.utilities',
+		'ui.bootstrap.modal'
+	       ]).
   directive('appVersion', ['version', function(version) {
     return function(scope, elm, attrs) {
       elm.text(version);
@@ -269,10 +273,11 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 			   e.attr('ng-mouseleave', switchName + '=false');
 			   e.attr('tooltip', pair_span + ' ' + pair_tm +
 				 ' ' + primer.sequence);
-//			   e.attr('ng-click',
-//				  "primerModal('" +
-//				  pp.left.sequence + "', '" +
-//				  pp.right.sequence + "')");
+			   e.data('ppp', ppp);
+			   e.attr('ng-click',
+				  "primerModal($event, '" +
+				  pp.left.sequence + "', '" +
+				  pp.right.sequence + "')");
 			   $compile(e)(scope);
 			   rv[side_name] = e;
 			 } else {
@@ -375,7 +380,7 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		   };
 
 
-		   scope.primerModal = function(left_seq, right_seq) {
+		   scope.primerModal = function(clickEvent, left_seq, right_seq) {
 
 		     var modalInstance = $modal.open({
 		       templateUrl: 'partials/primerModalContent.html',
@@ -384,6 +389,9 @@ angular.module('sprock.directives', ['underscore', 'sprock.utilities']).
 		       resolve: {
 			 primerPairs: function () {
 			   return scope.primerPairs;
+			 },
+			 me: function () {
+			   return angular.element(clickEvent.currentTarget);
 			 }
 		       }
 		     });

@@ -825,9 +825,10 @@ angular.module('sprock.controllers', []).
 
   }]).
 
-  controller('primerModalCtrl', function ($scope, $modalInstance, primerPairs) {
+  controller('primerModalCtrl', function ($scope, $modalInstance, me, primerPairs) {
 
     $scope.primerPairs = primerPairs;
+    $scope.ppp = me.data('ppp');
     $scope.selected = {
       item: $scope.primerPairs[0]
     };
