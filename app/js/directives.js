@@ -57,7 +57,8 @@ angular.module('sprock.directives',
 		 scope: {
 		   tree: '=',
 		   sequenceInfo: '=',
-		   pppList: '='
+		   pppList: '=',
+		   updateCounter: '='
 		 },
 
 		 link: function postLink(scope, iElement, iAttrs, controller) {
@@ -189,50 +190,14 @@ angular.module('sprock.directives',
 		     PrimerPairPossibilitiesDB.drop_by_ppp(ppp);
 		   };
 
-/*
- * We are passed the pppList in our (isolate) scope as an attribute. We maintain
- * an object in which we record where we put each primer pair.
-		   var obj_for_data_obj_for_ppp = {};
-
-		   function data_obj_for_ppp(ppp) {
-		     var key = key_for_ppp(ppp);
-		     return data_obj_for_ppp_from_key(key);
-		   };
-
-		   function key_for_ppp(ppp) {
-		     if (!ppp ||
-			 !_.has(ppp, 'primer_pair_num_returned') ||
-			 !ppp.primer_pair_num_returned) {
-		       return null;
-		     };
-		     var pp = ppp.primer_pairs[0];
-		     return pp.left.sequence + pp.right.sequence;
-		   };
-
-		   function data_obj_for_ppp_from_key(key) {
-		     if (key) {
-		       if (!_.has(obj_for_data_obj_for_ppp, key) ||
-			   !obj_for_data_obj_for_ppp[key]) {
-			 obj_for_data_obj_for_ppp[key] = {};
-		       };
-		       return obj_for_data_obj_for_ppp[key];
-		     };
-		     return null;
-		   };
-
-		   function remove_data_obj_for_ppp_from_ofdofp(ppp) {
-		     var key = key_for_ppp(ppp);
-		     if (key) {
-		       obj_for_data_obj_for_ppp[key] = null;
-		     }};
- */
 
 		   function makeDOMMatchPrimerPairPossibilitiesList() {
 		     if (!scope.pppList || !scope.pppList.length) return;
 
 		     // First clear away primers that are not in the current pppList
 		     var keysInPPPList =
-			   _.filter(_.map(scope.pppList, PrimerPairPossibilitiesDB.key_from_ppp),
+			   _.filter(_.map(scope.pppList,
+					  PrimerPairPossibilitiesDB.key_from_ppp),
 				    _.identity);
 		     var keysNotInPPPList =
 			   _.difference(PrimerPairPossibilitiesDB.all_keys(),
@@ -253,6 +218,8 @@ angular.module('sprock.directives',
 			 ensurePrimerPairPossibilitiesInTree(ppp);
 		       }});
 
+		     scope.updateCounter++;
+		     console.log('scope.updateCounter = ' + scope.updateCounter);
 		   };
 		   scope.$watchCollection('pppList', makeDOMMatchPrimerPairPossibilitiesList);
 

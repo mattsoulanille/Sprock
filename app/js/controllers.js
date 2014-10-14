@@ -588,8 +588,10 @@ angular.module('sprock.controllers', []).
 
   }]).
 
-  controller('MyCtrl6', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', 'compareSpans', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer, compareSpans) {
+  controller('MyCtrl6', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', 'compareSpans', 'PrimerPairPossibilitiesDB', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer, compareSpans, PrimerPairPossibilitiesDB) {
     $scope.serverError = null;
+    $scope.treeUpdates = 0;
+    $scope.updateCounter = 0;
     $scope.margin = 5000;	//FIXME
     $scope.prime = {
       minimum_primer_span: 100,
@@ -636,20 +638,6 @@ angular.module('sprock.controllers', []).
 	      };
 	    })));
 
-/*	_.reduce(gene.exons.exons,
-		     function(memo, v) {
-		       memo.push(v);
-		       return memo;
-		     },
-		     []).
-	    sort();
-*/
-/*      $scope.prime.excluded_region = _.map($scope.excluded_spans,
-					   function(v) {
-					     return [v[0], v[1]-v[0]]
-					   });
-/*      $scope.excluded_spans =
-	_.chain(features.features).where({type:'exon'}).pluck('span').value();*/
     };
 
     function init_desired_sequence_boundaries_from_gene() {
@@ -673,11 +661,9 @@ angular.module('sprock.controllers', []).
 
     $scope.makePrimers = function() {
       $scope.pppList = [];
-//      $scope.primer_pairs = [];
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
-	//console.log(v);
 	$scope.pppList.push(v);
 	note_new_ppp(v, $scope.pppList.length);
       }, [], $scope.prime).then(function(v) {
@@ -688,15 +674,6 @@ angular.module('sprock.controllers', []).
     function calc_primer_windows() {
       var gene = $scope.gene;
       var want_span = $scope.desired_sequence_span;
-/*
-      var exon_spans =
-	    _.reduce(gene.exons.exons,
-		     function(memo, v) {
-		       memo.push(v);
-		       return memo;
-		     },
-		     []).
-	    sort(); */
       var t =
 	    _.reduce($scope.prime.excluded_spans,
 		     function(memo, v) {
@@ -711,6 +688,10 @@ angular.module('sprock.controllers', []).
 
     function note_new_ppp(ppp, which) {
       console.log("FIXME: note_new_ppp() is a hack");
+      console.log('$scope.treeUpdates is ' + $scope.treeUpdates);
+      console.log('$scope.updateCounter is ' + $scope.updateCounter);
+      console.log(PrimerPairPossibilitiesDB.all_keys());
+
       if (!ppp || !_.has(ppp, 'primer_pairs')) {
 	return;
       };
@@ -732,54 +713,12 @@ angular.module('sprock.controllers', []).
       $scope.primer_pairs = [pp];
     };
 
-/*
-    function calc_desired_sequence_span() {
-      if ($scope.gene == undefined) return;
-      $scope.sequence_span_to_examine = [Math.max(0, $scope.gene.start - $scope.margin),
-					 $scope.gene.end + $scope.margin];
-      get_features().
-	then(function(features) {
-	  // We start with the full span for which we've gotten features.
-	  var dss = $scope.sequence_span_to_examine.slice(0); // a copy
-	  var gene_span = [$scope.gene.start, $scope.gene.end];
 
-	  // The nearest feature outside of the gene (if any), on each side,
-	  // will require us to move the desired sequence in so that it abuts
-	  // that feature.
-	  // Find all the feature boundaries (edges) in the examined span
-	  var edges = _.chain(features.features).
-		pluck('span').flatten().uniq().sortBy(_.identity).value();
-
-
-	  // Find where the gene boundaries fall relative to the features
-	  // _.sortedIndex(): "... the index at which the value should be
-	  // inserted into the list in order to maintain the list's sorted order."
-	  var ixen = _.map(gene_span,
-			   function(v) {
-			     return _.sortedIndex(edges, v);
-			   });
-
-	  // If the left-hand index is > 0, the edge to it's immediate left
-	  // is the nearest feature boundary on that side:
-	  if (ixen[0] > 0) {
-	    dss[0] = edges[ixen[0]-1];
-	  };
-
-	  // Look rightward along the edge list, starting at the right-hand index,
-	  // until we find an edge greater that the end of the gene, in which
-	  // case we use it as our boundary, or we fall off the feature edges list,
-	  // in which case we can keep the full rightward span.
-	  var i = ixen[1];
-	  while (i < edges.length && edges[i] <= gene_span[1]) i++;
-	  if (i < edges.length) dss[1] = edges[i];
-
-	  // Transmit our result to the $scope
-	  $scope.desired_sequence_span = dss;
-	});
+    function update_primer_tab_info() {
+      console.log('primer tab info says treeUpdates is ' + $scope.treeUpdates);
+      $scope.ppp_keys = PrimerPairPossibilitiesDB.all_keys();
     };
-    $scope.$watch('gene', calc_desired_sequence_span);
-    $scope.$watch('margin', calc_desired_sequence_span);
-*/
+    $scope.$watch('treeUpdates', update_primer_tab_info);
 
     function get_sequence_objects() {
       if ($scope.sequence_info == undefined) return null;

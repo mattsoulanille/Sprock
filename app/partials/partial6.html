@@ -77,18 +77,15 @@
 	<format-tree tree="gene"
 		     sequence-info="sequence_info"
 		     ppp-list="pppList"
+		     update-counter="updateCounter">
 	</format-tree>
       </tab>
       <tab heading="Primers">
-	<accordion ng-show="gene" close-others="false">
-	  <accordion-group heading="{{$index}}: {{ppp.sequence_primer_pair_ok_region_list[0]}} - {{ppp.sequence_primer_pair_ok_region_list[2]}}: {{ppp.primer_pair_num_returned}}" ng-repeat="ppp in ppp_list">
-	    <ul>
-	      <li ng-repeat="pp in ppp.primer_pairs">
-		left: {{pp.left.start}} {{pp.left.sequence}}, right: {{pp.right.start}} {{pp.right.sequence}}
-	      </li>
-	    </ul>
-	  </accordion-group>
-	</accordion>
+	<ul class="list-unstyled">
+	  <li ng-repeat="key in ppp_keys">
+	    {{key}}
+	  </li>
+	</ul>
       </tab>
       <tab heading="Gene {{gene.name}}" ng-show="gene">
 	  <pre style="text-align: left" ng-show="gene">{{gene | json}}</pre>
