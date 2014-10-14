@@ -81,15 +81,16 @@
 	</format-tree>
       </tab>
       <tab heading="Primers">
+	{{pppp_info.length}}<br/>
 	<ul class="list-unstyled">
-	  <li ng-repeat="key in ppp_keys">
-	    {{key}}
+	  <li ng-repeat="info in pppp_info">
+	    {{$index}}: {{info.elements.length}}
 	  </li>
 	</ul>
       </tab>
-      <tab heading="Gene {{gene.name}}" ng-show="gene">
+<!--      <tab heading="Gene {{gene.name}}" ng-show="gene">
 	  <pre style="text-align: left" ng-show="gene">{{gene | json}}</pre>
-      </tab>
+      </tab> -->
       <tab heading="Debug">
 	desired sequence span: {{desired_sequence_span | json}}<br/>
 	excluded spans: {{prime.excluded_spans | json}}<br/>

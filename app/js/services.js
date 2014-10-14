@@ -44,6 +44,10 @@ angular.module('sprock.services', ['sprock.utilities']).
       return _.keys(db).sort();
     };
 
+    function all() {
+      return _.map(all_keys(), get_by_key);
+    };
+
     function drop_by_ppp(ppp) {
       var key = key_from_ppp(ppp);
       drop_by_key(key);
@@ -61,6 +65,7 @@ angular.module('sprock.services', ['sprock.utilities']).
       key_from_ppp: key_from_ppp,
       get_by_key: get_by_key,
       all_keys: all_keys,
+      all: all,
       drop_by_ppp: drop_by_ppp,
       drop_by_key: drop_by_key
     };

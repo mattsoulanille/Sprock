@@ -716,7 +716,7 @@ angular.module('sprock.controllers', []).
 
     function update_primer_tab_info() {
       //console.log('primer tab info says treeUpdates is ' + $scope.tv.treeUpdates);
-      $scope.ppp_keys = PrimerPairPossibilitiesDB.all_keys();
+      $scope.pppp_info = PrimerPairPossibilitiesDB.all();
     };
     $scope.$watch('tv.treeUpdates', update_primer_tab_info);
 

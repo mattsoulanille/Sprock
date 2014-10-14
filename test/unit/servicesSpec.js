@@ -102,6 +102,10 @@ describe('service', function() {
       expect(PrimerPairPossibilitiesDB.all_keys).toBeFunction();
     }));
 
+    it('should provide an all function', inject(function(PrimerPairPossibilitiesDB) {
+      expect(PrimerPairPossibilitiesDB.all).toBeFunction();
+    }));
+
     it('should provide a drop_by_ppp function', inject(function(PrimerPairPossibilitiesDB) {
       expect(PrimerPairPossibilitiesDB.drop_by_ppp).toBeFunction();
     }));
@@ -148,6 +152,13 @@ describe('service', function() {
 	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
 	PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo = "restaurant";
 	expect(PrimerPairPossibilitiesDB.all_keys()).toBeAngularEqual(["ABCDEFGH", "IJKLMNOP"]);
+      }));
+
+      it('should produce all objects', inject(function(PrimerPairPossibilitiesDB) {
+	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
+	PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo = "restaurant";
+	expect(PrimerPairPossibilitiesDB.all().sort()).
+	  toBeAngularEqual([ { foo : 'bar' }, { foo : 'restaurant' } ].sort());
       }));
 
       it('should drop object', inject(function(PrimerPairPossibilitiesDB) {

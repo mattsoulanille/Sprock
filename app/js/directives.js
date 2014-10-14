@@ -375,13 +375,7 @@ angular.module('sprock.directives',
 		       resolve: {
 			 me: function () {
 			   return targetElement;
-			 }/*,
-			 putPrimerPairPossibilitiesInTree: function () {
-			   return putPrimerPairPossibilitiesInTree;
-			 },
-			 unPrime: function () {
-			   return unPrime;
-			 }*/
+			 }
 		       }
 		     });
 
