@@ -113,6 +113,18 @@ describe('service', function() {
 	expect(PrimerPairPossibilitiesDB.key_from_ppp(ppp_2)).toBe("IJKLMNOP");
       }));
 
+      it('should produce null key for non-ppp', inject(function(PrimerPairPossibilitiesDB) {
+	expect(PrimerPairPossibilitiesDB.key_from_ppp(null)).toBe(null);
+	expect(PrimerPairPossibilitiesDB.key_from_ppp({})).toBe(null);
+	expect(PrimerPairPossibilitiesDB.key_from_ppp({frogs: 7})).toBe(null);
+      }));
+
+      it('should return null for get of non-ppp', inject(function(PrimerPairPossibilitiesDB) {
+	expect(PrimerPairPossibilitiesDB.get_by_ppp(null)).toBe(null);
+	expect(PrimerPairPossibilitiesDB.get_by_ppp({})).toBe(null);
+	expect(PrimerPairPossibilitiesDB.get_by_ppp({frogs: 7})).toBe(null);
+      }));
+
       it('should provide object from ppp', inject(function(PrimerPairPossibilitiesDB) {
 	var t = PrimerPairPossibilitiesDB.get_by_ppp(ppp_1);
 	expect(t.foo).not.toBeDefined();
@@ -143,6 +155,12 @@ describe('service', function() {
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).toBe("bar");
 	PrimerPairPossibilitiesDB.drop_by_ppp(ppp_1);
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).not.toBeDefined();
+      }));
+
+      it('should forget key of dropped object', inject(function(PrimerPairPossibilitiesDB) {
+	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
+	PrimerPairPossibilitiesDB.drop_by_ppp(ppp_1);
+	expect(PrimerPairPossibilitiesDB.all_keys()).toEqual([]);
       }));
 
       it('should drop correct object', inject(function(PrimerPairPossibilitiesDB) {

@@ -46,15 +46,14 @@ angular.module('sprock.services', ['sprock.utilities']).
 
     function drop_by_ppp(ppp) {
       var key = key_from_ppp(ppp);
-      if (key) {
-	db[key] = null;
-      }
+      drop_by_key(key);
     };
 
     function drop_by_key(key) {
       if (key) {
 	db[key] = null;
-      }
+	delete db[key];
+      };
     };
 
     return {
