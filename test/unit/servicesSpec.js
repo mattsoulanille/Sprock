@@ -98,6 +98,10 @@ describe('service', function() {
       expect(PrimerPairPossibilitiesDB.get_by_key).toBeFunction();
     }));
 
+    it('should provide an all_keys function', inject(function(PrimerPairPossibilitiesDB) {
+      expect(PrimerPairPossibilitiesDB.all_keys).toBeFunction();
+    }));
+
     it('should provide a drop_by_ppp function', inject(function(PrimerPairPossibilitiesDB) {
       expect(PrimerPairPossibilitiesDB.drop_by_ppp).toBeFunction();
     }));
@@ -128,6 +132,12 @@ describe('service', function() {
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo).toBe("restaurant");
       }));
 
+      it('should produce all keys', inject(function(PrimerPairPossibilitiesDB) {
+	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
+	PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo = "restaurant";
+	expect(PrimerPairPossibilitiesDB.all_keys()).toBeAngularEqual(["ABCDEFGH", "IJKLMNOP"]);
+      }));
+
       it('should drop object', inject(function(PrimerPairPossibilitiesDB) {
 	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).toBe("bar");
@@ -142,6 +152,18 @@ describe('service', function() {
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).not.toBeDefined();
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo).toBe("restaurant");
       }));
+
+      it('should do several thing right', inject(function(PrimerPairPossibilitiesDB) {
+	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
+	PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo = "restaurant";
+	_.each(PrimerPairPossibilitiesDB.all_keys(), PrimerPairPossibilitiesDB.drop_by_key);
+	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).not.toBeDefined();
+	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo).not.toBeDefined();
+	expect(PrimerPairPossibilitiesDB.get_by_key('ABCDWXYZ')).toBeAngularEqual({});
+	expect(PrimerPairPossibilitiesDB.get_by_key('ABCDWXYZ').foo).not.toBeDefined();
+      }));
+
+
 
     }); // basic operations
 

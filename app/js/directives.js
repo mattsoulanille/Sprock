@@ -41,8 +41,14 @@ angular.module('sprock.directives',
 		      }]).
 
   directive('formatTree',
-	    ['_', '$compile', '$modal', '$log', 'compareSpans', 'findLeastElemContainingSpan',
-	     function factory(_, $compile, $modal, $log, compareSpans, findLeastElemContainingSpan) {
+	    ['_',
+	     '$compile',
+	     '$modal',
+	     '$log',
+	     'compareSpans',
+	     'findLeastElemContainingSpan',
+	     'PrimerPairPossibilitiesDB',
+	     function factory(_, $compile, $modal, $log, compareSpans, findLeastElemContainingSpan, PrimerPairPossibilitiesDB) {
 	       var directiveDefinitionObject = {
 		 //template: '<div></div>', // or // function(tElement, tAttrs) { ... },
 		 //transclude: true,
@@ -177,17 +183,15 @@ angular.module('sprock.directives',
 		   };
 
 		   function removePPP(ppp) {
-		     var d = data_obj_for_ppp(ppp);
+		     var d = PrimerPairPossibilitiesDB.get_by_ppp(ppp);
 		     chai.expect(d).to.include.keys('elements');
 		     _.each(d.elements, unPrime);
-		     remove_data_obj_for_ppp_from_ofdofp(ppp);
+		     PrimerPairPossibilitiesDB.drop_by_ppp(ppp);
 		   };
-
 
 /*
  * We are passed the pppList in our (isolate) scope as an attribute. We maintain
  * an object in which we record where we put each primer pair.
- */
 		   var obj_for_data_obj_for_ppp = {};
 
 		   function data_obj_for_ppp(ppp) {
@@ -221,24 +225,24 @@ angular.module('sprock.directives',
 		     if (key) {
 		       obj_for_data_obj_for_ppp[key] = null;
 		     }};
+ */
 
 		   function makeDOMMatchPrimerPairPossibilitiesList() {
 		     if (!scope.pppList || !scope.pppList.length) return;
 
 		     // First clear away primers that are not in the current pppList
 		     var keysInPPPList =
-			   _.filter(_.map(scope.pppList, key_for_ppp),
+			   _.filter(_.map(scope.pppList, PrimerPairPossibilitiesDB.key_from_ppp),
 				    _.identity);
 		     var keysNotInPPPList =
-			   _.difference(_.keys(obj_for_data_obj_for_ppp),
+			   _.difference(PrimerPairPossibilitiesDB.all_keys(),
 					keysInPPPList);
 		     _.each(keysNotInPPPList, function(key) {
-		       var d = data_obj_for_ppp_from_key(key);
+		       var d = PrimerPairPossibilitiesDB.get_by_key(key);
 		       chai.expect(d).to.include.keys('elements');
 		       _.each(d.elements, unPrime);
 		     });
-		     obj_for_data_obj_for_ppp =
-		       _.omit(obj_for_data_obj_for_ppp, keysNotInPPPList);
+		     _.each(keysNotInPPPList, PrimerPairPossibilitiesDB.drop_by_key);
 
 		     // Ensure each ppp in pppList is or gets put in the DOM
 		     _.each(scope.pppList, function(ppp) {
@@ -254,7 +258,7 @@ angular.module('sprock.directives',
 
 
 		   function ensurePrimerPairPossibilitiesInTree(ppp, ppIndex) {
-		     var ppp_data = data_obj_for_ppp(ppp);
+		     var ppp_data = PrimerPairPossibilitiesDB.get_by_ppp(ppp);
 		     if (!ppp_data.elements) {
 		       // ppp is not installed in the DOM.
 		       ppp_data.elements = putPrimerPairPossibilitiesInTree(ppp, ppIndex || 0);
