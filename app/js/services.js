@@ -7,9 +7,54 @@ angular.module('sprock.services', ['sprock.utilities']).
 
 // Demonstrate how to register services
 // In this case it is a simple value service.
-  value('version', '0.0.5').
+  value('version', '0.0.6').
 
 // FIXME: DRY
+
+  factory('PrimerPairPossibilitiesDB', ['_', function(_) {
+    var db = {};
+
+    function get_by_ppp(ppp) {
+      var key = key_from_ppp(ppp);
+      return get_by_key(key);
+    };
+
+    function key_from_ppp(ppp) {
+      if (!ppp ||
+	  !_.has(ppp, 'primer_pair_num_returned') ||
+	  !ppp.primer_pair_num_returned) {
+	return null;
+      };
+      var pp = ppp.primer_pairs[0];
+      return pp.left.sequence + pp.right.sequence;
+    };
+
+    function get_by_key(key) {
+      if (key) {
+	if (!_.has(db, key) ||
+	    !db[key]) {
+	  db[key] = {};
+	};
+	return db[key];
+      };
+      return null;
+    };
+
+    function drop_by_ppp(ppp) {
+      var key = key_from_ppp(ppp);
+      if (key) {
+	db[key] = null;
+      }
+    }
+
+    return {
+      get_by_ppp: get_by_ppp,
+      key_from_ppp: key_from_ppp,
+      get_by_key: get_by_key,
+      drop_by_ppp: drop_by_ppp
+    };
+
+  }]).
 
   factory('data_getSeq_test', ['$http', function($http) {
     return function() {
