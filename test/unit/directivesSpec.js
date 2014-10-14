@@ -488,448 +488,451 @@ describe('directives', function() {
       });
     });
 
-    it('should display primer pairs in very simple case', function() {
-      var tree = {name: 'root',
-		  type: 'gene',
-		  span: [15, 20],
-		  children: [{
-		    name: 'foo',
-		    type: 'exon',
+    xdescribe('primer display', function() {
+
+      it('should display primer pairs in very simple case', function() {
+	var tree = {name: 'root',
+		    type: 'gene',
 		    span: [15, 20],
-		    children: []
-		  }]
-		 };
+		    children: [{
+		      name: 'foo',
+		      type: 'exon',
+		      span: [15, 20],
+		      children: []
+		    }]
+		   };
 
-      var seqInfo = {
-	span: [7, 7 + 20],
-	sequence: "ABCDEFGHIJKLMNOPQRST",
-	quality: [90, 90, 90, 90, 90, 90, 90, 90, 90, 90,
-		  90, 90, 90, 90, 90, 90, 90, 90, 90, 90],
-	scaffold: "some scaffold"};
+	var seqInfo = {
+	  span: [7, 7 + 20],
+	  sequence: "ABCDEFGHIJKLMNOPQRST",
+	  quality: [90, 90, 90, 90, 90, 90, 90, 90, 90, 90,
+		    90, 90, 90, 90, 90, 90, 90, 90, 90, 90],
+	  scaffold: "some scaffold"};
 
-      var primerPair = {
-	left: {
-	  span: [8, 11],
-	  sequence: "LLL" },
-	 right: {
-	  span: [13, 15],
-	  sequence: "RR" }
-      };
-
-
-      inject(function($compile, $rootScope) {
-	$rootScope.tree = tree;
-	$rootScope.sequenceInfo = seqInfo;
-	$rootScope.primerPairs = [primerPair];
-	var myScope = $rootScope.$new()
-        var element = $compile(
-	  '<format-tree tree="tree"' +
-	    ' sequence-info="sequenceInfo"' +
-	    ' primer-pairs="primerPairs"' +
-	    '></format-tree>')(myScope);
-	myScope.$digest();	// fire the $watch'es
-	expect(element.html()).toBe(
-	  '<span class="seq">' +
-	    '<span class="seqFrag">' +
-	      '<span class="q90">A</span>' +
-	      '<span class="primer primer-left ng-scope">' +
-	        '<span class="q90">BCD</span>' +
-	      '</span>' +
-	      '<span class="q90">EF</span>' +
-	      '<span class="primer primer-right ng-scope">' +
-	        '<span class="q90">GH</span>' +
-	      '</span>' +
-	    '</span>' +
-	    '<span class="gene">' +
-	      '<span class="exon" data-name="foo">' +
-	        '<span class="seqFrag">' +
-	  	'<span class="q90">IJKLM</span>' +
-	        '</span>' +
-	      '</span>' +
-	    '</span>' +
-	    '<span class="seqFrag">' +
-	      '<span class="q90">NOPQRST</span>' +
-	    '</span>' +
-	  '</span>'
-	);
-      });
-    });
+	var primerPair = {
+	  left: {
+	    span: [8, 11],
+	    sequence: "LLL" },
+	   right: {
+	    span: [13, 15],
+	    sequence: "RR" }
+	};
 
 
-    it("should display primer pairs in very simple case, with primers after feature", function() {
-      var tree = {name: 'root',
-		  type: 'gene',
-		  span: [8, 20],
-		  children: [{
-		    name: 'foo',
-		    type: 'exon',
-		    span: [8, 12],
-		    children: []
-		  }]
-		 };
-
-      var seqInfo = {
-	span: [7, 7 + 20],
-	sequence: "ABCDEFGHIJKLMNOPQRST",
-	quality: [90, 90, 90, 90, 90, 90, 90, 90, 90, 90,
-		  90, 90, 90, 90, 90, 90, 90, 90, 90, 90],
-	scaffold: "some scaffold"};
-
-      var primerPair = {
-	left: {
-	  span: [13, 15],
-	  sequence: "LL" },
-	 right: {
-	  span: [17, 19],
-	  sequence: "RR" }
-      };
-
-
-      inject(function($compile, $rootScope) {
-	$rootScope.tree = tree;
-	$rootScope.sequenceInfo = seqInfo;
-	$rootScope.primerPairs = [primerPair];
-	var myScope = $rootScope.$new()
-        var element = $compile(
-	  '<format-tree tree="tree"' +
-	    ' sequence-info="sequenceInfo"' +
-	    ' primer-pairs="primerPairs"' +
-	    '></format-tree>')(myScope);
-	myScope.$digest();	// fire the $watch'es
-	expect(element.html()).toBe(
-
-	  '<span class="seq">' +
-	    '<span class="seqFrag">' +
-	      '<span class="q90">A</span>' +
-	    '</span>' +
-	    '<span class="gene">' +
-	      '<span class="exon" data-name="foo">' +
-	        '<span class="seqFrag">' +
-	  	'<span class="q90">BCDE</span>' +
-	        '</span>' +
-	      '</span>' +
-	      '<span class="seqFrag">' +
-	        '<span class="q90">F</span>' +
-	        '<span class="primer primer-left ng-scope">' +
-	  	'<span class="q90">GH</span>' +
-	        '</span>' +
-	        '<span class="q90">IJ</span>' +
-	        '<span class="primer primer-right ng-scope">' +
-	  	'<span class="q90">KL</span>' +
-	        '</span>' +
-	        '<span class="q90">M</span>' +
-	      '</span>' +
-	    '</span>' +
-	    '<span class="seqFrag">' +
-	      '<span class="q90">NOPQRST</span>' +
-	    '</span>' +
-	  '</span>'
-	);
-      });
-    });
-
-
-    it('should display primer pairs in simple case', function() {
-      var tree = {name: 'root',
-		  type: 'gene',
-		  span: [15, 20],
-		  children: [{
-		    name: 'foo',
-		    type: 'exon',
-		    span: [15, 20],
-		    children: []
-		  }]
-		 };
-
-      var seqInfo = {
-	span: [7, 7 + 20],
-	sequence: "ABCDEFGHIJKLMNOPQRST",
-	quality: [20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26,
-		  27, 27, 28, 28, 29, 29],
-	scaffold: "some scaffold"};
-
-      var primerPair = {
-	left: {
-	  span: [8, 11],
-	  sequence: "LLL" },
-	 right: {
-	  span: [13, 15],
-	  sequence: "RR" }
-      };
-
-
-      inject(function($compile, $rootScope) {
-	$rootScope.tree = tree;
-	$rootScope.sequenceInfo = seqInfo;
-	$rootScope.primerPairs = [primerPair];
-	var myScope = $rootScope.$new()
-        var element = $compile(
-	  '<format-tree tree="tree"' +
-	    ' sequence-info="sequenceInfo"' +
-	    ' primer-pairs="primerPairs"' +
-	    '></format-tree>')(myScope);
-	myScope.$digest();	// fire the $watch'es
-	expect(element.html()).toBe(
+	inject(function($compile, $rootScope) {
+	  $rootScope.tree = tree;
+	  $rootScope.sequenceInfo = seqInfo;
+	  $rootScope.primerPairs = [primerPair];
+	  var myScope = $rootScope.$new()
+	  var element = $compile(
+	    '<format-tree tree="tree"' +
+	      ' sequence-info="sequenceInfo"' +
+	      ' primer-pairs="primerPairs"' +
+	      '></format-tree>')(myScope);
+	  myScope.$digest();	// fire the $watch'es
+	  expect(element.html()).toBe(
 	    '<span class="seq">' +
 	      '<span class="seqFrag">' +
-		'<span class="q20">A</span>' +
+		'<span class="q90">A</span>' +
 		'<span class="primer primer-left ng-scope">' +
-		  '<span class="q20">B</span>' +
-		  '<span class="q21">CD</span>' +
+		  '<span class="q90">BCD</span>' +
 		'</span>' +
-		'<span class="q22">EF</span>' +
-	        '<span class="primer primer-right ng-scope">' +
-	          '<span class="q23">GH</span>' +
-	        '</span>' +
+		'<span class="q90">EF</span>' +
+		'<span class="primer primer-right ng-scope">' +
+		  '<span class="q90">GH</span>' +
+		'</span>' +
 	      '</span>' +
 	      '<span class="gene">' +
 		'<span class="exon" data-name="foo">' +
 		  '<span class="seqFrag">' +
-		    '<span class="q24">IJ</span>' +
-		    '<span class="q25">KL</span>' +
-		    '<span class="q26">M</span>' +
+		  '<span class="q90">IJKLM</span>' +
 		  '</span>' +
 		'</span>' +
 	      '</span>' +
 	      '<span class="seqFrag">' +
-		'<span class="q26">N</span>' +
-		'<span class="q27">OP</span>' +
-		'<span class="q28">QR</span>' +
-		'<span class="q29">ST</span>' +
+		'<span class="q90">NOPQRST</span>' +
 	      '</span>' +
 	    '</span>'
-	);
+	  );
+	});
       });
-    });
 
 
-    xit('should display primer pairs in mild complexity', function() {
-      var tree = {name: 'root',
-		  type: 'gene',
-		  span: [23, 49],
-		  children: [{
-		    name: 'foo',
-		    type: 'exon',
-		    span: [25, 30],
-		    children: []
-		  },{
-		    name: 'bar',
-		    type: 'exon',
-		    span: [46, 49],
-		    children: []
-		  }]
-		 };
+      it("should display primer pairs in very simple case, with primers after feature", function() {
+	var tree = {name: 'root',
+		    type: 'gene',
+		    span: [8, 20],
+		    children: [{
+		      name: 'foo',
+		      type: 'exon',
+		      span: [8, 12],
+		      children: []
+		    }]
+		   };
 
-      var first_seqInfo = {
-	span: [7, 7 + 49],
-	sequence: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw",
-	quality: [20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26,
-		  27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 32, 32, 33, 33,
-		  34, 34, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 40, 40,
-		  41, 41, 42, 42, 43, 43, 44, 44, 45, 45],
-	scaffold: "some scaffold"};
+	var seqInfo = {
+	  span: [7, 7 + 20],
+	  sequence: "ABCDEFGHIJKLMNOPQRST",
+	  quality: [90, 90, 90, 90, 90, 90, 90, 90, 90, 90,
+		    90, 90, 90, 90, 90, 90, 90, 90, 90, 90],
+	  scaffold: "some scaffold"};
 
-      var second_seqInfo = {
-	span: [10, 10 + 49],
-	sequence: "DEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-	quality: [20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26,
-		  27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 32, 32, 33, 33,
-		  34, 34, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 40, 40,
-		  41, 41, 42, 42, 43, 43, 44, 44, 45, 45],
-	scaffold: "some scaffold"};
-
-      var first_primerPair = {
-	left: {
-	  span: [10, 15],
-	  sequence: "LLLLL" },
-	 right: {
-	  span: [18, 22],
-	  sequence: "RRRR" }
-      };
-
-      var second_primerPair = {
-	left: {
-	  span: [31, 34],
-	  sequence: "lll" },
-	 right: {
-	  span: [40, 46],
-	  sequence: "rrrrrr" }
-      };
+	var primerPair = {
+	  left: {
+	    span: [13, 15],
+	    sequence: "LL" },
+	   right: {
+	    span: [17, 19],
+	    sequence: "RR" }
+	};
 
 
-      var first_expect = header +
+	inject(function($compile, $rootScope) {
+	  $rootScope.tree = tree;
+	  $rootScope.sequenceInfo = seqInfo;
+	  $rootScope.primerPairs = [primerPair];
+	  var myScope = $rootScope.$new()
+	  var element = $compile(
+	    '<format-tree tree="tree"' +
+	      ' sequence-info="sequenceInfo"' +
+	      ' primer-pairs="primerPairs"' +
+	      '></format-tree>')(myScope);
+	  myScope.$digest();	// fire the $watch'es
+	  expect(element.html()).toBe(
+
 	    '<span class="seq">' +
 	      '<span class="seqFrag">' +
-	        '<span class="q20">AB</span>' +
-	        '<span class="q21">CD</span>' +
-	        '<span class="q22">EF</span>' +
-	        '<span class="q23">GH</span>' +
-	        '<span class="q24">IJ</span>' +
-	        '<span class="q25">KL</span>' +
-	        '<span class="q26">MN</span>' +
-	        '<span class="q27">OP</span>' +
+		'<span class="q90">A</span>' +
 	      '</span>' +
 	      '<span class="gene">' +
-	        '<span class="seqFrag">' +
-	          '<span class="q28">QR</span>' +
-	        '</span>' +
-	        '<span class="exon" data-name="foo">' +
-	          '<span class="seqFrag">' +
-	    	'<span class="q29">ST</span>' +
-	    	'<span class="q30">UV</span>' +
-	    	'<span class="q31">W</span>' +
-	          '</span>' +
-	        '</span>' +
-	        '<span class="seqFrag">' +
-	          '<span class="q31">X</span>' +
-	          '<span class="q32">YZ</span>' +
-	          '<span class="q33">ab</span>' +
-	          '<span class="q34">cd</span>' +
-	          '<span class="q35">ef</span>' +
-	          '<span class="q36">gh</span>' +
-	          '<span class="q37">ij</span>' +
-	          '<span class="q38">kl</span>' +
-	          '<span class="q39">m</span>' +
-	        '</span>' +
-	        '<span class="exon" data-name="bar">' +
-	          '<span class="seqFrag">' +
-	    	'<span class="q39">n</span>' +
-	    	'<span class="q40">op</span>' +
-	          '</span>' +
-	        '</span>' +
+		'<span class="exon" data-name="foo">' +
+		  '<span class="seqFrag">' +
+		  '<span class="q90">BCDE</span>' +
+		  '</span>' +
+		'</span>' +
+		'<span class="seqFrag">' +
+		  '<span class="q90">F</span>' +
+		  '<span class="primer primer-left ng-scope">' +
+		  '<span class="q90">GH</span>' +
+		  '</span>' +
+		  '<span class="q90">IJ</span>' +
+		  '<span class="primer primer-right ng-scope">' +
+		  '<span class="q90">KL</span>' +
+		  '</span>' +
+		  '<span class="q90">M</span>' +
+		'</span>' +
 	      '</span>' +
 	      '<span class="seqFrag">' +
-	        '<span class="q41">qr</span>' +
-	        '<span class="q42">st</span>' +
-	        '<span class="q43">uv</span>' +
-	        '<span class="q44">w</span>' +
+		'<span class="q90">NOPQRST</span>' +
 	      '</span>' +
-	    '</span>';
-
-      var first_primed_expect = header +
-	    '<span class="seq">' +
-	      '<span class="seqFrag">' +
-	        '<span class="q20">AB</span>' +
-	        '<span class="q21">CD</span>' +
-	        '<span class="q22">EF</span>' +
-	        '<span class="q23">GH</span>' +
-	        '<span class="q24">IJ</span>' +
-	        '<span class="q25">KL</span>' +
-	        '<span class="q26">MN</span>' +
-	        '<span class="q27">OP</span>' +
-	      '</span>' +
-	      '<span class="gene">' +
-	        '<span class="seqFrag">' +
-	          '<span class="q28">QR</span>' +
-	        '</span>' +
-	        '<span class="exon" data-name="foo">' +
-	          '<span class="seqFrag">' +
-	    	'<span class="q29">ST</span>' +
-	    	'<span class="q30">UV</span>' +
-	    	'<span class="q31">W</span>' +
-	          '</span>' +
-	        '</span>' +
-	        '<span class="seqFrag">' +
-	          '<span class="q31">X</span>' +
-	          '<span class="q32">YZ</span>' +
-	          '<span class="q33">ab</span>' +
-	          '<span class="q34">cd</span>' +
-	          '<span class="q35">ef</span>' +
-	          '<span class="q36">gh</span>' +
-	          '<span class="q37">ij</span>' +
-	          '<span class="q38">kl</span>' +
-	          '<span class="q39">m</span>' +
-	        '</span>' +
-	        '<span class="exon" data-name="bar">' +
-	          '<span class="seqFrag">' +
-	    	'<span class="q39">n</span>' +
-	    	'<span class="q40">op</span>' +
-	          '</span>' +
-	        '</span>' +
-	      '</span>' +
-	      '<span class="seqFrag">' +
-	        '<span class="q41">qr</span>' +
-	        '<span class="q42">st</span>' +
-	        '<span class="q43">uv</span>' +
-	        '<span class="q44">w</span>' +
-	      '</span>' +
-	    '</span>';
-
-      var second_expect = header +
-	    '<span class="seq">' +
-	      '<span class="seqFrag">' +
-	        '<span class="q20">DE</span>' +
-	        '<span class="q21">FG</span>' +
-	        '<span class="q22">HI</span>' +
-	        '<span class="q23">JK</span>' +
-	        '<span class="q24">LM</span>' +
-	        '<span class="q25">NO</span>' +
-	        '<span class="q26">P</span>' +
-	      '</span>' +
-	      '<span class="gene">' +
-	        '<span class="seqFrag">' +
-	          '<span class="q26">Q</span>' +
-	          '<span class="q27">R</span>' +
-	        '</span>' +
-	        '<span class="exon" data-name="foo">' +
-	          '<span class="seqFrag">' +
-	    	'<span class="q27">S</span>' +
-	    	'<span class="q28">TU</span>' +
-	    	'<span class="q29">VW</span>' +
-	          '</span>' +
-	        '</span>' +
-	        '<span class="seqFrag">' +
-	          '<span class="q30">XY</span>' +
-	          '<span class="q31">Za</span>' +
-	          '<span class="q32">bc</span>' +
-	          '<span class="q33">de</span>' +
-	          '<span class="q34">fg</span>' +
-	          '<span class="q35">hi</span>' +
-	          '<span class="q36">jk</span>' +
-	          '<span class="q37">lm</span>' +
-	        '</span>' +
-	        '<span class="exon" data-name="bar">' +
-	          '<span class="seqFrag">' +
-	    	'<span class="q38">no</span>' +
-	    	'<span class="q39">p</span>' +
-	          '</span>' +
-	        '</span>' +
-	      '</span>' +
-	      '<span class="seqFrag">' +
-	        '<span class="q39">q</span>' +
-	        '<span class="q40">rs</span>' +
-	        '<span class="q41">tu</span>' +
-	        '<span class="q42">vw</span>' +
-	        '<span class="q43">xy</span>' +
-	        '<span class="q44">z</span>' +
-	      '</span>' +
-	    '</span>';
-
-      inject(function($compile, $rootScope) {
-	$rootScope.tree = tree;
-	$rootScope.sequenceInfo = first_seqInfo;
-	var myScope = $rootScope.$new()
-        var element = $compile(
-	  '<format-tree tree="tree"' +
-	    ' sequence-info="sequenceInfo"' +
-	    ' primer-pairs="primerPairs"' +
-	    '></format-tree>')(myScope);
-	myScope.$digest();	// fire the $watch'es
-	expect(element.html()).toBe(first_expect);
-	$rootScope.primerPairs = [first_primerPair];
-	myScope.$digest();	// fire the $watch'es
-	expect(element.html()).toBe(first_primed_expect);
-	$rootScope.primerPairs = [first_primerPair,
-				 second_primerPair];
-	myScope.$digest();	// fire the $watch'es
-
-	$rootScope.sequenceInfo = second_seqInfo;
-	myScope.$digest();	// fire the $watch'es
-	expect(element.html()).toBe(second_expect);
+	    '</span>'
+	  );
+	});
       });
-    });
+
+
+      it('should display primer pairs in simple case', function() {
+	var tree = {name: 'root',
+		    type: 'gene',
+		    span: [15, 20],
+		    children: [{
+		      name: 'foo',
+		      type: 'exon',
+		      span: [15, 20],
+		      children: []
+		    }]
+		   };
+
+	var seqInfo = {
+	  span: [7, 7 + 20],
+	  sequence: "ABCDEFGHIJKLMNOPQRST",
+	  quality: [20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26,
+		    27, 27, 28, 28, 29, 29],
+	  scaffold: "some scaffold"};
+
+	var primerPair = {
+	  left: {
+	    span: [8, 11],
+	    sequence: "LLL" },
+	   right: {
+	    span: [13, 15],
+	    sequence: "RR" }
+	};
+
+
+	inject(function($compile, $rootScope) {
+	  $rootScope.tree = tree;
+	  $rootScope.sequenceInfo = seqInfo;
+	  $rootScope.primerPairs = [primerPair];
+	  var myScope = $rootScope.$new()
+	  var element = $compile(
+	    '<format-tree tree="tree"' +
+	      ' sequence-info="sequenceInfo"' +
+	      ' primer-pairs="primerPairs"' +
+	      '></format-tree>')(myScope);
+	  myScope.$digest();	// fire the $watch'es
+	  expect(element.html()).toBe(
+	      '<span class="seq">' +
+		'<span class="seqFrag">' +
+		  '<span class="q20">A</span>' +
+		  '<span class="primer primer-left ng-scope">' +
+		    '<span class="q20">B</span>' +
+		    '<span class="q21">CD</span>' +
+		  '</span>' +
+		  '<span class="q22">EF</span>' +
+		  '<span class="primer primer-right ng-scope">' +
+		    '<span class="q23">GH</span>' +
+		  '</span>' +
+		'</span>' +
+		'<span class="gene">' +
+		  '<span class="exon" data-name="foo">' +
+		    '<span class="seqFrag">' +
+		      '<span class="q24">IJ</span>' +
+		      '<span class="q25">KL</span>' +
+		      '<span class="q26">M</span>' +
+		    '</span>' +
+		  '</span>' +
+		'</span>' +
+		'<span class="seqFrag">' +
+		  '<span class="q26">N</span>' +
+		  '<span class="q27">OP</span>' +
+		  '<span class="q28">QR</span>' +
+		  '<span class="q29">ST</span>' +
+		'</span>' +
+	      '</span>'
+	  );
+	});
+      });
+
+
+      xit('should display primer pairs in mild complexity', function() {
+	var tree = {name: 'root',
+		    type: 'gene',
+		    span: [23, 49],
+		    children: [{
+		      name: 'foo',
+		      type: 'exon',
+		      span: [25, 30],
+		      children: []
+		    },{
+		      name: 'bar',
+		      type: 'exon',
+		      span: [46, 49],
+		      children: []
+		    }]
+		   };
+
+	var first_seqInfo = {
+	  span: [7, 7 + 49],
+	  sequence: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw",
+	  quality: [20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26,
+		    27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 32, 32, 33, 33,
+		    34, 34, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 40, 40,
+		    41, 41, 42, 42, 43, 43, 44, 44, 45, 45],
+	  scaffold: "some scaffold"};
+
+	var second_seqInfo = {
+	  span: [10, 10 + 49],
+	  sequence: "DEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+	  quality: [20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26,
+		    27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 32, 32, 33, 33,
+		    34, 34, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 40, 40,
+		    41, 41, 42, 42, 43, 43, 44, 44, 45, 45],
+	  scaffold: "some scaffold"};
+
+	var first_primerPair = {
+	  left: {
+	    span: [10, 15],
+	    sequence: "LLLLL" },
+	   right: {
+	    span: [18, 22],
+	    sequence: "RRRR" }
+	};
+
+	var second_primerPair = {
+	  left: {
+	    span: [31, 34],
+	    sequence: "lll" },
+	   right: {
+	    span: [40, 46],
+	    sequence: "rrrrrr" }
+	};
+
+
+	var first_expect = header +
+	      '<span class="seq">' +
+		'<span class="seqFrag">' +
+		  '<span class="q20">AB</span>' +
+		  '<span class="q21">CD</span>' +
+		  '<span class="q22">EF</span>' +
+		  '<span class="q23">GH</span>' +
+		  '<span class="q24">IJ</span>' +
+		  '<span class="q25">KL</span>' +
+		  '<span class="q26">MN</span>' +
+		  '<span class="q27">OP</span>' +
+		'</span>' +
+		'<span class="gene">' +
+		  '<span class="seqFrag">' +
+		    '<span class="q28">QR</span>' +
+		  '</span>' +
+		  '<span class="exon" data-name="foo">' +
+		    '<span class="seqFrag">' +
+		  '<span class="q29">ST</span>' +
+		  '<span class="q30">UV</span>' +
+		  '<span class="q31">W</span>' +
+		    '</span>' +
+		  '</span>' +
+		  '<span class="seqFrag">' +
+		    '<span class="q31">X</span>' +
+		    '<span class="q32">YZ</span>' +
+		    '<span class="q33">ab</span>' +
+		    '<span class="q34">cd</span>' +
+		    '<span class="q35">ef</span>' +
+		    '<span class="q36">gh</span>' +
+		    '<span class="q37">ij</span>' +
+		    '<span class="q38">kl</span>' +
+		    '<span class="q39">m</span>' +
+		  '</span>' +
+		  '<span class="exon" data-name="bar">' +
+		    '<span class="seqFrag">' +
+		  '<span class="q39">n</span>' +
+		  '<span class="q40">op</span>' +
+		    '</span>' +
+		  '</span>' +
+		'</span>' +
+		'<span class="seqFrag">' +
+		  '<span class="q41">qr</span>' +
+		  '<span class="q42">st</span>' +
+		  '<span class="q43">uv</span>' +
+		  '<span class="q44">w</span>' +
+		'</span>' +
+	      '</span>';
+
+	var first_primed_expect = header +
+	      '<span class="seq">' +
+		'<span class="seqFrag">' +
+		  '<span class="q20">AB</span>' +
+		  '<span class="q21">CD</span>' +
+		  '<span class="q22">EF</span>' +
+		  '<span class="q23">GH</span>' +
+		  '<span class="q24">IJ</span>' +
+		  '<span class="q25">KL</span>' +
+		  '<span class="q26">MN</span>' +
+		  '<span class="q27">OP</span>' +
+		'</span>' +
+		'<span class="gene">' +
+		  '<span class="seqFrag">' +
+		    '<span class="q28">QR</span>' +
+		  '</span>' +
+		  '<span class="exon" data-name="foo">' +
+		    '<span class="seqFrag">' +
+		  '<span class="q29">ST</span>' +
+		  '<span class="q30">UV</span>' +
+		  '<span class="q31">W</span>' +
+		    '</span>' +
+		  '</span>' +
+		  '<span class="seqFrag">' +
+		    '<span class="q31">X</span>' +
+		    '<span class="q32">YZ</span>' +
+		    '<span class="q33">ab</span>' +
+		    '<span class="q34">cd</span>' +
+		    '<span class="q35">ef</span>' +
+		    '<span class="q36">gh</span>' +
+		    '<span class="q37">ij</span>' +
+		    '<span class="q38">kl</span>' +
+		    '<span class="q39">m</span>' +
+		  '</span>' +
+		  '<span class="exon" data-name="bar">' +
+		    '<span class="seqFrag">' +
+		  '<span class="q39">n</span>' +
+		  '<span class="q40">op</span>' +
+		    '</span>' +
+		  '</span>' +
+		'</span>' +
+		'<span class="seqFrag">' +
+		  '<span class="q41">qr</span>' +
+		  '<span class="q42">st</span>' +
+		  '<span class="q43">uv</span>' +
+		  '<span class="q44">w</span>' +
+		'</span>' +
+	      '</span>';
+
+	var second_expect = header +
+	      '<span class="seq">' +
+		'<span class="seqFrag">' +
+		  '<span class="q20">DE</span>' +
+		  '<span class="q21">FG</span>' +
+		  '<span class="q22">HI</span>' +
+		  '<span class="q23">JK</span>' +
+		  '<span class="q24">LM</span>' +
+		  '<span class="q25">NO</span>' +
+		  '<span class="q26">P</span>' +
+		'</span>' +
+		'<span class="gene">' +
+		  '<span class="seqFrag">' +
+		    '<span class="q26">Q</span>' +
+		    '<span class="q27">R</span>' +
+		  '</span>' +
+		  '<span class="exon" data-name="foo">' +
+		    '<span class="seqFrag">' +
+		  '<span class="q27">S</span>' +
+		  '<span class="q28">TU</span>' +
+		  '<span class="q29">VW</span>' +
+		    '</span>' +
+		  '</span>' +
+		  '<span class="seqFrag">' +
+		    '<span class="q30">XY</span>' +
+		    '<span class="q31">Za</span>' +
+		    '<span class="q32">bc</span>' +
+		    '<span class="q33">de</span>' +
+		    '<span class="q34">fg</span>' +
+		    '<span class="q35">hi</span>' +
+		    '<span class="q36">jk</span>' +
+		    '<span class="q37">lm</span>' +
+		  '</span>' +
+		  '<span class="exon" data-name="bar">' +
+		    '<span class="seqFrag">' +
+		  '<span class="q38">no</span>' +
+		  '<span class="q39">p</span>' +
+		    '</span>' +
+		  '</span>' +
+		'</span>' +
+		'<span class="seqFrag">' +
+		  '<span class="q39">q</span>' +
+		  '<span class="q40">rs</span>' +
+		  '<span class="q41">tu</span>' +
+		  '<span class="q42">vw</span>' +
+		  '<span class="q43">xy</span>' +
+		  '<span class="q44">z</span>' +
+		'</span>' +
+	      '</span>';
+
+	inject(function($compile, $rootScope) {
+	  $rootScope.tree = tree;
+	  $rootScope.sequenceInfo = first_seqInfo;
+	  var myScope = $rootScope.$new()
+	  var element = $compile(
+	    '<format-tree tree="tree"' +
+	      ' sequence-info="sequenceInfo"' +
+	      ' primer-pairs="primerPairs"' +
+	      '></format-tree>')(myScope);
+	  myScope.$digest();	// fire the $watch'es
+	  expect(element.html()).toBe(first_expect);
+	  $rootScope.primerPairs = [first_primerPair];
+	  myScope.$digest();	// fire the $watch'es
+	  expect(element.html()).toBe(first_primed_expect);
+	  $rootScope.primerPairs = [first_primerPair,
+				   second_primerPair];
+	  myScope.$digest();	// fire the $watch'es
+
+	  $rootScope.sequenceInfo = second_seqInfo;
+	  myScope.$digest();	// fire the $watch'es
+	  expect(element.html()).toBe(second_expect);
+	});
+      });
+
+    }); // describe primer display
 
   });
-
 
 });
