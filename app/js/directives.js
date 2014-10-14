@@ -219,7 +219,7 @@ angular.module('sprock.directives',
 		       }});
 
 		     scope.updateCounter++;
-		     console.log('scope.updateCounter = ' + scope.updateCounter);
+		     //console.log('scope.updateCounter = ' + scope.updateCounter);
 		   };
 		   scope.$watchCollection('pppList', makeDOMMatchPrimerPairPossibilitiesList);
 
@@ -391,6 +391,7 @@ angular.module('sprock.directives',
 			 var ppp = targetElement.data('ppp');
 			 removePPP(ppp);
 			 ensurePrimerPairPossibilitiesInTree(ppp, selected.index);
+			 scope.updateCounter++;
 		       };
 		     }, function (why) {
 		       $log.info('Modal dismissed at: ' + new Date() +

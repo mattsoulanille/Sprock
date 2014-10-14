@@ -590,8 +590,9 @@ angular.module('sprock.controllers', []).
 
   controller('MyCtrl6', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', 'compareSpans', 'PrimerPairPossibilitiesDB', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer, compareSpans, PrimerPairPossibilitiesDB) {
     $scope.serverError = null;
-    $scope.treeUpdates = 0;
-    $scope.updateCounter = 0;
+    $scope.tv = {
+      treeUpdates: 0
+    };
     $scope.margin = 5000;	//FIXME
     $scope.prime = {
       minimum_primer_span: 100,
@@ -665,7 +666,7 @@ angular.module('sprock.controllers', []).
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
 	$scope.pppList.push(v);
-	note_new_ppp(v, $scope.pppList.length);
+//	note_new_ppp(v, $scope.pppList.length);
       }, [], $scope.prime).then(function(v) {
 	$scope.pppList_eventually_was = v; //FIXME
       });
@@ -688,9 +689,8 @@ angular.module('sprock.controllers', []).
 
     function note_new_ppp(ppp, which) {
       console.log("FIXME: note_new_ppp() is a hack");
-      console.log('$scope.treeUpdates is ' + $scope.treeUpdates);
-      console.log('$scope.updateCounter is ' + $scope.updateCounter);
-      console.log(PrimerPairPossibilitiesDB.all_keys());
+      //console.log('$scope.tv.treeUpdates is ' + $scope.tv.treeUpdates);
+      //console.log(PrimerPairPossibilitiesDB.all_keys());
 
       if (!ppp || !_.has(ppp, 'primer_pairs')) {
 	return;
@@ -715,10 +715,10 @@ angular.module('sprock.controllers', []).
 
 
     function update_primer_tab_info() {
-      console.log('primer tab info says treeUpdates is ' + $scope.treeUpdates);
+      //console.log('primer tab info says treeUpdates is ' + $scope.tv.treeUpdates);
       $scope.ppp_keys = PrimerPairPossibilitiesDB.all_keys();
     };
-    $scope.$watch('treeUpdates', update_primer_tab_info);
+    $scope.$watch('tv.treeUpdates', update_primer_tab_info);
 
     function get_sequence_objects() {
       if ($scope.sequence_info == undefined) return null;

@@ -77,7 +77,7 @@
 	<format-tree tree="gene"
 		     sequence-info="sequence_info"
 		     ppp-list="pppList"
-		     update-counter="updateCounter">
+		     update-counter="tv.treeUpdates">
 	</format-tree>
       </tab>
       <tab heading="Primers">
@@ -94,7 +94,7 @@
 	desired sequence span: {{desired_sequence_span | json}}<br/>
 	excluded spans: {{prime.excluded_spans | json}}<br/>
 	primer windows: {{prime.primer_windows | json}}<br/>
-	soa.length: {{soa.length}}<br/>
+	tv: {{tv | json}}<br/>
       </tab>
     </tabset>
   </div>
