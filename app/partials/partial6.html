@@ -80,9 +80,7 @@
 		     update-counter="tv.treeUpdates">
 	</format-tree>
       </tab>
-      <tab heading="Primers">
-	<!--ul class="list-unstyled seq"-->
-
+      <tab heading="Primers" ng-show="primer_report_info">
 	<form>
 	  Make primer names start with:
 	  <input ng-model="settings.primerNameHead">
@@ -98,9 +96,12 @@
 		 value="Now"
 		 style="visibility:show">
 	</form>
-
-
 	<pre>{{primer_order_contents}}</pre>
+	<!--ul class="list-unstyled seq"-->
+	<!--table class="table table-bordered table-condensed">
+	  <tr>
+	    <td>
+	</table-->
       </tab>
 <!--      <tab heading="Gene {{gene.name}}" ng-show="gene">
 	  <pre style="text-align: left" ng-show="gene">{{gene | json}}</pre>
