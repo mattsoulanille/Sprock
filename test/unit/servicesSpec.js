@@ -158,13 +158,21 @@ describe('service', function() {
 	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
 	PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo = "restaurant";
 	expect(PrimerPairPossibilitiesDB.all().sort()).
-	  toBeAngularEqual([ { foo : 'bar' }, { foo : 'restaurant' } ].sort());
+	  toBeAngularEqual([
+	    { key: 'ABCDEFGH', foo : 'bar' },
+	    { key: 'IJKLMNOP', foo : 'restaurant' } ].sort());
       }));
 
-      it('should drop object', inject(function(PrimerPairPossibilitiesDB) {
+      it('should drop object by ppp', inject(function(PrimerPairPossibilitiesDB) {
 	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
-	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).toBe("bar");
 	PrimerPairPossibilitiesDB.drop_by_ppp(ppp_1);
+	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).not.toBeDefined();
+      }));
+
+      it('should drop object by answer', inject(function(PrimerPairPossibilitiesDB) {
+	var d = PrimerPairPossibilitiesDB.get_by_ppp(ppp_1)
+	d.foo = "bar";
+	PrimerPairPossibilitiesDB.drop(d);
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).not.toBeDefined();
       }));
 
@@ -188,7 +196,8 @@ describe('service', function() {
 	_.each(PrimerPairPossibilitiesDB.all_keys(), PrimerPairPossibilitiesDB.drop_by_key);
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).not.toBeDefined();
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo).not.toBeDefined();
-	expect(PrimerPairPossibilitiesDB.get_by_key('ABCDWXYZ')).toBeAngularEqual({});
+	expect(PrimerPairPossibilitiesDB.get_by_key('ABCDWXYZ')).
+	  toBeAngularEqual({ key : 'ABCDWXYZ' });
 	expect(PrimerPairPossibilitiesDB.get_by_key('ABCDWXYZ').foo).not.toBeDefined();
       }));
 

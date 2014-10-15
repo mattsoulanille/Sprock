@@ -33,7 +33,7 @@ angular.module('sprock.services', ['sprock.utilities']).
       if (key) {
 	if (!_.has(db, key) ||
 	    !db[key]) {
-	  db[key] = {};
+	  db[key] = {key: key};
 	};
 	return db[key];
       };
@@ -41,11 +41,26 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
 
     function all_keys() {
-      return _.keys(db).sort();
+      var rv = _.keys(db).sort();
+      _.each(rv, function(v) {
+	chai.expect(v).to.be.a('string');
+      });
+      return rv;
     };
 
     function all() {
-      return _.map(all_keys(), get_by_key);
+      var rv = _.map(all_keys(), get_by_key);
+      _.each(rv, function(v) {
+	chai.expect(v).to.be.an('object');
+      });
+      return rv;
+    };
+
+    function drop(d) {
+      try {
+	drop_by_key(d.key);
+      } catch (e) {
+      };
     };
 
     function drop_by_ppp(ppp) {
@@ -66,6 +81,7 @@ angular.module('sprock.services', ['sprock.utilities']).
       get_by_key: get_by_key,
       all_keys: all_keys,
       all: all,
+      drop: drop,
       drop_by_ppp: drop_by_ppp,
       drop_by_key: drop_by_key
     };
