@@ -88,6 +88,88 @@ angular.module('sprock.services', ['sprock.utilities']).
 
   }]).
 
+  factory('downloadData', ['_', '$log', function(_, $log) {
+
+// After http://stackoverflow.com/questions/24080018/download-file-from-a-webapi-method-using-angularjs
+// "Based on an implementation here: web.student.tuwien.ac.at/~e0427417/jsdownload.html"
+    return function(data, filename) {
+      var success;
+      var contentType = 'text/plain';
+      var octetStreamMime = 'application/octet-stream';
+      var success = false;
+      try {
+        // Try using msSaveBlob if supported
+        $log.info("Trying saveBlob method ...");
+        var blob = new Blob([data], { type: contentType });
+        if (navigator.msSaveBlob)
+          navigator.msSaveBlob(blob, filename);
+        else {
+          // Try using other saveBlob implementations, if available
+          var saveBlob = navigator.webkitSaveBlob || navigator.mozSaveBlob || navigator.saveBlob;
+          if(saveBlob === undefined) throw "Not supported";
+          saveBlob(blob, filename);
+        };
+        $log.info("saveBlob succeeded");
+        success = true;
+      } catch(ex) {
+        $log.warn("saveBlob method failed with the following exception:");
+        $log.warn(ex);
+      };
+
+      if (!success) {
+        // Get the blob url creator
+        var urlCreator = window.URL || window.webkitURL || window.mozURL || window.msURL;
+        if (urlCreator) {
+          // Try to use a download link
+          var link = document.createElement('a');
+          if ('download' in link) {
+            // Try to simulate a click
+            try {
+              // Prepare a blob URL
+              $log.info("Trying download link method with simulated click ...");
+              var blob = new Blob([data], { type: contentType });
+              var url = urlCreator.createObjectURL(blob);
+              link.setAttribute('href', url);
+
+              // Set the download attribute (Supported in Chrome 14+ / Firefox 20+)
+              link.setAttribute("download", filename);
+
+              // Simulate clicking the download link
+              var event = document.createEvent('MouseEvents');
+              event.initMouseEvent('click', true, true, window,
+				   1, 0, 0, 0, 0, false, false, false, false, 0, null);
+              link.dispatchEvent(event);
+              $log.info("Download link method with simulated click succeeded");
+              success = true;
+            } catch (ex) {
+              $log.warn(
+		"Download link method with simulated click failed with the following exception:");
+              $log.warn(ex);
+            };
+          };
+
+          if (!success) {
+            // Fallback to window.location method
+            try {
+              // Prepare a blob URL
+              // Use application/octet-stream when using window.location to force download
+              $log.info("Trying download link method with window.location ...");
+              var blob = new Blob([data], { type: octetStreamMime });
+              var url = urlCreator.createObjectURL(blob);
+              window.location = url;
+              $log.info("Download link method with window.location succeeded");
+              success = true;
+            } catch (ex) {
+              $log.warn(
+		"Download link method with window.location failed with the following exception:");
+              $log.warn(ex);
+            }}};
+      };
+      return success;
+    };
+  }]).
+
+
   factory('data_getSeq_test', ['$http', function($http) {
     return function() {
       return chai.expect($http.post('/data/getSeq', {scaffold: 'Scaffold1', start: 2, end: 34})).

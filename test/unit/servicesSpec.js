@@ -201,12 +201,28 @@ describe('service', function() {
 	expect(PrimerPairPossibilitiesDB.get_by_key('ABCDWXYZ').foo).not.toBeDefined();
       }));
 
-
-
     }); // basic operations
-
 
   });
 
+  describe('downloadData', function() {
+    var data;
 
+    beforeEach(function() {
+      var data_array = [['a', 'b', 'c'],[1,2,3]];
+      data = _.map(data_array, function(v) {
+	return v.join('\t');
+      }).join('\n') + '\n';
+      expect(data).toEqual('a\tb\tc\n1\t2\t3\n');
+    });
+
+    it('should exist', inject(function(downloadData) {
+      expect(downloadData).toBeFunction();
+    }));
+
+    it('should download data', inject(function(downloadData) {
+      expect(downloadData(data, 'trashMe.tsv')).toBe(true);
+    }));
+
+  });
 });
