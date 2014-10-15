@@ -202,12 +202,46 @@ angular.module('sprock.directives',
 		     var keysNotInPPPList =
 			   _.difference(PrimerPairPossibilitiesDB.all_keys(),
 					keysInPPPList);
+
+		     _.map(scope.pppList, function(ppp) {
+		       chai.expect(ppp).to.be.an('object')});
+		     _.map(PrimerPairPossibilitiesDB.all(), function(ppp) {
+		       chai.expect(ppp).to.be.an('object')});
+		     _.map(keysInPPPList, function(k) {
+		       chai.expect(k).to.be.a('string')});
+		     _.map(keysNotInPPPList, function(k) {
+		       chai.expect(k).to.be.a('string')});
+
+		     /* Not always, hmmm...
+		     chai.expect(
+		       _.map(
+			 _.difference(
+			   PrimerPairPossibilitiesDB.all(),
+			   _.map(
+			     scope.pppList,
+			   PrimerPairPossibilitiesDB.get_by_ppp)),
+			 PrimerPairPossibilitiesDB.key_from_ppp).sort()).
+		       to.deep.equal(keysNotInPPPList.sort());
+		      */
+
+		     if (0) {	// old way
 		     _.each(keysNotInPPPList, function(key) {
 		       var d = PrimerPairPossibilitiesDB.get_by_key(key);
 		       chai.expect(d).to.include.keys('elements');
 		       _.each(d.elements, unPrime);
 		     });
 		     _.each(keysNotInPPPList, PrimerPairPossibilitiesDB.drop_by_key);
+		     }else{	//new way
+		     _.each(
+		       _.difference(
+			 PrimerPairPossibilitiesDB.all(),
+			 _.map(scope.pppList, PrimerPairPossibilitiesDB.get_by_ppp)
+			 ), function(d) {
+			   chai.expect(d).to.include.keys('elements');
+			   _.each(d.elements, unPrime);
+			   PrimerPairPossibilitiesDB.drop(d);
+			 });
+		     };
 
 		     // Ensure each ppp in pppList is or gets put in the DOM
 		     _.each(scope.pppList, function(ppp) {
