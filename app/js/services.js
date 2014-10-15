@@ -88,12 +88,12 @@ angular.module('sprock.services', ['sprock.utilities']).
 
   }]).
 
+
   factory('downloadData', ['_', '$log', function(_, $log) {
 
 // After http://stackoverflow.com/questions/24080018/download-file-from-a-webapi-method-using-angularjs
 // "Based on an implementation here: web.student.tuwien.ac.at/~e0427417/jsdownload.html"
     return function(data, filename) {
-      var success;
       var contentType = 'text/plain';
       var octetStreamMime = 'application/octet-stream';
       var success = false;

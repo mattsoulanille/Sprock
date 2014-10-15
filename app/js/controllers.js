@@ -588,7 +588,7 @@ angular.module('sprock.controllers', []).
 
   }]).
 
-  controller('MyCtrl6', ['_', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', 'compareSpans', 'PrimerPairPossibilitiesDB', function(_, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer, compareSpans, PrimerPairPossibilitiesDB) {
+  controller('MyCtrl6', ['_', '$log', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', 'compareSpans', 'PrimerPairPossibilitiesDB', 'downloadData', function(_, $log, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer, compareSpans, PrimerPairPossibilitiesDB, downloadData) {
     $scope.serverError = null;
     $scope.tv = {
       treeUpdates: 0
@@ -601,7 +601,12 @@ angular.module('sprock.controllers', []).
       minimum_overlap: 1000,
       fuzz: 500
     };
-    $scope.soa_tickle_counter = 0;
+    $scope.log = $log;
+    $scope.settings = {
+      downloadFileBasename: 'sprock_primers',
+      downloadFileSuffix: '.tsv',
+      primerNameHead: 'TBS'
+    };
 
     // DEBUGGING h&w:
     $scope.watch_count = 0;
@@ -714,11 +719,59 @@ angular.module('sprock.controllers', []).
     };
 
 
-    function update_primer_tab_info() {
+    function update_primer_report_info() {
       //console.log('primer tab info says treeUpdates is ' + $scope.tv.treeUpdates);
-      $scope.pppp_info = PrimerPairPossibilitiesDB.all();
+      $scope.primer_report_info =
+	_.sortBy(
+	  _.map(PrimerPairPossibilitiesDB.all(), function(ppp_info) {
+	    var d = ppp_info.elements.left.data();
+	    var pp = d.ppp.primer_pairs[d.ppIndex];
+	    return {
+	      left: {
+		sequence: pp.left.sequence,
+		span: pp.left.span
+	      },
+	      right: {
+		sequence: pp.right.sequence,
+		span: pp.right.span
+	      }
+	    };
+	  }), function(v) {
+	    return v.left.span[0];
+	  });
     };
-    $scope.$watch('tv.treeUpdates', update_primer_tab_info);
+    $scope.$watch('tv.treeUpdates', update_primer_report_info);
+    $scope.$watch('gene_name', update_primer_report_info);
+
+    function updatePrimerOrderContents() {
+      $scope.primer_order_contents =
+	_.map(
+	  _.zip(_.range($scope.primer_report_info.length),
+		$scope.primer_report_info),
+	  function(v) {
+	    return $scope.settings.primerNameHead +
+	      '_' + v[0] +
+	      '_L\t' +
+	      v[1].left.sequence + '\n' +
+	      $scope.settings.primerNameHead +
+	      '_' + v[0] +
+	      '_R\t' +
+	      v[1].right.sequence
+	  }).join('\n') + '\n';
+    };
+    $scope.$watch('primer_report_info', updatePrimerOrderContents);
+    $scope.$watch('settings.primerNameHead', updatePrimerOrderContents);
+    $scope.$watch('gene_name', function(newValue, oldValue) {
+      $scope.settings.primerNameHead = newValue;
+    });
+
+    $scope.downloadPrimerOrder = function() {
+      var filename = $scope.settings.downloadFileBasename +
+	    $scope.settings.downloadFileSuffix;
+      $log.info('clicked download for ' + filename);
+      downloadData($scope.primer_order_contents, filename);
+    };
+
 
     function get_sequence_objects() {
       if ($scope.sequence_info == undefined) return null;

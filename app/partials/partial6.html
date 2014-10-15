@@ -81,12 +81,26 @@
 	</format-tree>
       </tab>
       <tab heading="Primers">
-	{{pppp_info.length}}<br/>
-	<ul class="list-unstyled">
-	  <li ng-repeat="info in pppp_info">
-	    {{$index}}: {{info.key}}
-	  </li>
-	</ul>
+	<!--ul class="list-unstyled seq"-->
+
+	<form>
+	  Make primer names start with:
+	  <input ng-model="settings.primerNameHead">
+	</form>
+	<form ng-show="primer_order_contents"
+	      ng-submit="downloadPrimerOrder()">
+	  Download to file:&nbsp;
+	  <input type="text" ng-model="settings.downloadFileBasename"
+		 size="14" placeholder="file name">
+	  {{settings.downloadFileSuffix}}
+	  <input class="btn btn-primary"
+		 type="submit"
+		 value="Now"
+		 style="visibility:show">
+	</form>
+
+
+	<pre>{{primer_order_contents}}</pre>
       </tab>
 <!--      <tab heading="Gene {{gene.name}}" ng-show="gene">
 	  <pre style="text-align: left" ng-show="gene">{{gene | json}}</pre>

@@ -260,15 +260,14 @@ angular.module('sprock.directives',
 
 		   function ensurePrimerPairPossibilitiesInTree(ppp, ppIndex) {
 		     var ppp_data = PrimerPairPossibilitiesDB.get_by_ppp(ppp);
-		     if (!ppp_data.elements) {
-		       // ppp is not installed in the DOM.
-		       ppp_data.elements = putPrimerPairPossibilitiesInTree(ppp, ppIndex || 0);
+		     if (!ppp_data.elements) { // ppp is not installed in the DOM.
+		       _.extend(ppp_data, putPrimerPairPossibilitiesInTree(ppp, ppIndex || 0));
 		     };
 		   };
 
 
 		   function putPrimerPairPossibilitiesInTree(ppp, ppIndex) {
-		     var rv = {};
+		     var rv = {elements: {}};
 		     var seq_elem = iElement.children().eq(0); // get our root sequence element
 		     chai.assert(seq_elem.hasClass("seq"),
 				 'putPrimerPairInTree() expected a "seq" element');
@@ -297,7 +296,7 @@ angular.module('sprock.directives',
 				  pp.left.sequence + "', '" +
 				  pp.right.sequence + "')");
 			   $compile(e)(scope);
-			   rv[side_name] = e;
+			   rv.elements[side_name] = e;
 			 } else {
 			   console.log("no place for primer:");
 			   console.log(primer);

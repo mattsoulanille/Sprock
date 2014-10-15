@@ -220,7 +220,9 @@ describe('service', function() {
       expect(downloadData).toBeFunction();
     }));
 
-    it('should download data', inject(function(downloadData) {
+    // This spec is expected to pass. Because it litters the download destination it is x'd out.
+    // It should be re-enabled upon any suspicion about the correct functioning of downloadData
+    xit('should download data', inject(function(downloadData) {
       expect(downloadData(data, 'trashMe.tsv')).toBe(true);
     }));
 
