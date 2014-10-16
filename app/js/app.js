@@ -15,44 +15,20 @@ angular.module('sprock', [
 ])
 
 .config(['$routeProvider', function($routeProvider) {
-  $routeProvider
-    .when('/test1', {
+  $routeProvider.
+    when('/test1', {
 	templateUrl: 'partials/partest1.html',
 	controller: 'Tester1'
-    })
-    .when('/test2', {
-	templateUrl: 'partials/partest2.html',
-	controller: 'Tester2'
-    })
-    .when('/view1', {
-	templateUrl: 'partials/partial1.html',
-	controller: 'MyCtrl1'
-    })
-    .when('/view2', {
-	templateUrl: 'partials/partial2.html',
-	controller: 'MyCtrl2'
-    })
-    .when('/view3', {
-	templateUrl: 'partials/partial3.html',
-	controller: 'MyCtrl3'
-    })
-    .when('/view4', {
-	templateUrl: 'partials/partial4.html',
-	controller: 'MyCtrl4'
-    })
-    .when('/view5', {
-	templateUrl: 'partials/partial5.html',
-	controller: 'MyCtrl5'
-    })
-    .when('/view6', {
+    }).
+    when('/view6', {
 	templateUrl: 'partials/partial6.html',
 	controller: 'MyCtrl6'
-    })
-    .when('/dev', {
+    }).
+    when('/dev', {
 	templateUrl: 'partials/dev.html',
 	controller: 'MyDev'
-    })
-    .otherwise({redirectTo: '/view1'})
+    }).
+    otherwise({redirectTo: '/view6'})
 }]);
 
 // some console hacks.. TODO put somewhere better
