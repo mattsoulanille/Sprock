@@ -5,28 +5,50 @@
 describe('controllers', function(){
   beforeEach(module('sprock'));
 
-  describe('MyCtrl4', function() {
-    var myCtrl4;
+  describe('MyCtrl6', function() {
+    var myCtrl;
 
     beforeEach(inject(function($controller, $rootScope) {
-      myCtrl4 = $controller('MyCtrl4', {$scope: $rootScope});
+      myCtrl = $controller('MyCtrl6', {$scope: $rootScope});
     }));
 
     it('should exist', function() {
-      expect(myCtrl4).toBeDefined();
+      expect(myCtrl).toBeDefined();
+    });
+
+  });
+
+  xdescribe('primerModalCtrl', function() {
+    var myCtrl;
+    var howExited;
+
+    beforeEach(inject(function($controller, $rootScope) {
+      $rootScope.modalInstance = {
+	close: function(msg) {
+	  howExited = 'close: ' + msg;
+	},
+	cancel: function(msg) {
+	  howExited = 'cancel: ' + msg;
+	}
+      };
+      myCtrl = $controller('primerModalCtrl', {$scope: $rootScope});
+    }));
+
+    it('should exist', function() {
+      expect(myCtrl).toBeDefined();
     });
 
   });
 
   describe('Dev', function() {
-    var myCtrl5;
+    var myCtrl;
 
     beforeEach(inject(function($controller, $rootScope) {
-      myCtrl5 = $controller('Dev', {$scope: $rootScope});
+      myCtrl = $controller('Dev', {$scope: $rootScope});
     }));
 
     it('should exist', function() {
-      expect(myCtrl5).toBeDefined();
+      expect(myCtrl).toBeDefined();
     });
 
   });

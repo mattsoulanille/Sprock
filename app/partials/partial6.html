@@ -84,22 +84,33 @@
 	</format-tree>
       </tab>
       <tab heading="Primers" ng-show="primer_report_info">
-	<form>
-	  Make primer names start with:
-	  <input ng-model="settings.primerNameHead">
-	</form>
-	<form ng-show="primer_order_contents"
-	      ng-submit="downloadPrimerOrder()">
-	  Download to file:&nbsp;
-	  <input type="text" ng-model="settings.downloadFileBasename"
-		 size="14" placeholder="file name">
-	  {{settings.downloadFileSuffix}}
-	  <input class="btn"
-		 type="submit"
-		 value="Now"
-		 style="visibility:show">
-	</form>
-	<pre>{{primer_order_contents}}</pre>
+	<p>
+	  <form>
+	    Primer names start with:
+	    <input ng-model="settings.primerNameHead">
+	  </form>
+	</p>
+<!--
+	<p>
+	  <form ng-show="primer_order_contents"
+		ng-submit="downloadPrimerOrder()">
+	    Download to file:&nbsp;
+	    <input type="text" ng-model="settings.downloadFileBasename"
+		   size="14" placeholder="file name">
+	    {{settings.downloadFileSuffix}}
+	    <input class="btn"
+		   ng-class="settings.primeButtonClasses"
+		   type="submit"
+		   value="Now"
+		   style="visibility:show">
+	  </form>
+	</p>
+-->
+	<textarea
+	   class="seq"
+	   cols="80"
+	   rows="{{primer_report_info.length*2 + 2}}">{{primer_order_contents}}</textarea>
+	<p>You can <span ng-show="tv.makingPrimers == 'finished'">edit the above, and </span>copy &amp; paste the results into a spreadsheet or file.</p>
 	<!--ul class="list-unstyled seq"-->
 	<!--table class="table table-bordered table-condensed">
 	  <tr>
