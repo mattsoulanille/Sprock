@@ -7,7 +7,7 @@ angular.module('sprock.services', ['sprock.utilities']).
 
 // Demonstrate how to register services
 // In this case it is a simple value service.
-  value('version', '0.0.6').
+  value('version', '0.1.0').
 
 // FIXME: DRY
 
@@ -91,7 +91,8 @@ angular.module('sprock.services', ['sprock.utilities']).
 
   factory('downloadData', ['_', '$log', function(_, $log) {
 
-// After http://stackoverflow.com/questions/24080018/download-file-from-a-webapi-method-using-angularjs
+// Modelled after solution at
+//   http://stackoverflow.com/questions/24080018/download-file-from-a-webapi-method-using-angularjs
 // "Based on an implementation here: web.student.tuwien.ac.at/~e0427417/jsdownload.html"
     return function(data, filename) {
       var contentType = 'text/plain';

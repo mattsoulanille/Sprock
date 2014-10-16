@@ -2,16 +2,6 @@
 
 /* jasmine specs for utilities go here */
 
-/* farting around:
-describe('module interface', function() {
-  describe('before running module function', function() {
-    it('should not have inject function', function() {
-      expect(inject).not.toBeDefined();
-    });
-  });
-});
-*/
-
 describe('service', function() {
   beforeEach(module('sprock.utilities'));
 

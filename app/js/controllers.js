@@ -54,7 +54,7 @@ angular.module('sprock.controllers', []).
 
 }]).
 
-  controller('MyCtrl6', ['_', '$log', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', 'compareSpans', 'PrimerPairPossibilitiesDB', 'downloadData', function(_, $log, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer, compareSpans, PrimerPairPossibilitiesDB, downloadData) {
+  controller('MyCtrl6', ['_', '$scope', '$log', '$q', '$http', 'getTree', 'getSequence', 'eachFromServer', 'PrimerPairPossibilitiesDB', 'downloadData', function(_, $scope, $log, $q, $http, getTree, getSequence, eachFromServer, PrimerPairPossibilitiesDB, downloadData) {
     $scope.tv = {
       treeUpdates: 0,
       makingPrimers: false
@@ -211,7 +211,6 @@ angular.module('sprock.controllers', []).
 
 
     function update_primer_report_info() {
-      //console.log('primer tab info says treeUpdates is ' + $scope.tv.treeUpdates);
       $scope.primer_report_info =
 	_.sortBy(
 	  _.map(PrimerPairPossibilitiesDB.all(), function(ppp_info) {
@@ -286,6 +285,6 @@ angular.module('sprock.controllers', []).
     };
   }).
 
-  controller('Dev', ['_', '$scope', 'getTree', function(_, $scope, getTree) {
+  controller('Dev', ['_', '$scope', function(_, $scope) {
     $scope.done = false;
   }]);
