@@ -591,7 +591,8 @@ angular.module('sprock.controllers', []).
   controller('MyCtrl6', ['_', '$log', '$q', '$http', '$scope', 'getTree', 'getGene', 'getFeatures', 'getSequence', 'GeneSequenceInfo', 'eachFromServer', 'compareSpans', 'PrimerPairPossibilitiesDB', 'downloadData', function(_, $log, $q, $http, $scope, getTree, getGene, getFeatures, getSequence, GeneSequenceInfo, eachFromServer, compareSpans, PrimerPairPossibilitiesDB, downloadData) {
     $scope.serverError = null;
     $scope.tv = {
-      treeUpdates: 0
+      treeUpdates: 0,
+      makingPrimers: false
     };
     $scope.margin = 5000;	//FIXME
     $scope.prime = {
@@ -605,7 +606,9 @@ angular.module('sprock.controllers', []).
     $scope.settings = {
       downloadFileBasename: 'sprock_primers',
       downloadFileSuffix: '.tsv',
-      primerNameHead: 'TBS'
+      primerNameHead: 'TBS',
+      primeButtonClasses: {},
+      primeButtonText: 'No Gene!'
     };
 
     // DEBUGGING h&w:
@@ -655,27 +658,74 @@ angular.module('sprock.controllers', []).
 
     function get_sequence() {
       if ($scope.gene == undefined) return null;
+      $scope.settings.primeButtonText = 'getting sequence';
       var gene = $scope.gene;
       var want_span = $scope.desired_sequence_span;
       return $scope.sequence_info_promise =
 	getSequence(gene.scaffold, want_span[0], want_span[1]).
 	then(function(v) {
+	  $scope.settings.primeButtonText = 'make primers';
+	  $scope.settings.primeButtonClasses['btn-primary'] = true;
 	  return $scope.sequence_info = v;
 	});
     };
     $scope.$watchCollection('desired_sequence_span', get_sequence);
 
     $scope.makePrimers = function() {
+      $scope.makePrimersPromise = makePrimers();
+    };
+
+    function countOfGoodPrimers() {
+      var rv =
+	    _.reduce(
+	      _.map($scope.pppList, function(ppp) {
+		return ppp.primer_pair_num_returned > 0 ? 1 : 0;
+	      }),
+	      function(memo, v) {
+		return memo + v;
+	      });
+      return rv;
+    };
+
+    function makePrimers() {
+      $scope.tv.makingPrimers = 'started';
+      $scope.settings.primeButtonText = 'making...';
+//      $scope.tv.makingPrimersDone = false;
       $scope.pppList = [];
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
 	$scope.pppList.push(v);
+	$scope.settings.primeButtonText = 'made ' +
+	  countOfGoodPrimers() + ' pairs';
+
 //	note_new_ppp(v, $scope.pppList.length);
       }, [], $scope.prime).then(function(v) {
 	$scope.pppList_eventually_was = v; //FIXME
+	$scope.tv.makingPrimers = 'finished';
+//	$scope.tv.makingPrimersDone = true;
       });
     };
+
+    $scope.$watch('tv.makingPrimers', function(newValue, oldValue) {
+      $scope.settings.primeButtonClasses['btn-primary'] = false;
+      $scope.settings.primeButtonClasses['btn-warning'] = newValue == 'started';
+      $scope.settings.primeButtonClasses['btn-success'] = newValue == 'finished';
+      if (newValue == 'started') {
+	$scope.settings.primeButtonText = 'making primers';
+      };
+      if (newValue == 'finished') {
+	$scope.settings.primeButtonText = 'Done: ' + $scope.settings.primeButtonText;
+      };
+    });
+
+    $scope.$watch('prime', function() {
+      $scope.settings.primeButtonText = 'make primers';
+      $scope.settings.primeButtonClasses['btn-primary'] = true;
+      $scope.settings.primeButtonClasses['btn-warning'] = false;
+      $scope.settings.primeButtonClasses['btn-success'] = false;
+    });
+
 
     function calc_primer_windows() {
       var gene = $scope.gene;

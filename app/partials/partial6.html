@@ -27,34 +27,37 @@
     </span>
 
     <form ng-show="gene" ng-submit="makePrimers()">
-      target span: <input type="number"
-			  ng-model="prime.target_primer_span"
-			  min="1"
-			  max="10000"
-			  placeholder="span">bp,
-      minimum span: <input type="number"
-			   ng-model="prime.minimum_primer_span"
-			   min="1"
-			   max="10000"
-			   placeholder="span">bp,
-      max span: <input type="number"
-		       ng-model="prime.maximum_primer_span"
-		       min="1"
-		       max="10000"
-		       placeholder="max span">bp,
-      min overlap: <input type="number"
-			  ng-model="prime.minimum_overlap"
-			  min="0"
-			  max="10000"
-			  placeholder="min overlap">bp,
-      fuzz: <input type="number"
-		   ng-model="prime.fuzz"
-		   min="0"
-		   max="5000"
-		   placeholder="fuzz">bp<br/>
-      <input class="btn btn-primary"
+      <p>
+	target span: <input type="number"
+			    ng-model="prime.target_primer_span"
+			    min="1"
+			    max="10000"
+			    placeholder="span">bp,
+	minimum span: <input type="number"
+			     ng-model="prime.minimum_primer_span"
+			     min="1"
+			     max="10000"
+			     placeholder="span">bp,
+	max span: <input type="number"
+			 ng-model="prime.maximum_primer_span"
+			 min="1"
+			 max="10000"
+			 placeholder="max span">bp,
+	min overlap: <input type="number"
+			    ng-model="prime.minimum_overlap"
+			    min="0"
+			    max="10000"
+			    placeholder="min overlap">bp,
+	fuzz: <input type="number"
+		     ng-model="prime.fuzz"
+		     min="0"
+		     max="5000"
+		     placeholder="fuzz">bp<br/>
+      </p>
+      <input class="btn"
 	     type="submit"
-	     value="make primers"
+	     ng-class="settings.primeButtonClasses"
+	     value="{{settings.primeButtonText}}"
 	     style="visibility:show">
     </form>
   </div>
@@ -91,7 +94,7 @@
 	  <input type="text" ng-model="settings.downloadFileBasename"
 		 size="14" placeholder="file name">
 	  {{settings.downloadFileSuffix}}
-	  <input class="btn btn-primary"
+	  <input class="btn"
 		 type="submit"
 		 value="Now"
 		 style="visibility:show">
