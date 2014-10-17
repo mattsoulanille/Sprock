@@ -50,8 +50,16 @@ beforeEach(function () {
 
     toBeAwesome: function () {
       // ummm.  to be awesome you must have functions!
-      return !! _.functions(this.actual).length
+      return !! _.functions(this.actual).length;
+    },
+
+    toBeHTMLEqual: function (html) {
+      if (this.actual === html) return true;
+      var me = angular.element(this.actual);
+      var he = angular.element(html);
+      return me.html() === he.html();
     }
+
   })
 
 })
@@ -119,5 +127,26 @@ describe("matchers", function () {
       expect(t).toBeAwesome()
     })
   })
-})
+
+  describe('toBeHTMLEqual()', function() {
+    it("should consider empty strings equal", function() {
+      expect('').toBeHTMLEqual('');
+    });
+    it("should consider identical HTML strings equal", function() {
+      expect('<br/>').toBeHTMLEqual('<br/>');
+    });
+    it("should consider equivalent HTML strings equal", function() {
+      expect('<br/>').toBeHTMLEqual('<br></br>');
+    });
+    it("should consider equivalent when attributes merely in different order", function() {
+      expect('<span data-name="foo" class="bar"></span>').
+	toBeHTMLEqual('<span class="bar" data-name="foo"></span>');
+    });
+    it("should consider equivalent when classes are merely in different order", function() {
+      expect('<span class="foo bar"></span>').
+	toBeHTMLEqual('<span class="bar foo"></span>');
+    });
+  });
+
+});
 
