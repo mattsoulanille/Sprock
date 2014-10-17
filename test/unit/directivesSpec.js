@@ -17,7 +17,8 @@ describe('directives', function() {
     });
   });
 
-  describe('formatScience', function() {
+  // UNUSED
+  xdescribe('formatScience', function() {
     var si;
     var header = '<h3>format-science</h3>';
 

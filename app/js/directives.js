@@ -14,6 +14,7 @@ angular.module('sprock.directives',
     }
   }]).
 
+  /*** UNUSED
   directive('formatSequence',
 	    ['_',
 	     'differentiateSequenceToEvents',
@@ -39,6 +40,8 @@ angular.module('sprock.directives',
 			  link: link
 			};
 		      }]).
+
+   *** END UNUSED */
 
   directive('formatTree',
 	    ['_',
@@ -430,8 +433,8 @@ angular.module('sprock.directives',
 	       };
 
 	       return directiveDefinitionObject;
-	     }]).
-
+	     }]);
+  /*** UNUSED 
   directive('formatScience',
 	    ['_', 'differentiateSequenceToEvents', 'integrateSequenceEventsToHTML', 'convertFeaturesToEvents',
 	     function factory(_, differentiateSequenceToEvents, integrateSequenceEventsToHTML, convertFeaturesToEvents ) {
@@ -499,3 +502,4 @@ angular.module('sprock.directives',
 	       };
 	       return directiveDefinitionObject;
 	     }]);
+   *** END UNUSED */

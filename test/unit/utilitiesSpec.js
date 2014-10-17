@@ -356,7 +356,8 @@ describe('service', function() {
 
   });
 
-  describe('differentiateSequenceToEvents', function() {
+  // UNUSED
+  xdescribe('differentiateSequenceToEvents', function() {
     it('should be a function', inject(function(differentiateSequenceToEvents) {
       expect(differentiateSequenceToEvents).toBeFunction();
     }));
@@ -373,7 +374,8 @@ describe('service', function() {
     }));
   });
 
-  describe('convertExonsToEvents', function() {
+  // UNUSED
+  xdescribe('convertExonsToEvents', function() {
     it('should be a function', inject(function(convertExonsToEvents) {
       expect(convertExonsToEvents).toBeFunction();
     }));
@@ -388,7 +390,8 @@ describe('service', function() {
     }));
   });
 
-  describe('convertFeaturesToEvents', function() {
+  // UNUSED
+  xdescribe('convertFeaturesToEvents', function() {
     it('should be a function', inject(function(convertFeaturesToEvents) {
       expect(convertFeaturesToEvents).toBeFunction();
     }));
@@ -443,7 +446,8 @@ describe('service', function() {
     }));
   });
 
-  describe('ObjPlay', function() {
+  // ObjPlay unused
+  xdescribe('ObjPlay', function() {
     it('should be a function', inject(function(ObjPlay) {
       expect(ObjPlay).toBeFunction();
     }));

@@ -3,8 +3,71 @@
 
 angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 
+  factory('compareSpans', ['_', function(_) {
+    return function(a, b) {
+      var a_start = a[0];
+      var a_end = a[1];
+      var b_start = b[0];
+      var b_end = b[1];
+      var rv = a_start < b_start ? '<' : a_start > b_start ? '>' : '=';
+      rv += a_start < b_end ? '<' : a_start > b_end ? '>' : '=';
+      rv += a_end < b_start ? '<' : a_end > b_start ? '>' : '=';
+      rv += a_end < b_end ? '<' : a_end > b_end ? '>' : '=';
+      return rv;
+    }
+  }]).
+
+  factory('findLeastElemContainingSpan', ['_', function(_) {
+    return function flecs(elem, span) {
+      // Find the leafward-most element, along the first path found,
+      // whose "span" contains the given span
+      var elem_span;
+      elem_span = elem.data().span;
+      if (elem_span === undefined ||
+	  elem_span[0] > span[0] ||
+	  elem_span[1] < span[1]) {
+	return null;
+      };
+
+      var elem_children = _.map(elem.children(), angular.element);
+      // Look for it sequentially rather than functionally, to avoid extra work:
+      for (var i=0; i<elem_children.length; i++) {
+	var candidate = flecs(elem_children[i], span);
+	if (candidate !== null) {
+	  return candidate;
+	};
+      };
+      chai.expect(elem.data()).to.have.property("span").instanceof(Array);
+      return elem;
+    };
+  }]).
+
+  factory('reverseComplement', ['_', function(_) {
+    return function(seq) {
+      return _.map(seq, function(bp) {
+	return {A:'T', T:'A', C:'G', G:'C', N:'N'}[bp]
+      }).reverse().join('');
+    };
+  }]).
+
+  factory('MessAround', ['_', function(_) {
+
+    function fooey(a, b) {
+      this.a = a;
+      return this;
+    };
+
+    fooey.prototype.getSmart =
+      function() {
+	return this.a;
+      };
+
+    return fooey;
+  }]);
+
+  /*** UNUSED
   factory('integrateSequenceEventsToHTML', ['_', function(_) {
-    /*
+
     if (false) {
       // example input:
       var seq_events = { events: [[11, {x: null}],
@@ -14,7 +77,7 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 				  [5, {q: 'qual70'}]
 				 ],
 			 sequence: 'GACCTACATCAGGCT' };
-    };*/
+    };
     return function integrate(seq_events) {
 //      console.log('A: ' + JSON.stringify(seq_events.events));
       var sequence = seq_events['sequence'];
@@ -183,21 +246,9 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 
     return si;
   }]).
+  *** END UNUSED */
 
-  factory('compareSpans', ['_', function(_) {
-    return function(a, b) {
-      var a_start = a[0];
-      var a_end = a[1];
-      var b_start = b[0];
-      var b_end = b[1];
-      var rv = a_start < b_start ? '<' : a_start > b_start ? '>' : '=';
-      rv += a_start < b_end ? '<' : a_start > b_end ? '>' : '=';
-      rv += a_end < b_start ? '<' : a_end > b_start ? '>' : '=';
-      rv += a_end < b_end ? '<' : a_end > b_end ? '>' : '=';
-      return rv;
-    }
-  }]).
-
+/*** UNUSED
   factory('GeneSequenceInfo_test', ['GeneSequenceInfo', function(GeneSequenceInfo) {
     return function() {
       var expect = chai.expect;
@@ -358,63 +409,5 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
 	  })};
 
     return gsi;
-  }]).
-
-  factory('findLeastElemContainingSpan', ['_', function(_) {
-    return function flecs(elem, span) {
-      // Find the leafward-most element, along the first path found,
-      // whose "span" contains the given span
-      var elem_span;
-/*
-                     try {
-		       elem_span = elem.data().span;
-		       if (elem_span === undefined ||
-			   elem_span[0] > span[0] ||
-			   elem_span[1] < span[1]) {
-			 return null;
-		       };
-		     } catch (e) {
-		       return null; //FIXME: when??
-		     }; */
-      elem_span = elem.data().span;
-      if (elem_span === undefined ||
-	  elem_span[0] > span[0] ||
-	  elem_span[1] < span[1]) {
-	return null;
-      };
-
-      var elem_children = _.map(elem.children(), angular.element);
-      // Look for it sequentially rather than functionally, to avoid extra work:
-      for (var i=0; i<elem_children.length; i++) {
-	var candidate = flecs(elem_children[i], span);
-	if (candidate !== null) {
-	  return candidate;
-	};
-      };
-      chai.expect(elem.data()).to.have.property("span").instanceof(Array);
-      return elem;
-    };
-  }]).
-
-  factory('reverseComplement', ['_', function(_) {
-    return function(seq) {
-      return _.map(seq, function(bp) {
-	return {A:'T', T:'A', C:'G', G:'C', N:'N'}[bp]
-      }).reverse().join('');
-    };
-  }]).
-
-  factory('MessAround', ['_', function(_) {
-
-    function fooey(a, b) {
-      this.a = a;
-      return this;
-    };
-
-    fooey.prototype.getSmart =
-      function() {
-	return this.a;
-      };
-
-    return fooey;
   }]);
+ *** END UNUSED */

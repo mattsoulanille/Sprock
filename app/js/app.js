@@ -12,9 +12,9 @@ angular.module('sprock', [
   'sprock.directives',
   'sprock.controllers',
   'sprock.utilities'
-])
+]).
 
-.config(['$routeProvider', function($routeProvider) {
+  config(['$routeProvider', function($routeProvider) {
   $routeProvider.
     when('/test1', {
 	templateUrl: 'partials/partest1.html',
@@ -26,7 +26,7 @@ angular.module('sprock', [
     }).
     when('/dev', {
 	templateUrl: 'partials/dev.html',
-	controller: 'MyDev'
+	controller: 'Dev'
     }).
     otherwise({redirectTo: '/view6'})
 }]);

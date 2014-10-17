@@ -37,7 +37,8 @@ describe('service', function() {
     }));
   });
 
-  describe('getSeqInfo', function() {
+  // unused
+  xdescribe('getSeqInfo', function() {
     it('should be a function', inject(function(getSeqInfo) {
       expect(getSeqInfo).toBeFunction();
     }));

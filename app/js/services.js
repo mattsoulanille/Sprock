@@ -233,6 +233,7 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
+  /*** UNUSED
   factory('getSeqInfo', ['$http', '$q', 'getSequence', 'getFeatures', 'SequenceInfo',
 			 function($http, $q, getSequence, getFeatures, SequenceInfo) {
     return function (scaffold, start, end) {
@@ -253,6 +254,7 @@ angular.module('sprock.services', ['sprock.utilities']).
       return deferred.promise;
     };
   }]).
+   *** END UNUSED */
 
   factory('data_getGene_test', ['$http', function($http) {
     return function() {
@@ -365,8 +367,8 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
-  factory('getTree', ['$http', '$q', 'SequenceInfo',
-			 function($http, $q, SequenceInfo) {
+  factory('getTree', ['$http', '$q',
+			 function($http, $q) {
     return function (name, relative_positions) {
       var deferred = $q.defer();
       $http.post('/data/getTree', {name: name, relative_positions: relative_positions}).
@@ -382,6 +384,7 @@ angular.module('sprock.services', ['sprock.utilities']).
     };
   }]).
 
+/*** OBSOLETE
   factory('data_muks_test', ['$http', function($http) {
     return function() {
       var expect = chai.expect;
@@ -456,6 +459,7 @@ angular.module('sprock.services', ['sprock.utilities']).
       return deferred.promise;
     };
   }]).
+ *** END OBSOLETE */
 
   factory('eachFromServer_test', ['_', 'eachFromServer', function(_, eachFromServer) {
     return function() {
