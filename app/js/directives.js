@@ -153,7 +153,7 @@ angular.module('sprock.directives',
 			 var gap_right = span[1];
 			 var gap_left;
 			 try {
-			   if (!!children[0].data().span) {
+			   if (children.length && !!children[0].data().span) {
 			     for (var i=children.length-1; i>=0; i--) {
 			       var child = children[i];
 			       var child_span = child.data().span;

@@ -1,57 +1,82 @@
 <div class="row" style="text-align: center">
 
   <div class="form-group">
-    <input type="text"
-	   ng-model="gene_name"
-	   size="14"
-	   placeholder="Gene name">
-    <span ng-hide="gene"><p> e.g. SPU_013015 or SPU_022066</p></span>
-    <span ng-show="gene"><p>is on {{gene.scaffold}} from {{gene.span[0]}} to {{gene.span[1]}}</p></span>
+    <form name="geneNameForm">
+      <input type="text"
+	     ng-model="gene_name"
+	     size="14"
+             ng-model-options="{ updateOn: 'blur' }"
+             ng-keyup="cancelFormChanges($event, 'geneNameForm')"
+	     placeholder="Gene name"/>
+      <span ng-hide="gene">
+	<p>e.g. SPU_013015 or SPU_022066</p>
+      </span>
+    </form>
+      <span ng-show="gene">
+	<p>is on {{gene.scaffold}} from {{gene.span[0]}} to {{gene.span[1]}}</p>
+      </span>
     <span ng-show="gene">
-      <p>Start
-	<input
-	   type="number"
-	   min="0"
-	   max="{{gene.end}}"
-	   step="1000"
-	   ng-model="desired_sequence_span[0]" size="8">
-	= {{gene.span[0] - desired_sequence_span[0]}} from {{gene.span[0]}}
-	| {{gene.span[1]}} = {{desired_sequence_span[1] - gene.span[1]}} to
-	<input
-	   type="number"
-	   min="{{gene.start}}"
-	   max="1000000"
-	   step="1000"
-	   ng-model="desired_sequence_span[1]" size="8"> End
-      </p>
+      <form name="sequenceSpanForm" ng-submit="angular.noop()">
+	<p>Start
+	  <input
+	     type="number"
+	     min="0"
+	     max="{{gene.span[0]}}"
+	     ng-model="desired_sequence_span[0]"
+	     size="8"
+             ng-model-options="{ updateOn: 'blur' }"
+             ng-keyup="cancelFormChanges($event, 'sequenceSpanForm')"/>
+	  = {{gene.span[0] - desired_sequence_span[0]}} from {{gene.span[0]}}
+	  | {{gene.span[1]}} = {{desired_sequence_span[1] - gene.span[1]}} to
+	  <input
+	     type="number"
+	     min="{{gene.span[1]}}"
+	     max="1000000"
+	     ng-model="desired_sequence_span[1]"
+	     size="8"
+             ng-model-options="{ updateOn: 'blur' }"
+             ng-keyup="cancelFormChanges($event, 'sequenceSpanForm')"/>
+	  End
+	</p>
+      </form>
     </span>
 
-    <form ng-show="gene" ng-submit="makePrimers()">
+    <form name="primeForm" ng-show="gene" ng-submit="makePrimers()">
       <p>
 	target span: <input type="number"
 			    ng-model="prime.target_primer_span"
 			    min="1"
 			    max="10000"
+			    ng-model-options="{ updateOn: 'blur' }"
+			    ng-keyup="cancelFormChanges($event, 'primeForm')"
 			    placeholder="span">bp,
 	minimum span: <input type="number"
 			     ng-model="prime.minimum_primer_span"
 			     min="1"
 			     max="10000"
+			     ng-model-options="{ updateOn: 'blur' }"
+			     ng-keyup="cancelFormChanges($event, 'primeForm')"
 			     placeholder="span">bp,
 	max span: <input type="number"
 			 ng-model="prime.maximum_primer_span"
 			 min="1"
 			 max="10000"
+			 ng-model-options="{ updateOn: 'blur' }"
+			 ng-keyup="cancelFormChanges($event, 'primeForm')"
 			 placeholder="max span">bp,
 	min overlap: <input type="number"
 			    ng-model="prime.minimum_overlap"
 			    min="0"
 			    max="10000"
+			    ng-model-options="{ updateOn: 'blur' }"
+			    ng-keyup="cancelFormChanges($event, 'primeForm')"
 			    placeholder="min overlap">bp,
 	fuzz: <input type="number"
 		     ng-model="prime.fuzz"
 		     min="0"
 		     max="5000"
+		     ng-model-options="{ updateOn: 'blur' }"
+		     ng-keyup="cancelFormChanges($event, 'primeForm')"
 		     placeholder="fuzz">bp<br/>
       </p>
       <input class="btn"

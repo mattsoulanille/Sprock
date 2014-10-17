@@ -37,6 +37,10 @@
   word-wrap: break-word;
 }
 
+.seqFrag {
+  letter-spacing: 0em;
+}
+
 .exon {
     background: #cce9ca;
 }

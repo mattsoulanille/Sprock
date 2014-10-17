@@ -55,6 +55,7 @@ angular.module('sprock.controllers', []).
 }]).
 
   controller('MyCtrl6', ['_', '$scope', '$log', '$q', '$http', 'getTree', 'getSequence', 'eachFromServer', 'PrimerPairPossibilitiesDB', 'downloadData', function(_, $scope, $log, $q, $http, getTree, getSequence, eachFromServer, PrimerPairPossibilitiesDB, downloadData) {
+
     $scope.tv = {
       treeUpdates: 0,
       makingPrimers: false
@@ -75,6 +76,14 @@ angular.module('sprock.controllers', []).
       primeButtonClasses: {},
       primeButtonText: 'No Gene!'
     };
+
+    // An ngKeyup suited for ng-model-options="{ updateOn: 'blur' }" fields
+    $scope.cancelFormChanges = function (e, formName) {
+      if (e.keyCode == 27) {
+        eval("$scope." + formName).$rollbackViewValue(); // FIXME: find a safer way
+      }
+    };
+
 
     // DEBUGGING h&w:
     $scope.watch_count = 0;
