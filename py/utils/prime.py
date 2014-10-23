@@ -22,7 +22,7 @@ class Primer(object):
 class PrimerPair(object):
     """A pair of primers as produced by primer3"""
     def __init__(self, d, **kwargs):
-        self.d = d
+        # skip the clutter, don't do self.d = d
         self.__dict__.update(kwargs)
 
         splits = set((tuple(k.split('_')), k) for k in d.keys())
@@ -116,6 +116,7 @@ class PrimerMaker(object):
         self.seq_args = dict()
         self.global_args = dict()
         self.input_log = self.output_log = self.err_log = None
+        self.useSimulatedBindings = True # overrideable default
 
     def config_for(self, prime):
         # Do what you need to absorb the particulars
@@ -209,14 +210,19 @@ class PrimerMaker(object):
                 = [target[0], self.prime.fuzz,
                    target[1] - self.prime.fuzz, self.prime.fuzz]
 
-            self.seq_args['PRIMER_PRODUCT_SIZE_RANGE'] \
-                = (target[1] - target[0] - 2*self.prime.fuzz,
-                   target[1]-target[0])
+            self.global_args['PRIMER_PRODUCT_SIZE_RANGE'] \
+                = sorted((max(target[1] - target[0] - 2*self.prime.fuzz,
+                       self.prime.minimum_primer_span),
+                   target[1]-target[0]))
 
-            primers = primer3.simulatedbindings.designPrimers(
-                self.seq_args, self.global_args,
-                input_log=self.input_log,
-                output_log=self.output_log)
+            if self.useSimulatedBindings:
+                primers = primer3.simulatedbindings.designPrimers(
+                    self.seq_args, self.global_args,
+                    input_log=self.input_log,
+                    output_log=self.output_log)
+            else:
+                primers = primer3.bindings.designPrimers(
+                    self.seq_args, self.global_args)
 
             yield PrimerPairPossibilities(primers)
 
