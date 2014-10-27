@@ -269,6 +269,11 @@ angular.module('sprock.directives',
 		   };
 
 
+		   function round(floatAmount, reqPrecision) {
+		     return Math.round(floatAmount * Math.pow(10, reqPrecision)) /
+		       Math.pow(10, reqPrecision);
+		   };
+
 		   function putPrimerPairPossibilitiesInTree(ppp, ppIndex) {
 		     var rv = {elements: {}};
 		     var seq_elem = iElement.children().eq(0); // get our root sequence element
@@ -278,7 +283,9 @@ angular.module('sprock.directives',
 		     var switchName = 'lightSwitches.' +
 			   pp.left.sequence + pp.right.sequence;
 		     var pair_span = pp.right.span[1] - pp.left.span[0];
-		     var pair_tm = [pp.left.tm, pp.right.tm];
+		     var pair_tm = _.map([pp.left.tm, pp.right.tm], function(v) {
+		       return round(v, 2);
+		     });
 		     _.each(
 		       [[pp.left, "left"], [pp.right, "right"]], function(t) {
 			 var primer = t[0];
