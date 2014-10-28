@@ -245,24 +245,28 @@ angular.module('sprock.controllers', []).
 
 
     function updatePrimerOrderContents() {
-      var sep = $scope.settings.primerReportSeparator;
       $scope.primer_order_contents =
 	_.map(
-	  _.zip(_.range($scope.primer_report_info.length),
-		$scope.primer_report_info),
-	  function(v) {
-	    var n = v[0] + 1;
-	    return $scope.settings.primerNameHead +
-	      '_' + n +
-	      '_L' +
-	      sep +
-	      v[1].left.sequence + '\n' +
-	      $scope.settings.primerNameHead +
-	      '_' + n +
-	      '_R' +
-	      sep +
-	      v[1].right.sequence
-	  }).join('\n') + '\n';
+
+	  _.flatten(
+	    _.map(
+	      _.zip(_.range($scope.primer_report_info.length),
+		    $scope.primer_report_info), // [ [n,info]* ]
+	      function(v) {
+		var n = v[0] + 1;
+		return [[$scope.settings.primerNameHead + '_' + n + '_L',
+			 v[1].left.sequence],
+			[$scope.settings.primerNameHead + '_' + n + '_R',
+			 v[1].right.sequence]];
+		// [[name, seq], [name,seq]]
+	      }),	// [ [[name, seq], [name,seq]]* ]
+	    true),	// [ [name, seq]* ]
+
+	  function(vv) { // [name, seq]
+	    return vv.join($scope.settings.primerReportSeparator);
+	      // "name\tseq" or "name,seq"
+	  }). // [ "name,seq"* ]
+	join('\n');	// "name,seq\nname,seq..."
     };
     $scope.$watch('primer_report_info', updatePrimerOrderContents);
     $scope.$watch('settings.primerNameHead', updatePrimerOrderContents);
