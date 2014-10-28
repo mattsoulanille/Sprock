@@ -148,11 +148,31 @@
 	  <span ng-show="tv.makingPrimers == 'finished'">edit the above, and </span>
 	  copy &amp; paste it into a spreadsheet or file.
 	</p>
-	<!--ul class="list-unstyled seq"-->
-	<!--table class="table table-bordered table-condensed">
-	  <tr>
-	    <td>
-	</table-->
+      </tab>
+      <tab heading="Pieces" ng-show="primer_report_info">
+	<p>
+	  <form>
+	    Primer names start with:
+	    <input ng-model="settings.primerNameHead"></input>
+	    Separate columns with:
+	    <span class="btn-group">
+	      <label class="btn btn-primary"
+		     ng-model="settings.primerReportSeparator"
+		     btn-radio="'\t'">tabs</label>
+	      <label class="btn btn-primary"
+		     ng-model="settings.primerReportSeparator"
+		     btn-radio="','">commas</label>
+	    </span>
+	  </form>
+	</p>
+	<textarea
+	   class="seq"
+	   cols="120"
+	   rows="{{primer_report_info.length + 2}}">{{pieces_report_contents}}</textarea>
+	<p>You can
+	  <span ng-show="tv.makingPrimers == 'finished'">edit the above, and </span>
+	  copy &amp; paste it into a spreadsheet or file.
+	</p>
       </tab>
 <!--      <tab heading="Gene {{gene.name}}" ng-show="gene">
 	  <pre style="text-align: left" ng-show="gene">{{gene | json}}</pre>

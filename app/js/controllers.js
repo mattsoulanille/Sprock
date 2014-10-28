@@ -75,7 +75,7 @@ angular.module('sprock.controllers', []).
       primerNameHead: 'TBS',
       primeButtonClasses: {},
       primeButtonText: 'No Gene!',
-      primerReportSeparator: '\t'
+      primerReportSeparator: ','
     };
 
     // An ngKeyup suited for ng-model-options="{ updateOn: 'blur' }" fields
@@ -192,7 +192,7 @@ angular.module('sprock.controllers', []).
 	$scope.settings.primeButtonText = 'Working...';
       };
       if (newValue == 'finished') {
-	$scope.settings.primeButtonText = 'Done: ' + $scope.settings.primeButtonText;
+	$scope.settings.primeButtonText = 'Done: made ' + countOfGoodPrimers() + ' pairs';
       };
     });
 
@@ -245,29 +245,23 @@ angular.module('sprock.controllers', []).
 
 
     function updatePrimerOrderContents() {
-      $scope.primer_order_contents =
+      var t = _.flatten(
 	_.map(
-	  // Create a list of [name, seq] pairs:
-	  _.flatten(
-	    _.map(
-	      _.zip(_.range($scope.primer_report_info.length),
-		    $scope.primer_report_info), // [ [n,info]* ]
-	      function(v) {
-		var n = v[0] + 1;
-		return [[$scope.settings.primerNameHead + '_' + n + '_L',
-			 v[1].left.sequence],
-			[$scope.settings.primerNameHead + '_' + n + '_R',
-			 v[1].right.sequence]];
-		// [[name, seq], [name,seq]]
-	      }),	// [ [[name, seq], [name,seq]]* ]
-	    true),	// [ [name, seq]* ]
-	  // Make it into a list of "name,seq" or "name\tseq" strings:
-	  function(vv) { // [name, seq]
-	    return vv.join($scope.settings.primerReportSeparator);
-	      // "name\tseq" or "name,seq"
-	  }). // [ "name,seq"* ]
-	// String them all together with newline:
-	join('\n');	// "name,seq\nname,seq..."
+	  _.zip(_.range($scope.primer_report_info.length),
+		$scope.primer_report_info), // [ [n,info]* ]
+	  function(v) {
+	    var n = v[0] + 1;
+	    return [[$scope.settings.primerNameHead + '_' + n + '_L',
+		     v[1].left.sequence],
+		    [$scope.settings.primerNameHead + '_' + n + '_R',
+		     v[1].right.sequence]];
+	    // [[name, seq], [name,seq]]
+	  }),	// [ [[name, seq], [name,seq]]* ]
+	true);  // [ [name, seq]* ]
+      $scope.primer_order_contents =
+	stringifyColumnar([ ['Primer Name', 'Primer Sequence'] ].concat(t),
+//		stringifyColumnar(t,
+			  $scope.settings.primerReportSeparator, '\n');
     };
     $scope.$watch('primer_report_info', updatePrimerOrderContents);
     $scope.$watch('settings.primerNameHead', updatePrimerOrderContents);
@@ -275,6 +269,42 @@ angular.module('sprock.controllers', []).
     $scope.$watch('gene_name', function(newValue, oldValue) {
       $scope.settings.primerNameHead = newValue;
     });
+
+
+    function updatePiecesReportContents() {
+      var t = _.map(
+	_.zip(_.range($scope.primer_report_info.length),
+	      $scope.primer_report_info), // [ [n,info]* ]
+	function(v) {
+	  var n = v[0] + 1;
+	  var scaffold = $scope.prime.scaffold;
+	  var h = $scope.settings.primerNameHead + '_' + n + '_' ;
+	  return [h + 'L', v[1].left.sequence,
+		  h + 'R', v[1].right.sequence,
+		  scaffold, v[1].left.span[0], v[1].right.span[1]];
+	});
+      $scope.pieces_report_contents =
+	stringifyColumnar([ ['Left Name',
+			     'Left Sequence',
+			     'Right Name',
+			     'Right Sequence',
+			     'Scaffold',
+			     'Left Pos',
+			     'Right Pos'] ].concat(t),
+			  $scope.settings.primerReportSeparator, '\n');
+    };
+    $scope.$watch('primer_report_info', updatePiecesReportContents);
+    $scope.$watch('settings.primerNameHead', updatePiecesReportContents);
+    $scope.$watch('settings.primerReportSeparator', updatePiecesReportContents);
+
+
+    function stringifyColumnar(data, columnSeparator, lineSeparator) {
+      columnSeparator = columnSeparator || ',';
+      lineSeparator = lineSeparator || '\n';
+      return _.map(data, function(v) { // [col1, col2, ...]
+	return v.join(columnSeparator);
+      }).join(lineSeparator);
+    };
 
 
     $scope.downloadPrimerOrder = function() {
