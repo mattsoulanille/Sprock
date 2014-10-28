@@ -164,7 +164,6 @@ class primeTestCase(unittest.TestCase):
 
     def setUp(self):
         self.maker = PrimerMaker()
-        self.maker.useSimulatedBindings = True
         self.prime = Prime(minimum_primer_span=800,
                            target_primer_span=2000,
                            maximum_primer_span=4000,
@@ -194,56 +193,6 @@ class primeTestCase(unittest.TestCase):
 
 
     def test0_hot_MakePrimers(self):
-        # The "hot" test is the one currently the focus of development.
-        # Once settled it is moved down the numbered list
-        # IndexError priming SPU_000439
-        s = '{"minimum_primer_span":100,"target_primer_span":2000,"maximum_primer_span":4000,"minimum_overlap":1000,"fuzz":500,"excluded_spans":[[44020,44222],[48383,48647],[49591,49731],[53349,53410],[53845,53909],[54483,54653],[57711,58315]],"primer_windows":[[39020,44020],[44222,48383],[48647,49591],[49731,53349],[53410,53845],[53909,54483],[54653,57711],[58315,64419]],"scaffold":"Scaffold578"}'
-        pd = json.loads(s)
-        scaffold = pd['scaffold']
-#        self.prime.__dict__.update(pd)
-#        self.use_sequence_from_scaffold(scaffold)
-
-        d = fqdb.get_sequence_data_entire_scaffold(scaffold)
-        whole_sequence = d['sequence']
-        whole_quality = d['quality']
-
-        sim_maker = PrimerMaker()
-        sim_maker.useSimulatedBindings = True
-        bind_maker = PrimerMaker()
-        bind_maker.useSimulatedBindings = False
-        simp = Prime(**pd)
-        binp = Prime(**pd)
-        for prime in (simp, binp):
-            prime.whole_sequence = whole_sequence
-            prime.whole_quality = whole_quality
-        sim_maker.config_for(simp) # separate but equal
-        bind_maker.config_for(binp)
-        #self.maker.input_log = open('primer3_core_input.log', 'w')
-        #self.maker.output_log = open('primer3_core_output.log', 'w')
-	#self.maker.err_log = open('primer3_core_err.log', 'w')
-	for sim_ppp, bind_ppp in izip_longest(sim_maker, bind_maker):
-            self.assert_ppp_basics(sim_ppp)
-            self.assert_ppp_basics(bind_ppp)
-            for ppp in (sim_ppp, bind_ppp):
-                for k in set(['',
-                              'primer_product_size_range',
-                              'sequence_template_length',
-                              'sequence_excluded_region',
-                              'primer_explain_flag',
-                              'sequence_primer_pair_ok_region_list',
-                              'sequence_quality_length',
-                              'primer_thermodynamic_parameters_path']) \
-                    | set(filter(lambda k: k.endswith('explain'), ppp.__dict__)):
-                    if hasattr(ppp, k):
-                        #FIXME: some of these should actually appear
-                        del(ppp.__dict__[k])
-                if hasattr(ppp, 'primer_pairs'):
-                    for pp in ppp.primer_pairs:
-                        for k in filter(lambda k: k.endswith('explain'), pp.__dict__):
-                            del(pp.__dict__[k])
-            assert deeplyEqualWithFuzz(sim_ppp, bind_ppp, fuzz=0.1, verbose=True)
-
-    def xtest0_hot_MakePrimers(self):
         # The "hot" test is the one currently the focus of development.
         # Once settled it is moved down the numbered list
         # IndexError priming SPU_000439
@@ -412,6 +361,55 @@ class primeTestCase(unittest.TestCase):
         for ppp in self.maker:
             self.assert_ppp_basics(ppp)
 
+    def test9_MakePrimers(self):
+        # compare simulated bindings results with binding results
+        # I.e. compare the wrapped "primer3_core" subprocess results with the 
+        # cython library results
+        s = '{"minimum_primer_span":100,"target_primer_span":2000,"maximum_primer_span":4000,"minimum_overlap":1000,"fuzz":500,"excluded_spans":[[44020,44222],[48383,48647],[49591,49731],[53349,53410],[53845,53909],[54483,54653],[57711,58315]],"primer_windows":[[39020,44020],[44222,48383],[48647,49591],[49731,53349],[53410,53845],[53909,54483],[54653,57711],[58315,64419]],"scaffold":"Scaffold578"}'
+        pd = json.loads(s)
+        scaffold = pd['scaffold']
+#        self.prime.__dict__.update(pd)
+#        self.use_sequence_from_scaffold(scaffold)
+
+        d = fqdb.get_sequence_data_entire_scaffold(scaffold)
+        whole_sequence = d['sequence']
+        whole_quality = d['quality']
+
+        sim_maker = PrimerMaker()
+        sim_maker.useSimulatedBindings = True
+        bind_maker = PrimerMaker()
+        bind_maker.useSimulatedBindings = False
+        simp = Prime(**pd)
+        binp = Prime(**pd)
+        for prime in (simp, binp):
+            prime.whole_sequence = whole_sequence
+            prime.whole_quality = whole_quality
+        sim_maker.config_for(simp) # separate but equal
+        bind_maker.config_for(binp)
+        #self.maker.input_log = open('primer3_core_input.log', 'w')
+        #self.maker.output_log = open('primer3_core_output.log', 'w')
+	#self.maker.err_log = open('primer3_core_err.log', 'w')
+	for sim_ppp, bind_ppp in izip_longest(sim_maker, bind_maker):
+            self.assert_ppp_basics(sim_ppp)
+            self.assert_ppp_basics(bind_ppp)
+            for ppp in (sim_ppp, bind_ppp):
+                for k in set(['',
+                              'primer_product_size_range',
+                              'sequence_template_length',
+                              'sequence_excluded_region',
+                              'primer_explain_flag',
+                              'sequence_primer_pair_ok_region_list',
+                              'sequence_quality_length',
+                              'primer_thermodynamic_parameters_path']) \
+                    | set(filter(lambda k: k.endswith('explain'), ppp.__dict__)):
+                    if hasattr(ppp, k):
+                        #FIXME: some of these should actually appear
+                        del(ppp.__dict__[k])
+                if hasattr(ppp, 'primer_pairs'):
+                    for pp in ppp.primer_pairs:
+                        for k in filter(lambda k: k.endswith('explain'), pp.__dict__):
+                            del(pp.__dict__[k])
+            assert deeplyEqualWithFuzz(sim_ppp, bind_ppp, fuzz=0.1, verbose=True)
 
 def main():
     unittest.main()

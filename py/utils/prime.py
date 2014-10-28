@@ -116,7 +116,7 @@ class PrimerMaker(object):
         self.seq_args = dict()
         self.global_args = dict()
         self.input_log = self.output_log = self.err_log = None
-        self.useSimulatedBindings = True # overrideable default
+        self.useSimulatedBindings = False # overrideable default
 
     def config_for(self, prime):
         # Do what you need to absorb the particulars
