@@ -74,7 +74,8 @@ angular.module('sprock.controllers', []).
       downloadFileSuffix: '.tsv',
       primerNameHead: 'TBS',
       primeButtonClasses: {},
-      primeButtonText: 'No Gene!'
+      primeButtonText: 'No Gene!',
+      primerReportSeparator: '\t'
     };
 
     // An ngKeyup suited for ng-model-options="{ updateOn: 'blur' }" fields
@@ -161,8 +162,8 @@ angular.module('sprock.controllers', []).
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
 	$scope.pppList.push(v);
-	$scope.settings.primeButtonText = 'made ' +
-	  countOfGoodPrimers() + ' pairs';
+	$scope.settings.primeButtonText = 'Working, made ' +
+	  countOfGoodPrimers() + ' pairs so far';
 
       }, [], $scope.prime).then(function(v) {
 	$scope.pppList_eventually_was = v;
@@ -188,7 +189,7 @@ angular.module('sprock.controllers', []).
       $scope.settings.primeButtonClasses['btn-warning'] = newValue == 'started';
       $scope.settings.primeButtonClasses['btn-success'] = newValue == 'finished';
       if (newValue == 'started') {
-	$scope.settings.primeButtonText = 'making primers';
+	$scope.settings.primeButtonText = 'Working...';
       };
       if (newValue == 'finished') {
 	$scope.settings.primeButtonText = 'Done: ' + $scope.settings.primeButtonText;
@@ -244,23 +245,28 @@ angular.module('sprock.controllers', []).
 
 
     function updatePrimerOrderContents() {
+      var sep = $scope.settings.primerReportSeparator;
       $scope.primer_order_contents =
 	_.map(
 	  _.zip(_.range($scope.primer_report_info.length),
 		$scope.primer_report_info),
 	  function(v) {
+	    var n = v[0] + 1;
 	    return $scope.settings.primerNameHead +
-	      '_' + v[0] +
-	      '_L\t' +
+	      '_' + n +
+	      '_L' +
+	      sep +
 	      v[1].left.sequence + '\n' +
 	      $scope.settings.primerNameHead +
-	      '_' + v[0] +
-	      '_R\t' +
+	      '_' + n +
+	      '_R' +
+	      sep +
 	      v[1].right.sequence
 	  }).join('\n') + '\n';
     };
     $scope.$watch('primer_report_info', updatePrimerOrderContents);
     $scope.$watch('settings.primerNameHead', updatePrimerOrderContents);
+    $scope.$watch('settings.primerReportSeparator', updatePrimerOrderContents);
     $scope.$watch('gene_name', function(newValue, oldValue) {
       $scope.settings.primerNameHead = newValue;
     });

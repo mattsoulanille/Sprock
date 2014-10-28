@@ -112,7 +112,16 @@
 	<p>
 	  <form>
 	    Primer names start with:
-	    <input ng-model="settings.primerNameHead">
+	    <input ng-model="settings.primerNameHead"></input>
+	    Separate columns with:
+	    <span class="btn-group">
+	      <label class="btn btn-primary"
+		     ng-model="settings.primerReportSeparator"
+		     btn-radio="'\t'">tabs</label>
+	      <label class="btn btn-primary"
+		     ng-model="settings.primerReportSeparator"
+		     btn-radio="','">commas</label>
+	    </span>
 	  </form>
 	</p>
 <!--
