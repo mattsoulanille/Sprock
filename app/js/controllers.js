@@ -54,7 +54,7 @@ angular.module('sprock.controllers', []).
 
 }]).
 
-  controller('MyCtrl6', ['_', '$scope', '$log', '$q', '$http', 'getTree', 'getSequence', 'eachFromServer', 'PrimerPairPossibilitiesDB', 'downloadData', function(_, $scope, $log, $q, $http, getTree, getSequence, eachFromServer, PrimerPairPossibilitiesDB, downloadData) {
+  controller('MyCtrl6', ['_', '$scope', '$log', '$q', '$http', 'getTree', 'getSequence', 'eachFromServer', 'PrimerPairPossibilitiesDB', 'downloadData', 'version', function(_, $scope, $log, $q, $http, getTree, getSequence, eachFromServer, PrimerPairPossibilitiesDB, downloadData, version) {
 
     $scope.tv = {
       treeUpdates: 0,
@@ -157,6 +157,8 @@ angular.module('sprock.controllers', []).
     function makePrimers() {
       $scope.tv.makingPrimers = 'started';
       $scope.settings.primeButtonText = 'making...';
+      $scope.primingRunStart = new Date();
+      $scope.primingRunFinish = null;
       $scope.pppList = [];
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
@@ -168,6 +170,7 @@ angular.module('sprock.controllers', []).
       }, [], $scope.prime).then(function(v) {
 	$scope.pppList_eventually_was = v;
 	$scope.tv.makingPrimers = 'finished';
+	$scope.primingRunFinish = new Date();
       });
     };
 
@@ -245,6 +248,9 @@ angular.module('sprock.controllers', []).
 
 
     function updatePrimerOrderContents() {
+      if ($scope.primer_report_info.length == 0) {
+	return;
+      };
       var t = _.flatten(
 	_.map(
 	  _.zip(_.range($scope.primer_report_info.length),
@@ -259,6 +265,7 @@ angular.module('sprock.controllers', []).
 	  }),	// [ [[name, seq], [name,seq]]* ]
 	true);  // [ [name, seq]* ]
       $scope.primer_order_contents =
+	'Sprock v' + version + ' at ' + $scope.primingRunStart.toISOString() + '\n' +
 	stringifyColumnar([ ['Primer Name', 'Primer Sequence'] ].concat(t),
 //		stringifyColumnar(t,
 			  $scope.settings.primerReportSeparator, '\n');
@@ -272,6 +279,9 @@ angular.module('sprock.controllers', []).
 
 
     function updatePiecesReportContents() {
+      if ($scope.primer_report_info.length == 0) {
+	return;
+      };
       var t = _.map(
 	_.zip(_.range($scope.primer_report_info.length),
 	      $scope.primer_report_info), // [ [n,info]* ]
@@ -284,6 +294,7 @@ angular.module('sprock.controllers', []).
 		  scaffold, v[1].left.span[0], v[1].right.span[1]];
 	});
       $scope.pieces_report_contents =
+	'Sprock v' + version + ' at ' + $scope.primingRunStart.toISOString() + '\n' +
 	stringifyColumnar([ ['Left Name',
 			     'Left Sequence',
 			     'Right Name',
