@@ -247,7 +247,7 @@ angular.module('sprock.controllers', []).
     function updatePrimerOrderContents() {
       $scope.primer_order_contents =
 	_.map(
-
+	  // Create a list of [name, seq] pairs:
 	  _.flatten(
 	    _.map(
 	      _.zip(_.range($scope.primer_report_info.length),
@@ -261,11 +261,12 @@ angular.module('sprock.controllers', []).
 		// [[name, seq], [name,seq]]
 	      }),	// [ [[name, seq], [name,seq]]* ]
 	    true),	// [ [name, seq]* ]
-
+	  // Make it into a list of "name,seq" or "name\tseq" strings:
 	  function(vv) { // [name, seq]
 	    return vv.join($scope.settings.primerReportSeparator);
 	      // "name\tseq" or "name,seq"
 	  }). // [ "name,seq"* ]
+	// String them all together with newline:
 	join('\n');	// "name,seq\nname,seq..."
     };
     $scope.$watch('primer_report_info', updatePrimerOrderContents);
