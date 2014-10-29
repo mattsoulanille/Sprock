@@ -150,9 +150,27 @@ angular.module('sprock.controllers', []).
     $scope.$watchCollection('desired_sequence_span', get_sequence);
 
 
+    $scope.makePrimersPromise = $q.when(null);
+    $scope.abortMakingPrimers = false;
+    $scope.makeNewPrimers = false;
     $scope.makePrimers = function() {
-      $scope.makePrimersPromise = makePrimers();
+      $scope.abortMakingPrimers = true;
+      $scope.pleaseMakeNewPrimers = true;
     };
+
+    function abortMaybeRestart() {
+      if ($scope.abortMakingPrimers) {
+	$q.when($scope.makePrimersPromise).then(
+	  function(v) {
+	    $scope.abortMakingPrimers = false;
+	    if ($scope.pleaseMakeNewPrimers) {
+	      $scope.pleaseMakeNewPrimers = false;
+	      $scope.makePrimersPromise = makePrimers();
+	    };
+	  });
+      };
+    };
+    $scope.$watch('abortMakingPrimers', abortMaybeRestart);
 
     function makePrimers() {
       $scope.tv.makingPrimers = 'started';
@@ -163,10 +181,14 @@ angular.module('sprock.controllers', []).
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
-	$scope.pppList.push(v);
-	$scope.settings.primeButtonText = 'Working, made ' +
-	  countOfGoodPrimers() + ' pairs so far';
-
+	if ($scope.abortMakingPrimers) {
+	  return 'abort';
+	} else {
+	  $scope.pppList.push(v);
+	  $scope.settings.primeButtonText = 'Working, made ' +
+	    countOfGoodPrimers() + ' pairs so far';
+	  return '';
+	};
       }, [], $scope.prime).then(function(v) {
 	$scope.pppList_eventually_was = v;
 	$scope.tv.makingPrimers = 'finished';
@@ -182,7 +204,7 @@ angular.module('sprock.controllers', []).
 	      }),
 	      function(memo, v) {
 		return memo + v;
-	      });
+	      }, 0);
       return rv;
     };
 
