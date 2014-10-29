@@ -263,6 +263,29 @@ class DataService(object):
             # FIXME: del the iter?
         return rv
 
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def destroyIterator(self):
+        #curl -s -i -X POST -H "Content-Type: application/json" -d '{"iter":"1408247325_t-Jy0k3lG7y7GmxDgB7lbg"}' 'http://localhost:8082/data/destroyIterator'
+        argd = cherrypy.request.json
+        k = argd['iter']
+        rv = {}
+        try:
+            self.destroyIter(k)
+        except KeyError:
+            raise cherrypy.HTTPError(404, "Iter not found")
+        return {
+            'request': argd,
+            'results': 'Done'
+        }
+
+
+    def destroyIter(self, key):
+        del self.g.iter_things[key]
+        cherrypy.log("deleted iterable %s, %d remain" % (key, len(self.g.iter_things)))
+
+
 
 def serve(g):
     # Set up site-wide config first so we get a log if errors occur.

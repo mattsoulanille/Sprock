@@ -517,6 +517,18 @@ angular.module('sprock.services', ['sprock.utilities']).
 	return s6;
       })).eventually.to.eql([ 'A: one', 'B: two']);
 
+      var s7 = 0
+      expect(eachFromServer('sleepy_range', function(v) {
+	s7 += v;
+	if (v == 3) {
+	  return 'abort';
+	} else {
+	  return '';
+	};
+      }, [1,5]).then(function() {
+	return s7;
+      })).eventually.to.eql(6);
+
     };
   }]).
 
@@ -535,8 +547,18 @@ angular.module('sprock.services', ['sprock.utilities']).
 		  deferred.resolve();
 		  return 0;
 		} else {
-		  fun(data.value);
-		  return 1 + do_next(data.iter || iter);
+		  if (fun(data.value) == 'abort') {
+		    $http.post('/data/destroyIterator', {iter: iter}).
+		      success(function(data) {
+			deferred.resolve();
+		      }).
+		      error(function(data, status) {
+			deferred.reject(status);
+		      });
+		    return 1;
+		  } else {
+		    return 1 + do_next(data.iter || iter);
+		  };
 		}
 	      }).
 	      error(function(data, status) {
