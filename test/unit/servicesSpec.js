@@ -191,6 +191,19 @@ describe('service', function() {
 	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo).toBe("restaurant");
       }));
 
+      it('should drop all correctly', inject(function(PrimerPairPossibilitiesDB) {
+	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
+	PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo = "restaurant";
+	PrimerPairPossibilitiesDB.drop_all();
+	expect(PrimerPairPossibilitiesDB.all_keys()).toEqual([]);
+	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo).not.toBeDefined();
+	expect(PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo).not.toBeDefined();
+      }));
+
+    }); // basic operations
+
+    describe('basic operations', function() {
+
       it('should do several thing right', inject(function(PrimerPairPossibilitiesDB) {
 	PrimerPairPossibilitiesDB.get_by_ppp(ppp_1).foo = "bar";
 	PrimerPairPossibilitiesDB.get_by_ppp(ppp_2).foo = "restaurant";
@@ -202,7 +215,7 @@ describe('service', function() {
 	expect(PrimerPairPossibilitiesDB.get_by_key('ABCDWXYZ').foo).not.toBeDefined();
       }));
 
-    }); // basic operations
+    });
 
   });
 

@@ -75,6 +75,10 @@ angular.module('sprock.services', ['sprock.utilities']).
       };
     };
 
+    function drop_all() {
+      db = {};
+    };
+
     return {
       get_by_ppp: get_by_ppp,
       key_from_ppp: key_from_ppp,
@@ -83,7 +87,8 @@ angular.module('sprock.services', ['sprock.utilities']).
       all: all,
       drop: drop,
       drop_by_ppp: drop_by_ppp,
-      drop_by_key: drop_by_key
+      drop_by_key: drop_by_key,
+      drop_all: drop_all
     };
 
   }]).
