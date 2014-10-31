@@ -289,7 +289,7 @@ class DataService(object):
 
 def serve(g):
     # Set up site-wide config first so we get a log if errors occur.
-    cherrypy.config.update({#'environment': 'production',
+    cherrypy.config.update({'environment': 'production',
                             'log.access_file': 'access.log',
                             'log.error_file': 'errors.log',
                             'log.screen': True})
@@ -319,7 +319,7 @@ def serve(g):
     checkpassword = cherrypy.lib.auth_basic.checkpassword_dict(userpassdict)
 
     app_config = {'/':
-                  {'environment': 'development', # error traces to the browser, etc
+                  {#'environment': 'development', # error traces to the browser, etc
                    'tools.auth_basic.on': False,
                    'tools.auth_basic.realm': 'earth',
                    'tools.auth_basic.checkpassword': checkpassword,
