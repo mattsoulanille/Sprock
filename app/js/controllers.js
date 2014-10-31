@@ -106,7 +106,10 @@ angular.module('sprock.controllers', []).
 	    $scope.gene = null;
 	  });
     };
-    $scope.$watch('gene_name', get_gene);
+    $scope.$watch('gene_name', function() {
+      $scope.abortMakingPrimers = true;
+      get_gene();
+    });
 
     function calc_excluded_spans(gene) {
       var w = _.walk(function(node) {
@@ -127,9 +130,12 @@ angular.module('sprock.controllers', []).
 
 
     function init_desired_sequence_boundaries_from_gene() {
-      if ($scope.gene == undefined) return null;
-      return $scope.desired_sequence_span = [Math.max(0, $scope.gene.span[0] - $scope.margin),
-				      $scope.gene.span[1] + $scope.margin];
+      var rv = null;
+      if ($scope.gene) {
+	rv = [Math.max(0, $scope.gene.span[0] - $scope.margin),
+	      $scope.gene.span[1] + $scope.margin];
+      };
+      return $scope.desired_sequence_span = rv;
     };
     $scope.$watch('gene', init_desired_sequence_boundaries_from_gene);
 

@@ -104,6 +104,9 @@ angular.module('sprock.directives',
 
 
 		   function putSequenceInTree() {
+		     // new sequence so DB contents are obsolete
+		     PrimerPairPossibilitiesDB.drop_all();
+
 		     var si = scope.sequenceInfo;
 		     if (si === undefined) return; // bail if no sequence to install
 		     // set the "seq" wrapper to have the span of the sequence:
@@ -227,14 +230,6 @@ angular.module('sprock.directives',
 		       to.deep.equal(keysNotInPPPList.sort());
 		      */
 
-		     if (0) {	// old way
-		     _.each(keysNotInPPPList, function(key) {
-		       var d = PrimerPairPossibilitiesDB.get_by_key(key);
-		       chai.expect(d).to.include.keys('elements');
-		       _.each(d.elements, unPrime);
-		     });
-		     _.each(keysNotInPPPList, PrimerPairPossibilitiesDB.drop_by_key);
-		     }else{	//new way
 		     _.each(
 		       _.difference(
 			 PrimerPairPossibilitiesDB.all(),
@@ -244,7 +239,6 @@ angular.module('sprock.directives',
 			   _.each(d.elements, unPrime);
 			   PrimerPairPossibilitiesDB.drop(d);
 			 });
-		     };
 
 		     // Ensure each ppp in pppList is or gets put in the DOM
 		     _.each(scope.pppList, function(ppp) {
