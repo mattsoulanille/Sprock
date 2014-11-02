@@ -54,7 +54,7 @@ angular.module('sprock.controllers', []).
 
 }]).
 
-  controller('MyCtrl6', ['_', '$scope', '$log', '$q', '$http', 'getTree', 'getSequence', 'eachFromServer', 'PrimerPairPossibilitiesDB', 'downloadData', 'version', function(_, $scope, $log, $q, $http, getTree, getSequence, eachFromServer, PrimerPairPossibilitiesDB, downloadData, version) {
+  controller('MyCtrl6', ['_', '$scope', '$log', '$q', '$http', 'getTree', 'getSequence', 'eachFromServer', 'PrimerPairPossibilitiesDB', 'downloadData', 'version', 'round', function(_, $scope, $log, $q, $http, getTree, getSequence, eachFromServer, PrimerPairPossibilitiesDB, downloadData, version, round) {
 
     $scope.tv = {
       treeUpdates: 0,
@@ -260,11 +260,13 @@ angular.module('sprock.controllers', []).
 	    return {
 	      left: {
 		sequence: pp.left.sequence,
-		span: pp.left.span
+		span: pp.left.span,
+		tm: pp.left.tm
 	      },
 	      right: {
 		sequence: pp.right.sequence,
-		span: pp.right.span
+		span: pp.right.span,
+		tm: pp.right.tm
 	      }
 	    };
 	  }), function(v) {
@@ -317,16 +319,18 @@ angular.module('sprock.controllers', []).
 	  var n = v[0] + 1;
 	  var scaffold = $scope.prime.scaffold;
 	  var h = $scope.settings.primerNameHead + '_' + n + '_' ;
-	  return [h + 'L', v[1].left.sequence,
-		  h + 'R', v[1].right.sequence,
+	  return [h + 'L', v[1].left.sequence, round(v[1].left.tm,2),
+		  h + 'R', v[1].right.sequence, round(v[1].right.tm,2),
 		  scaffold, v[1].left.span[0], v[1].right.span[1]];
 	});
       $scope.pieces_report_contents =
 	'Sprock v' + version + ' at ' + $scope.primingRunStart.toISOString() + '\n' +
 	stringifyColumnar([ ['Left Name',
 			     'Left Sequence',
+			     'Left Tm',
 			     'Right Name',
 			     'Right Sequence',
+			     'Right Tm',
 			     'Scaffold',
 			     'Left Pos',
 			     'Right Pos'] ].concat(t),
@@ -359,6 +363,7 @@ angular.module('sprock.controllers', []).
 
     $scope.ppp = me.data('ppp');
     $scope.ppIndex = me.data('ppIndex');
+    $scope.round = $injector.get('round');
 
     $scope.selected = {
       original_index: $scope.ppIndex,

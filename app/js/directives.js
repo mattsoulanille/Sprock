@@ -51,7 +51,8 @@ angular.module('sprock.directives',
 	     'compareSpans',
 	     'findLeastElemContainingSpan',
 	     'PrimerPairPossibilitiesDB',
-	     function factory(_, $compile, $modal, $log, compareSpans, findLeastElemContainingSpan, PrimerPairPossibilitiesDB) {
+	     'round',
+	     function factory(_, $compile, $modal, $log, compareSpans, findLeastElemContainingSpan, PrimerPairPossibilitiesDB, round) {
 	       var directiveDefinitionObject = {
 		 //template: '<div></div>', // or // function(tElement, tAttrs) { ... },
 		 //transclude: true,
@@ -262,11 +263,6 @@ angular.module('sprock.directives',
 		     };
 		   };
 
-
-		   function round(floatAmount, reqPrecision) {
-		     return Math.round(floatAmount * Math.pow(10, reqPrecision)) /
-		       Math.pow(10, reqPrecision);
-		   };
 
 		   function putPrimerPairPossibilitiesInTree(ppp, ppIndex) {
 		     var rv = {elements: {}};

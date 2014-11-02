@@ -293,6 +293,19 @@ describe('service', function() {
 
   });
 
+  describe('round', function() {
+    it('should be a function', inject(function(round) {
+      expect(round).toBeFunction();
+    }));
+    it('should round', inject(function(round) {
+      expect(round(3.55, 0)).toBe(4);
+      expect(round(3.499, 0)).toBe(3);
+      expect(round(3.499, 1)).toBe(3.5);
+      expect(round(3141, -2)).toBe(3100);
+    }));
+  });
+
+  // UNUSED
   xdescribe('integrateSequenceEventsToHTML', function() {
     it('should be a function', inject(function(integrateSequenceEventsToHTML) {
       expect(integrateSequenceEventsToHTML).toBeFunction();
@@ -355,6 +368,9 @@ describe('service', function() {
     }));
 
   });
+
+
+
 
   // UNUSED
   xdescribe('differentiateSequenceToEvents', function() {
@@ -502,6 +518,8 @@ describe('service', function() {
 
   });
 
+
+  // UNUSED
   xdescribe('GeneSequenceInfo', function() {
     var gsi, t1, t2, t3;
 

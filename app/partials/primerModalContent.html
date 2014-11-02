@@ -7,7 +7,7 @@
       <span ng-click="selected.index = $index">
 	{{pp.left.start}}
 	<span class="seq primer primer-left" ng-class="{lit: $index == selected.index}">{{pp.left.sequence}}</span>
-	{{pp.left.tm}} {{pp.right.tm}}
+	{{round(pp.left.tm, 2)}} {{round(pp.right.tm, 2)}}
 	<span class="seq primer primer-right" ng-class="{lit: $index == selected.index}">{{pp.right.sequence}}</span>
 	{{pp.right.start}}
       </span>

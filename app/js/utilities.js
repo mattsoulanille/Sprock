@@ -50,6 +50,12 @@ angular.module('sprock.utilities', ['underscore', 'sprock.services']).
     };
   }]).
 
+  factory('round', ['_', function(_) {
+    return function round(floatAmount, reqPrecision) {
+      return Math.round(floatAmount * Math.pow(10, reqPrecision)) /
+	Math.pow(10, reqPrecision);
+    }}]).
+
   factory('MessAround', ['_', function(_) {
 
     function fooey(a, b) {
