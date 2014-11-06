@@ -24,7 +24,9 @@ class FQDB(object):
 
     def get_sequence_data(self, scaffold, start_position, end_position):
         snippedRecord = self.get_seq_object(scaffold, start_position, end_position)
-        return {'sequence': str(snippedRecord.seq), 'quality': snippedRecord.letter_annotations["phred_quality"]}
+        return {'sequence': str(snippedRecord.seq),
+                'quality': snippedRecord.letter_annotations["phred_quality"],
+                'span': [start_position, start_position + len(snippedRecord)]}
     
     def get_sequence_data_entire_scaffold(self, scaffold):
         record = self.get_seq_object_entire_scaffold(scaffold)

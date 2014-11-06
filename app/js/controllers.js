@@ -75,7 +75,8 @@ angular.module('sprock.controllers', []).
       primerNameHead: 'TBS',
       primeButtonClasses: {},
       primeButtonText: 'No Gene!',
-      primerReportSeparator: ','
+      primerReportSeparator: ',',
+      maxSequencePosition: 1000000000
     };
 
     // An ngKeyup suited for ng-model-options="{ updateOn: 'blur' }" fields
@@ -136,6 +137,7 @@ angular.module('sprock.controllers', []).
 	rv = [Math.max(0, $scope.gene.span[0] - $scope.margin),
 	      $scope.gene.span[1] + $scope.margin];
       };
+      $scope.settings.maxSequencePosition = 1000000000; // FIXME: not quite right
       return $scope.desired_sequence_span = rv;
     };
     $scope.$watch('gene', init_desired_sequence_boundaries_from_gene);
@@ -151,6 +153,9 @@ angular.module('sprock.controllers', []).
 	then(function(v) {
 	  $scope.settings.primeButtonText = 'make primers';
 	  $scope.settings.primeButtonClasses = {'btn-primary': true};
+	  if (v.span[1] < want_span[1]) {
+	    $scope.settings.maxSequencePosition = want_span[1] = v.span[1];
+	  };
 	  return $scope.sequence_info = v;
 	});
     };

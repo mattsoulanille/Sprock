@@ -92,9 +92,6 @@ class DataService(object):
         end = int(argd['end'])
         seq_data = self.fqdb.get_sequence_data(scaffold, start, end)
         seq_data['scaffold'] = scaffold
-        seq_data['start'] = start
-        seq_data['end'] = end
-        seq_data['span'] = [start, end]
         return { 'request': argd,
                  'results': seq_data }
 
