@@ -260,7 +260,7 @@ class DataService(object):
             cherrypy.log("Error in next(%s): %s" % (k, e))
             cherrypy.log(format_exc(5))
             raise cherrypy.HTTPError(500, "Something went wrong with iter")
-            # FIXME: del the iter?
+            #del self.g.iter_things[k] # FIXME: do this, or not?
         return rv
 
     @cherrypy.expose

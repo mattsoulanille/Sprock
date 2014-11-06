@@ -150,7 +150,7 @@ angular.module('sprock.controllers', []).
 	getSequence(gene.scaffold, want_span[0], want_span[1]).
 	then(function(v) {
 	  $scope.settings.primeButtonText = 'make primers';
-	  $scope.settings.primeButtonClasses['btn-primary'] = true;
+	  $scope.settings.primeButtonClasses = {'btn-primary': true};
 	  return $scope.sequence_info = v;
 	});
     };
@@ -201,6 +201,11 @@ angular.module('sprock.controllers', []).
 	$scope.pppList_eventually_was = v;
 	$scope.tv.makingPrimers = 'finished';
 	$scope.primingRunFinish = new Date();
+      }, function(why) {
+	$scope.settings.primeButtonText = 'Failed'
+	$scope.settings.primeButtonClasses = {'btn-warning': true};
+	$scope.tv.makingPrimers = 'error';
+	$scope.tv.mpErr = why;
       });
     };
 
@@ -218,9 +223,12 @@ angular.module('sprock.controllers', []).
 
     // Some UI status control
     $scope.$watch('tv.makingPrimers', function(newValue, oldValue) {
-      $scope.settings.primeButtonClasses['btn-primary'] = false;
-      $scope.settings.primeButtonClasses['btn-warning'] = newValue == 'started';
-      $scope.settings.primeButtonClasses['btn-success'] = newValue == 'finished';
+      $scope.settings.primeButtonClasses = {
+	'btn-info': newValue == 'started',
+	'btn-success': newValue == 'finished',
+	'btn-warning': newValue == 'error'
+      };
+
       if (newValue == 'started') {
 	$scope.settings.primeButtonText = 'Working...';
       };
@@ -231,9 +239,7 @@ angular.module('sprock.controllers', []).
 
     $scope.$watch('prime', function() {
       $scope.settings.primeButtonText = 'make primers';
-      $scope.settings.primeButtonClasses['btn-primary'] = true;
-      $scope.settings.primeButtonClasses['btn-warning'] = false;
-      $scope.settings.primeButtonClasses['btn-success'] = false;
+      $scope.settings.primeButtonClasses = {'btn-primary': true};
     });
 
 
