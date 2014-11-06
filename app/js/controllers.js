@@ -184,6 +184,7 @@ angular.module('sprock.controllers', []).
       $scope.primingRunStart = new Date();
       $scope.primingRunFinish = null;
       $scope.pppList = [];
+      PrimerPairPossibilitiesDB.drop_all(); // FIXME: Here?
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
@@ -273,8 +274,8 @@ angular.module('sprock.controllers', []).
 	    return v.left.span[0];
 	  });
     };
-    $scope.$watch('tv.treeUpdates', update_primer_report_info);
-    $scope.$watch('gene_name', update_primer_report_info);
+    $scope.$watchGroup(['tv.treeUpdates',
+			'gene_name'], update_primer_report_info);
 
 
     function updatePrimerOrderContents() {
@@ -300,9 +301,10 @@ angular.module('sprock.controllers', []).
 //		stringifyColumnar(t,
 			  $scope.settings.primerReportSeparator, '\n');
     };
-    $scope.$watch('primer_report_info', updatePrimerOrderContents);
-    $scope.$watch('settings.primerNameHead', updatePrimerOrderContents);
-    $scope.$watch('settings.primerReportSeparator', updatePrimerOrderContents);
+    $scope.$watchGroup(['primer_report_info',
+			'settings.primerNameHead',
+			'settings.primerReportSeparator'],
+		       updatePrimerOrderContents);
     $scope.$watch('gene_name', function(newValue, oldValue) {
       $scope.settings.primerNameHead = newValue;
     });
@@ -336,10 +338,10 @@ angular.module('sprock.controllers', []).
 			     'Right Pos'] ].concat(t),
 			  $scope.settings.primerReportSeparator, '\n');
     };
-    $scope.$watch('primer_report_info', updatePiecesReportContents);
-    $scope.$watch('settings.primerNameHead', updatePiecesReportContents);
-    $scope.$watch('settings.primerReportSeparator', updatePiecesReportContents);
-
+    $scope.$watchGroup(['primer_report_info',
+			'settings.primerNameHead',
+			'settings.primerReportSeparator'],
+		       updatePiecesReportContents);
 
     function stringifyColumnar(data, columnSeparator, lineSeparator) {
       columnSeparator = columnSeparator || ',';
