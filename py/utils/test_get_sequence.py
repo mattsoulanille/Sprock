@@ -14,14 +14,16 @@ class GetSequenceTestCase(unittest.TestCase):
     def testGetSequenceDatq(self):
         seq = self.db.get_sequence_data('Scaffold1', 1, 23)
         assert seq == {'quality': [35, 35, 35, 32, 35, 53, 47, 41, 42, 46, 45, 29, 29, 29, 32, 33, 51, 51, 51, 51, 51, 51],
-                       'sequence': 'ACATTTTATCACCAGTTCGATT'}
+                       'sequence': 'ACATTTTATCACCAGTTCGATT',
+                       'span': [1, 23]}
 
     def testGetSequenceDatq2(self):
         seq = self.db.get_sequence_data('Scaffold1', 2, 34)
         assert seq == {'quality': [35, 35, 32, 35, 53, 47, 41, 42, 46, 45,
                                    29, 29, 29, 32, 33, 51, 51, 51, 51, 51, 51, 46,
                                    46, 46, 46, 40, 40, 40, 44, 44, 39, 32],
-                       'sequence': 'CATTTTATCACCAGTTCGATTTTCCCCTTGTT'}
+                       'sequence': 'CATTTTATCACCAGTTCGATTTTCCCCTTGTT',
+                       'span': [2, 34]}
 
 def main():
     unittest.main()

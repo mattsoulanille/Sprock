@@ -59,7 +59,7 @@ class GetGeneTestCase(unittest.TestCase):
 
 
     def testGetTreeDataByName(self):
-        data = db.get_tree_data_by_name('SPU_022066')
+        data = db.get_tree_data_by_name('SPU_022066', relative_positions=True)
         assert data == {'span': (10480, 18337), 'name': 'SPU_022066', 'scaffold': 'Scaffold694', 'type': 'gene', 'children':
                         [{'span': (0, 7857), 'name': 'Sp-Shmt2_1', 'scaffold': 'Scaffold694', 'type': 'transcript', 'children':
                           [{'span': (0, 33), 'name': 'SPU_022066_3UTR:0"', 'scaffold': 'Scaffold694',
@@ -80,6 +80,68 @@ class GetGeneTestCase(unittest.TestCase):
                             'type': 'exon', 'children': [], 'strand': '-'}],
                           'strand': '-'}],
                         'strand': '-'}
+
+        data = db.get_tree_data_by_name('SPU_022066')
+        assert data == {'children':
+                        [{'children':
+                          [{'children': [],
+                            'name': 'SPU_022066_3UTR:0"',
+                            'scaffold': 'Scaffold694',
+                            'span': (10480, 10513),
+                            'strand': '-',
+                            'type': 'three_prime_UTR'},
+                           {'children': [],
+                            'name': 'SPU_022066:0"',
+                            'scaffold': 'Scaffold694',
+                            'span': (10514, 10683),
+                            'strand': '-',
+                            'type': 'exon'},
+                           {'children': [],
+                            'name': 'SPU_022066:1"',
+                            'scaffold': 'Scaffold694',
+                            'span': (11406, 11633),
+                            'strand': '-',
+                            'type': 'exon'},
+                           {'children': [],
+                            'name': 'SPU_022066:2"',
+                            'scaffold': 'Scaffold694',
+                            'span': (11875, 11997),
+                            'strand': '-',
+                            'type': 'exon'},
+                           {'children': [],
+                            'name': 'SPU_022066:3"',
+                            'scaffold': 'Scaffold694',
+                            'span': (12713, 12826),
+                            'strand': '-',
+                            'type': 'exon'},
+                           {'children': [],
+                            'name': 'SPU_022066:4"',
+                            'scaffold': 'Scaffold694',
+                            'span': (13329, 13541),
+                            'strand': '-',
+                            'type': 'exon'},
+                           {'children': [],
+                            'name': 'SPU_022066:5"',
+                            'scaffold': 'Scaffold694',
+                            'span': (14180, 14538),
+                            'strand': '-',
+                            'type': 'exon'},
+                           {'children': [],
+                            'name': 'SPU_022066:6"',
+                            'scaffold': 'Scaffold694',
+                            'span': (17988, 18337),
+                            'strand': '-',
+                            'type': 'exon'}],
+                          'name': 'Sp-Shmt2_1',
+                          'scaffold': 'Scaffold694',
+                          'span': (10480, 18337),
+                          'strand': '-',
+                          'type': 'transcript'}],
+                        'name': 'SPU_022066',
+                        'scaffold': 'Scaffold694',
+                        'span': (10480, 18337),
+                        'strand': '-',
+                        'type': 'gene'}
 
 def main():
     unittest.main()
