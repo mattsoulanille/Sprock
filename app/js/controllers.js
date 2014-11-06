@@ -108,6 +108,7 @@ angular.module('sprock.controllers', []).
     };
     $scope.$watch('gene_name', function() {
       $scope.abortMakingPrimers = true;
+      PrimerPairPossibilitiesDB.drop_all(); // New name means old primers don't apply
       get_gene();
     });
 
@@ -184,7 +185,7 @@ angular.module('sprock.controllers', []).
       $scope.primingRunStart = new Date();
       $scope.primingRunFinish = null;
       $scope.pppList = [];
-      PrimerPairPossibilitiesDB.drop_all(); // FIXME: Here?
+      PrimerPairPossibilitiesDB.drop_all(); // just to be sure
       calc_primer_windows();
       $scope.prime.scaffold = $scope.gene.scaffold;
       return eachFromServer('primers', function(v) {
