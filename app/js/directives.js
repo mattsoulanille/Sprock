@@ -289,6 +289,7 @@ angular.module('sprock.directives',
 			   e.attr('ng-mouseleave', switchName + '=false');
 			   e.attr('tooltip', pair_span + ' ' + pair_tm +
 				 ' ' + primer.sequence);
+			   e.attr('tooltip-placement', 'top');
 			   e.data('ppp', ppp);
 			   e.data('ppIndex', ppIndex);
 			   e.attr('ng-click',

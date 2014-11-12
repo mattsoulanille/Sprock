@@ -79,6 +79,17 @@ angular.module('sprock.controllers', []).
       maxSequencePosition: 1000000000
     };
 
+    // A polyfill hack for compatibility with angular1.2
+    // no guarantee of correctness
+    if (angular.version.major == 1 &&
+	angular.version.minor <=26) {
+      $scope.$watchGroup = function(watchExpressions, listener) {
+	//var name = _.uniqueId('polyfill_watchGroup_');
+	_.each(watchExpressions, function(ex) { $scope.$watch(ex, listener) });
+      };
+    };
+
+
     // An ngKeyup suited for ng-model-options="{ updateOn: 'blur' }" fields
     $scope.cancelFormChanges = function (e, formName) {
       if (e.keyCode == 27) {
